@@ -9,14 +9,81 @@ public class Level {
 	private float robotSpeed;
 	private float pointsPerRobotKilled;
 	private float pointsPerOpponentKilled;
-	/**
-	 * -	Empty
-	 * W	Wall
-	 * O	Obstacle
-	 * R	Robot
-	 * 1-3	Players
-	 */
-	private char[] gridLayout;
+	
+	public String getLevelName() {
+		return levelName;
+	}
+
+	public void setLevelName(String levelName) {
+		this.levelName = levelName;
+	}
+
+	public float getGameDuration() {
+		return gameDuration;
+	}
+
+	public void setGameDuration(float gameDuration) {
+		this.gameDuration = gameDuration;
+	}
+
+	public float getExplosionTimeout() {
+		return explosionTimeout;
+	}
+
+	public void setExplosionTimeout(float explosionTimeout) {
+		this.explosionTimeout = explosionTimeout;
+	}
+
+	public float getExplosionDuration() {
+		return explosionDuration;
+	}
+
+	public void setExplosionDuration(float explosionDuration) {
+		this.explosionDuration = explosionDuration;
+	}
+
+	public float getExplosionRange() {
+		return explosionRange;
+	}
+
+	public void setExplosionRange(float explosionRange) {
+		this.explosionRange = explosionRange;
+	}
+
+	public float getRobotSpeed() {
+		return robotSpeed;
+	}
+
+	public void setRobotSpeed(float robotSpeed) {
+		this.robotSpeed = robotSpeed;
+	}
+
+	public float getPointsPerRobotKilled() {
+		return pointsPerRobotKilled;
+	}
+
+	public void setPointsPerRobotKilled(float pointsPerRobotKilled) {
+		this.pointsPerRobotKilled = pointsPerRobotKilled;
+	}
+
+	public float getPointsPerOpponentKilled() {
+		return pointsPerOpponentKilled;
+	}
+
+	public void setPointsPerOpponentKilled(float pointsPerOpponentKilled) {
+		this.pointsPerOpponentKilled = pointsPerOpponentKilled;
+	}
+
+	public LevelGrid getGrid() {
+		return grid;
+	}
+
+	public void setGrid(LevelGrid grid) {
+		this.grid = grid;
+	}
+
+	private LevelGrid grid = new LevelGrid();
+
 	/**
 	 * @param levelName
 	 * @param gameDuration
@@ -31,7 +98,7 @@ public class Level {
 	public Level(String levelName, float gameDuration, float explosionTimeout,
 			float explosionDuration, float explosionRange, float robotSpeed,
 			float pointsPerRobotKilled, float pointsPerOpponentKilled,
-			char[] gridLayout) {
+			char[] gridLayout, int rowSize) {
 		super();
 		this.levelName = levelName;
 		this.gameDuration = gameDuration;
@@ -41,27 +108,24 @@ public class Level {
 		this.robotSpeed = robotSpeed;
 		this.pointsPerRobotKilled = pointsPerRobotKilled;
 		this.pointsPerOpponentKilled = pointsPerOpponentKilled;
-		this.gridLayout = gridLayout;
+		this.grid.setGridLayout(gridLayout, rowSize);
 	}
+
 	/**
 	 * To test.
 	 */
 	public Level() {
 		super();
 		this.levelName = "defaultLevelName";
-		this.gameDuration = 180000; //three minutes?
+		this.gameDuration = 180000; // three minutes?
 		this.explosionTimeout = 1500;
 		this.explosionDuration = 1000;
 		this.explosionRange = 1;
-		this.robotSpeed = 1; //1 cell per second
+		this.robotSpeed = 1; // 1 cell per second
 		this.pointsPerRobotKilled = 1;
 		this.pointsPerOpponentKilled = 2;
-		this.gridLayout = new char[] {
-			'W','W','W','W','W','W','W',
-			'W','-','-','-','-','-','W',
-			'W','W','W','W','W','W','W'
-		};
+		this.grid.setGridLayout(new char[] { 'W', 'W', 'W', 'W', 'W', 'W', 'W',
+				'W', '-', '-', '-', '-', '-', 'W', 'W', 'W', 'W', 'W', 'W',
+				'W', 'W' }, 7);
 	}
-	
-	
 }
