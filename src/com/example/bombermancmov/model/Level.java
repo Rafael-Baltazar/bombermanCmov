@@ -1,8 +1,12 @@
 package com.example.bombermancmov.model;
 
 import com.example.bombermancmov.R;
+
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
 import android.view.SurfaceView;
 
 public class Level {
@@ -16,6 +20,8 @@ public class Level {
 	private float pointsPerOpponentKilled;
 	
 	private SurfaceView surfaceHolder;
+	
+	private LevelGrid grid = new LevelGrid();
 	
 	public String getLevelName() {
 		return levelName;
@@ -89,8 +95,6 @@ public class Level {
 		this.grid = grid;
 	}
 
-	private LevelGrid grid = new LevelGrid();
-
 	/**
 	 * @param levelName
 	 * @param gameDuration
@@ -105,7 +109,7 @@ public class Level {
 	public Level(String levelName, float gameDuration, float explosionTimeout,
 			float explosionDuration, float explosionRange, float robotSpeed,
 			float pointsPerRobotKilled, float pointsPerOpponentKilled,
-			char[] gridLayout, int rowSize, SurfaceView surfaceHolder) {
+			char[][] gridLayout, int rowSize, int collSize, SurfaceView surfaceHolder) {
 		super();
 		this.levelName = levelName;
 		this.gameDuration = gameDuration;
@@ -115,14 +119,14 @@ public class Level {
 		this.robotSpeed = robotSpeed;
 		this.pointsPerRobotKilled = pointsPerRobotKilled;
 		this.pointsPerOpponentKilled = pointsPerOpponentKilled;
-		this.grid.setGridLayout(gridLayout, rowSize);
+		this.grid.setGridLayout(gridLayout, rowSize, collSize);
 		this.surfaceHolder = surfaceHolder;
 	}
 
 	/**
 	 * To test.
 	 */
-	public Level() {
+	public Level(SurfaceView surfaceHolder) {
 		super();
 		this.levelName = "defaultLevelName";
 		this.gameDuration = 180000; // three minutes?
@@ -132,15 +136,48 @@ public class Level {
 		this.robotSpeed = 1; // 1 cell per second
 		this.pointsPerRobotKilled = 1;
 		this.pointsPerOpponentKilled = 2;
-		this.grid.setGridLayout(new char[] { 'W', 'W', 'W', 'W', 'W', 'W', 'W',
-				'W', '-', '-', '-', '-', '-', 'W', 'W', 'W', 'W', 'W', 'W',
-				'W', 'W' }, 7);
+		this.grid.setGridLayout(new char[][] {{'W', 'W', 'W', 'W', 'W', 'W', 'W'},
+											  {'W', '-', '-', '-', '-', '-', 'W'},
+											  {'W', '-', 'W', '-', 'W', '-', 'W'},
+											  {'W', '-', '-', '-', '-', '-', 'W'},
+											  {'W', '-', 'W', '-', 'W', '-', 'W'},
+											  {'W', 'W', 'W', '-', 'W', 'W', 'W'},
+											  {'W', '-', '-', '-', '-', '-', 'W'},
+											  {'W', '-', '-', '-', '-', '-', 'W'},
+											  {'W', '-', '-', '-', '-', '-', 'W'},
+											  {'W', 'W', 'W', 'W', 'W', 'W', 'W'}}, 7, 10);
+		this.surfaceHolder = surfaceHolder;
 	}
 	
 	public void draw(Canvas canvas){
-		//for each GirdPosition - Create object and draw it.
+		int rowNum, collNum;
+		Bitmap wallBitMap = BitmapFactory.decodeResource(surfaceHolder.getResources(), R.drawable.wall_1);
+		Bitmap droidBitmap = BitmapFactory.decodeResource(surfaceHolder.getResources(), R.drawable.droid_1);
 		
-		GameObject wall1 = new GameObject(BitmapFactory.decodeResource(surfaceHolder.getResources(), R.drawable.droid_1), 10, 10);
-		wall1.draw(canvas);
+		int newWight = surfaceHolder.getWidth() / grid.getRowSize();
+		int newHeight = surfaceHolder.getHeight() / grid.getCollSize();
+		
+		canvas.drawColor(Color.WHITE);
+		
+		for(rowNum = 0; rowNum < grid.getRowSize(); ++rowNum){
+			for(collNum = 0; collNum < grid.getCollSize(); ++collNum){
+				switch(grid.getGridCell(collNum, rowNum)){
+					case 'W': 
+					{
+						canvas.drawBitmap(Bitmap.createScaledBitmap(wallBitMap, newWight, newHeight, false), rowNum*newWight, collNum*newHeight , null);
+						break;
+					}
+					case 'R':
+					{
+						canvas.drawBitmap(droidBitmap,rowNum*droidBitmap.getWidth(), collNum*droidBitmap.getHeight(), null);
+						break;
+					}
+					default :
+					{
+						break;
+					}
+				}
+			}	
+		}
 	}
 }

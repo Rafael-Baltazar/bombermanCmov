@@ -9,30 +9,37 @@ public class LevelGrid {
 	/**
 	 * 1-3 Players
 	 */
-	private char[] gridLayout;
+	private char[][] gridLayout;
 	private int rowSize;
+	private int collSize;
 
 	public LevelGrid() {
 	}
 
-	public char[] getGridLayout() {
+	public char[][] getGridLayout() {
 		return gridLayout;
 	}
 
 	public int getRowSize() {
 		return rowSize;
 	}
+	
+	public int getCollSize(){
+		return collSize;
+	}
 
-	public void setGridLayout(char[] gridLayout, int rowSize) {
+	public void setGridLayout(char[][] gridLayout, int rowSize, int collSize) {
 		this.gridLayout = gridLayout;
 		this.rowSize = rowSize;
+		this.collSize = collSize;
 	}
 
 	public char getGridCell(int x, int y) {
-		return gridLayout[x + y * rowSize];
+		return gridLayout[x][y];
 	}
 
 	public void setGridCell(int x, int y, char c) {
-		gridLayout[x + y * rowSize] = c;
+		gridLayout[x][y] = c;
 	}
+	
 }
