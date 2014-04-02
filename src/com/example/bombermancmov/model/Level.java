@@ -1,5 +1,10 @@
 package com.example.bombermancmov.model;
 
+import com.example.bombermancmov.R;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.view.SurfaceView;
+
 public class Level {
 	private String levelName;
 	private float gameDuration;
@@ -9,6 +14,8 @@ public class Level {
 	private float robotSpeed;
 	private float pointsPerRobotKilled;
 	private float pointsPerOpponentKilled;
+	
+	private SurfaceView surfaceHolder;
 	
 	public String getLevelName() {
 		return levelName;
@@ -98,7 +105,7 @@ public class Level {
 	public Level(String levelName, float gameDuration, float explosionTimeout,
 			float explosionDuration, float explosionRange, float robotSpeed,
 			float pointsPerRobotKilled, float pointsPerOpponentKilled,
-			char[] gridLayout, int rowSize) {
+			char[] gridLayout, int rowSize, SurfaceView surfaceHolder) {
 		super();
 		this.levelName = levelName;
 		this.gameDuration = gameDuration;
@@ -109,6 +116,7 @@ public class Level {
 		this.pointsPerRobotKilled = pointsPerRobotKilled;
 		this.pointsPerOpponentKilled = pointsPerOpponentKilled;
 		this.grid.setGridLayout(gridLayout, rowSize);
+		this.surfaceHolder = surfaceHolder;
 	}
 
 	/**
@@ -127,5 +135,10 @@ public class Level {
 		this.grid.setGridLayout(new char[] { 'W', 'W', 'W', 'W', 'W', 'W', 'W',
 				'W', '-', '-', '-', '-', '-', 'W', 'W', 'W', 'W', 'W', 'W',
 				'W', 'W' }, 7);
+	}
+	
+	public void draw(Canvas canvas){
+		GameObject wall_1 = new GameObject(BitmapFactory.decodeResource(surfaceHolder.getResources(), R.drawable.droid_1), 50, 50);
+		
 	}
 }

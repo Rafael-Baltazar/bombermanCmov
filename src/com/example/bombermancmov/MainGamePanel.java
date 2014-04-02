@@ -3,6 +3,8 @@
  */
 package com.example.bombermancmov;
 
+import com.example.bombermancmov.model.Level;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.BitmapFactory;
@@ -24,6 +26,8 @@ public class MainGamePanel extends SurfaceView implements
 	private static final String TAG = MainGamePanel.class.getSimpleName();
 	
 	private MainThread thread;
+	private Level level;
+	
 
 	public MainGamePanel(Context context) {
 		super(context);
