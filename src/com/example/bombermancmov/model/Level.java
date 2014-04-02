@@ -138,7 +138,9 @@ public class Level {
 	}
 	
 	public void draw(Canvas canvas){
-		GameObject wall_1 = new GameObject(BitmapFactory.decodeResource(surfaceHolder.getResources(), R.drawable.droid_1), 50, 50);
+		//for each GirdPosition - Create object and draw it.
 		
+		GameObject wall1 = new GameObject(BitmapFactory.decodeResource(surfaceHolder.getResources(), R.drawable.droid_1), 10, 10);
+		wall1.draw(canvas);
 	}
 }

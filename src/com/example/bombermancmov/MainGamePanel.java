@@ -34,7 +34,9 @@ public class MainGamePanel extends SurfaceView implements
 		// adding the callback (this) to the surface holder to intercept events
 		getHolder().addCallback(this);
 
-		// create droid and load bitmap
+		// create level
+		
+		level = new Level("", 1, 1, 1, 1, 1, 1, 1, null, 10, this);
 		
 		// create the game loop thread
 		thread = new MainThread(getHolder(), this);
@@ -82,6 +84,7 @@ public class MainGamePanel extends SurfaceView implements
 	protected void onDraw(Canvas canvas) {
 		// fills the canvas with black
 		canvas.drawColor(Color.GREEN);
+		level.draw(canvas);
 	}
 
 }
