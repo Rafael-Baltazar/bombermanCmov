@@ -4,6 +4,7 @@
 package com.example.bombermancmov;
 
 import com.example.bombermancmov.model.Level;
+import com.example.bombermancmov.model.Character;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -27,6 +29,7 @@ public class MainGamePanel extends SurfaceView implements
 	
 	private MainThread thread;
 	private Level level;
+	private Character player;
 	
 
 	public MainGamePanel(Context context) {
@@ -35,8 +38,11 @@ public class MainGamePanel extends SurfaceView implements
 		getHolder().addCallback(this);
 
 		// create level
-		
 		level = new Level(this);
+		
+		//create player
+		player = new Character(1.0f, 1.0f, 1.0f, level.getGrid(), this);
+		
 		
 		// create the game loop thread
 		thread = new MainThread(getHolder(), this);
@@ -79,12 +85,29 @@ public class MainGamePanel extends SurfaceView implements
 	public boolean onTouchEvent(MotionEvent event) {
 		return true;
 	}
+	
+	
+	
+	
+	
+	
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		
+		int keyaction = event.getAction();
+		
+		if(keyaction == KeyEvent.ACTION_DOWN){
+			player.moveDown();
+		}
+		
+		return super.dispatchKeyEvent(event);
+	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		// fills the canvas with black
-		canvas.drawColor(Color.GREEN);
 		level.draw(canvas);
+		player.draw(canvas);
 	}
 
 }
