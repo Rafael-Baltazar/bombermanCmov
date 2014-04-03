@@ -8,7 +8,7 @@ import android.graphics.Canvas;
 import android.view.SurfaceView;
 
 public class Character extends GameObject {
-	private float speed = 0.0f;
+	private float speed = 0.3f;
 	private LevelGrid level;
 	private Bitmap[] bitmaps;
 	private SurfaceView surfaceHolder;
@@ -60,22 +60,22 @@ public class Character extends GameObject {
 	
 	public boolean moveDown(){
 		activeSprite = FRONT;
-		return move(getX(), getY()-1);
+		return move(getX(), getY()+speed);
 	}
 	
 	public boolean moveUp(){
 		activeSprite = BACK;
-		return move(getX(), getY()+1);
+		return move(getX(), getY()-speed);
 	}
 	
 	public boolean moveLeft(){
 		activeSprite = LEFT;
-		return move(getX()-1, getY());
+		return move(getX()-speed, getY());
 	}
 	
 	public boolean moveRight(){
 		activeSprite = RIGHT;
-		return move(getX()+1, getY());
+		return move(getX()+speed, getY());
 	}
 
 	/**
@@ -99,12 +99,14 @@ public class Character extends GameObject {
 	}
 	
 	public void draw(Canvas canvas){
-		
-		Bitmap wallBitMap = bitmaps[activeSprite];
-		
-		int newWight = surfaceHolder.getWidth() / level.getRowSize();
-		int newHeight = surfaceHolder.getHeight() / level.getCollSize();
-		
-		canvas.drawBitmap(Bitmap.createScaledBitmap(wallBitMap, newWight, newHeight, false), getX()*newWight, getY()*newHeight , null);
+		Bitmap activeBitMap = bitmaps[activeSprite];
+		canvas.drawBitmap(activeBitMap, getX()*10, getY()*10, null);
+	}
+	
+	public void scale(int newWidth, int newHeight) {
+		bitmaps[FRONT] =  Bitmap.createScaledBitmap(bitmaps[FRONT], newWidth, newHeight, false);
+		bitmaps[LEFT] =  Bitmap.createScaledBitmap(bitmaps[LEFT], newWidth, newHeight, false);
+		bitmaps[RIGHT] =  Bitmap.createScaledBitmap(bitmaps[RIGHT], newWidth, newHeight, false);
+		bitmaps[BACK] =  Bitmap.createScaledBitmap(bitmaps[BACK], newWidth, newHeight, false);
 	}
 }

@@ -41,7 +41,7 @@ public class MainGamePanel extends SurfaceView implements
 		level = new Level(this);
 		
 		//create player
-		player = new Character(1.0f, 1.0f, 1.0f, level.getGrid(), this);
+		player = new Character(1.0f, 1.0f, 0.25f, level.getGrid(), this);
 		
 		
 		// create the game loop thread
@@ -54,6 +54,7 @@ public class MainGamePanel extends SurfaceView implements
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
+		player.scale(width, height);
 	}
 
 	@Override
@@ -62,6 +63,9 @@ public class MainGamePanel extends SurfaceView implements
 		// we can safely start the game loop
 		thread.setRunning(true);
 		thread.start();
+		int newWidth = this.getWidth() / level.getGrid().getRowSize();
+		int newHeigth = this.getHeight() / level.getGrid().getCollSize();
+		player.scale(newWidth, newHeigth);
 	}
 
 	@Override
@@ -86,21 +90,37 @@ public class MainGamePanel extends SurfaceView implements
 		return true;
 	}
 	
-	
-	
-	
-	
-	
 	@Override
-	public boolean dispatchKeyEvent(KeyEvent event) {
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		int keyaction = event.getKeyCode();
 		
-		int keyaction = event.getAction();
-		
-		if(keyaction == KeyEvent.ACTION_DOWN){
-			player.moveDown();
+		switch(keyaction) {
+		case KeyEvent.KEYCODE_W:
+		case KeyEvent.KEYCODE_DPAD_UP:
+			if(player.moveUp())
+				Log.d("KEY_DOWN", "Moved Up");
+			else Log.d("KEY_DOWN", "Collided moving up");
+			break;
+		case KeyEvent.KEYCODE_S:
+		case KeyEvent.KEYCODE_DPAD_DOWN:
+			if(player.moveDown())
+				Log.d("KEY_DOWN", "Moved Down");
+			else Log.d("KEY_DOWN", "Collided moving down");
+			break;
+		case KeyEvent.KEYCODE_A:
+		case KeyEvent.KEYCODE_DPAD_LEFT:
+			if(player.moveLeft())
+				Log.d("KEY_DOWN", "Moved Left");
+			else Log.d("KEY_DOWN", "Collided moving left");
+			break;
+		case KeyEvent.KEYCODE_D:
+		case KeyEvent.KEYCODE_DPAD_RIGHT:
+			if(player.moveRight())
+				Log.d("KEY_DOWN", "Moved Right");
+			else Log.d("KEY_DOWN", "Collided moving right");
+			break;
 		}
-		
-		return super.dispatchKeyEvent(event);
+		return super.onKeyDown(keyCode, event);
 	}
 
 	@Override
