@@ -28,11 +28,7 @@ public class BomberActivity extends ActionBarActivity {
         setContentView(new MainGamePanel(this));
         Log.d(TAG, "View added");
 		
-		
-		/*
-		setContentView(R.layout.activity_main);
-
-		if (savedInstanceState == null) {
+		/*if (savedInstanceState == null) {
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.container, new PlaceholderFragment()).commit();
 		}*/
@@ -40,7 +36,6 @@ public class BomberActivity extends ActionBarActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
