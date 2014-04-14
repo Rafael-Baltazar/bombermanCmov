@@ -21,12 +21,12 @@ public class MainGamePanel extends SurfaceView implements
 
 	private static final String TAG = MainGamePanel.class.getSimpleName();
 
-	private MainThread thread;
+	private GameLoopThread thread;
 	private SurfaceHolder surfaceHolder = getHolder();
 
 	/* Game model */
 	private Level level;
-	private Character player;
+	private Character player, droids[];
 
 	public MainGamePanel(Context context) {
 		super(context);
@@ -38,9 +38,12 @@ public class MainGamePanel extends SurfaceView implements
 
 		// create player
 		player = new Character(1.0f, 1.0f, 0.25f, level.getGrid(), this);
+		
+		//create the enemy droids
+		droids = new Character[] { new Character(1.0f, 2.0f, 0.25f, level.getGrid(), this) };
 
 		// create the game loop thread
-		thread = new MainThread(surfaceHolder, this);
+		thread = new GameLoopThread(surfaceHolder, this);
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
@@ -54,6 +57,7 @@ public class MainGamePanel extends SurfaceView implements
 		Log.d(TAG, "Surface changed");
 		level.scale();
 		player.scale();
+		droids[0].scale();
 
 		thread.run();
 	}
@@ -65,6 +69,7 @@ public class MainGamePanel extends SurfaceView implements
 
 		level.scale();
 		player.scale();
+		droids[0].scale();
 
 		thread.run();
 	}
@@ -138,6 +143,7 @@ public class MainGamePanel extends SurfaceView implements
 		canvas.drawColor(Color.WHITE);
 		level.draw(canvas);
 		player.draw(canvas);
+		droids[0].draw(canvas);
 	}
 
 }

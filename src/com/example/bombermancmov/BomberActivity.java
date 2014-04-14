@@ -14,7 +14,7 @@ import android.view.WindowManager;
 
 public class BomberActivity extends ActionBarActivity {
 	
-	private static final String TAG = MainThread.class.getSimpleName();
+	private static final String TAG = GameLoopThread.class.getSimpleName();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
