@@ -38,16 +38,17 @@ public class MainGamePanel extends SurfaceView implements
 
 		// create player
 		player = new Character(1.0f, 1.0f, 0.25f, level.getGrid(), this);
-		
-		//create the enemy droids
-		droids = new Character[] { new Character(1.0f, 2.0f, 0.25f, level.getGrid(), this) };
+
+		// create the enemy droids
+		droids = new Character[] { new Character(1.0f, 2.0f, 0.25f,
+				level.getGrid(), this) };
 
 		// create the game loop thread
 		thread = new GameLoopThread(surfaceHolder, this);
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
-		
+
 		Log.d(TAG, "constructor");
 	}
 
@@ -92,7 +93,53 @@ public class MainGamePanel extends SurfaceView implements
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		return true;
+		int motionAction = event.getActionMasked();
+		boolean isTouch = motionAction == MotionEvent.ACTION_DOWN;
+		if (isTouch) {
+			int pointerIndex = event.getActionIndex();
+			float pointerX = event.getX(pointerIndex);
+			float pointerY = event.getY(pointerIndex);
+			Log.d(TAG, "X: " + pointerX + " Y: " + pointerY);
+			// Translate the origin (0,0) to the middle of the 
+			// surface
+			//TODO: Are the values given by getX and getY absolute 
+			// in screen or surface?
+			float surfaceWidth = this.getWidth();
+			float surfaceHeight = this.getHeight();
+			pointerX -= surfaceWidth/2;
+			pointerY -= surfaceHeight/2;
+			float slope = surfaceHeight/surfaceWidth;
+			// Scale the coordinates, so y is negative in the 
+			// lower part of the screen and positive in the 
+			// upper part
+			pointerY *= -1;
+			// Use simple linear functions (f(x) = y = x 
+			// and f(x) = y = -x) to divide the view in four 
+			// parts and then determine where to move the player
+			boolean upperLeftTriangle = pointerY > slope * pointerX;
+			boolean upperRightTriangle = pointerY > -slope * pointerX;
+			boolean leftTriangle = upperLeftTriangle && !upperRightTriangle;
+			boolean rightTriangle = upperRightTriangle && !upperLeftTriangle;
+			if(upperLeftTriangle) {
+				if(leftTriangle) {
+					Log.d(TAG, "leftTriangle");
+					player.moveLeft();
+				} else {
+					Log.d(TAG, "upperTriangle");
+					player.moveUp();
+				}
+			} else {
+				if(rightTriangle) {
+					Log.d(TAG, "rightTriangle");
+					player.moveRight();
+				} else {
+					Log.d(TAG, "downTriangle");
+					player.moveDown();
+				}
+			}
+			thread.run();
+		}
+		return isTouch;
 	}
 
 	@Override
@@ -143,7 +190,10 @@ public class MainGamePanel extends SurfaceView implements
 		canvas.drawColor(Color.WHITE);
 		level.draw(canvas);
 		player.draw(canvas);
-		droids[0].draw(canvas);
+		int numDroids = droids.length;
+		for (int i = 0; i < numDroids; i++) {
+			droids[i].draw(canvas);
+		}
 	}
 
 }
