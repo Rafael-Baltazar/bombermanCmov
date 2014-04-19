@@ -29,7 +29,10 @@ public class Level {
 	public void setGrid(LevelGrid grid) {
 		this.grid = grid;
 	}
-
+	public Bitmap getWallBitMap() {
+		return wallBitMap;
+	}
+	
 	/**
 	 * To test.
 	 */
@@ -77,4 +80,5 @@ public class Level {
 		Log.d("SCALE", "Scaled Level width: " + newWidth + " real: " + wallBitMap.getWidth() + 
 				" Scaled Level height: " + newHeight + " real: " + wallBitMap.getHeight());
 	}
+	
 }

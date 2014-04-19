@@ -25,6 +25,9 @@ public class GameLoopThread extends Thread {
 	// duration of a frame (in milliseconds)
 	private long frameDuration = 100;
 
+	// max frame skip
+	private int maxFrameSkip = 1;
+
 	public void setRunning(boolean running) {
 		this.running = running;
 	}
@@ -42,6 +45,7 @@ public class GameLoopThread extends Thread {
 	 */
 	@Override
 	public void run() {
+		int framesSkipped = 0;
 		while (running) {
 			long beginTime = System.currentTimeMillis();
 			// draw step
@@ -54,7 +58,9 @@ public class GameLoopThread extends Thread {
 					// update game state
 					// render state to the screen
 					// draws the canvas on the panel
-					this.gamePanel.drawGameModel(canvas);
+					if (canvas != null) {
+						this.gamePanel.drawGameModel(canvas);
+					}
 				}
 			} finally {
 				// the surface is not left in an inconsistent state
@@ -62,8 +68,8 @@ public class GameLoopThread extends Thread {
 					surfaceHolder.unlockCanvasAndPost(canvas);
 				}
 			}
-			// To get the constant frame rate of frameDuration, get the time
-			// spent drawing and sleep for the remainder.
+			// To get constant frame rate, get the time spent 
+			// drawing and sleep for the remainder.
 			long timeSpent = System.currentTimeMillis() - beginTime;
 			try {
 				// sleep to get constant frame rate

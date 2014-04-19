@@ -59,7 +59,10 @@ public class MainGamePanel extends SurfaceView implements
 		Log.d(TAG, "Surface changed");
 		level.scale();
 		player.scale();
-		droids[0].scale();
+		int numDroids = droids.length;
+		for (int i = 0; i < numDroids; i++) {
+			droids[i].scale();
+		}
 	}
 
 	@Override
@@ -69,8 +72,10 @@ public class MainGamePanel extends SurfaceView implements
 
 		level.scale();
 		player.scale();
-		droids[0].scale();
-
+		int numDroids = droids.length;
+		for (int i = 0; i < numDroids; i++) {
+			droids[i].scale();
+		}
 		thread.start();
 	}
 
@@ -98,16 +103,19 @@ public class MainGamePanel extends SurfaceView implements
 			int pointerIndex = event.getActionIndex();
 			float pointerX = event.getX(pointerIndex);
 			float pointerY = event.getY(pointerIndex);
-			Log.d(TAG, "X: " + pointerX + " Y: " + pointerY);
-			// Translate the origin (0,0) to the middle of the
-			// surface
+			Log.d(TAG, "poiX: " + pointerX + " poiY: " + pointerY);
+			// Translate the origin (0,0) to the middle of the 
+			// player's sprite
 			// TODO: Are the values given by getX and getY absolute
 			// in screen or surface?
-			float surfaceWidth = this.getWidth();
-			float surfaceHeight = this.getHeight();
-			pointerX -= surfaceWidth / 2;
-			pointerY -= surfaceHeight / 2;
-			float slope = surfaceHeight / surfaceWidth;
+			float bitmapWidth = level.getWallBitMap().getWidth();
+			float bitmapHeight = level.getWallBitMap().getHeight();
+			float playerX = player.getX() * bitmapWidth + (bitmapWidth / 2);
+			float playerY = player.getY() * bitmapHeight + (bitmapHeight / 2);
+			Log.d(TAG, "plaX: " + playerX + " plaY: " + playerY);
+			pointerX -= playerX;
+			pointerY -= playerY;
+			float slope = playerY / playerX;
 			// Scale the coordinates, so y is negative in the
 			// lower part of the screen and positive in the
 			// upper part
