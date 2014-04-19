@@ -38,7 +38,6 @@ public class GameLoopThread extends Thread {
 	public void run() {
 		if (!running)
 			return;
-
 		Canvas canvas = null;
 		Log.d(TAG, "Drawing canvas on GamePanel");
 		// try locking the canvas for exclusive pixel editing

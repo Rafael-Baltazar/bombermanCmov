@@ -122,4 +122,8 @@ public class Character extends GameObject {
 		Log.d("SCALE", "ScaledB width: " + newWidth + " real: " + bitmaps[BACK].getWidth() + 
 				" ScaledB height: " + newHeight + " real: " + bitmaps[BACK].getHeight());
 	}
+	
+	public void placeBomb(){
+	}
+	
 }

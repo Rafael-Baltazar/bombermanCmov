@@ -1,7 +1,8 @@
 package com.example.bombermancmov;
 
-import com.example.bombermancmov.model.Level;
-import com.example.bombermancmov.model.Character;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -12,6 +13,10 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.example.bombermancmov.model.Bomb;
+import com.example.bombermancmov.model.Character;
+import com.example.bombermancmov.model.Level;
+
 /**
  * @author impaler This is the main surface that handles the ontouch events and
  *         draws the image to the screen.
@@ -20,13 +25,16 @@ public class MainGamePanel extends SurfaceView implements
 		SurfaceHolder.Callback {
 
 	private static final String TAG = MainGamePanel.class.getSimpleName();
+	private static final int ROUND_TIME = 800;//ms
 
 	private GameLoopThread thread;
 	private SurfaceHolder surfaceHolder = getHolder();
 
 	/* Game model */
 	private Level level;
-	private Character player, droids[];
+	private Character player;
+	private List<Character> droids;
+	private List<Bomb> bombs;
 
 	public MainGamePanel(Context context) {
 		super(context);
@@ -37,14 +45,36 @@ public class MainGamePanel extends SurfaceView implements
 		level = new Level(this);
 
 		// create player
-		player = new Character(1.0f, 1.0f, 0.25f, level.getGrid(), this);
+		player = new Character(1.0f, 1.0f, 1.0f, level.getGrid(), this);
 
 		// create the enemy droids
-		droids = new Character[] { new Character(1.0f, 2.0f, 0.25f,
-				level.getGrid(), this) };
+		droids = new ArrayList<Character>(); 
+		
+		droids.add(new Character(1.0f, 2.0f, 1.0f, level.getGrid(), this));
+		
 
+		// create bomb list
+		bombs = new ArrayList<Bomb>();
+		
 		// create the game loop thread
 		thread = new GameLoopThread(surfaceHolder, this);
+		
+		// create env thread
+		new Thread(new Runnable(){
+			@Override
+			public void run(){
+				while(true){
+					updateMobs();
+					thread.run();
+					try {
+						Thread.sleep(ROUND_TIME); //1 sec
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
@@ -58,7 +88,14 @@ public class MainGamePanel extends SurfaceView implements
 		Log.d(TAG, "Surface changed");
 		level.scale();
 		player.scale();
-		droids[0].scale();
+		
+		for(Character c : droids){
+			c.scale();
+		}
+		
+		for(Bomb b : bombs){
+			b.scale();
+		}
 
 		thread.run();
 	}
@@ -67,11 +104,16 @@ public class MainGamePanel extends SurfaceView implements
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.d(TAG, "Surface is being created");
 		thread.setRunning(true);
-
 		level.scale();
 		player.scale();
-		droids[0].scale();
-
+		
+		for(Character c : droids){
+			c.scale();
+		}
+		
+		for(Bomb b : bombs){
+			b.scale();
+		}
 		thread.run();
 	}
 
@@ -80,6 +122,7 @@ public class MainGamePanel extends SurfaceView implements
 		Log.d(TAG, "Surface is being destroyed");
 		// tell the thread to shut down
 		thread.setRunning(false);
+		
 		while (true) {
 			try {
 				thread.join();
@@ -175,6 +218,11 @@ public class MainGamePanel extends SurfaceView implements
 			else
 				Log.d("KEY_DOWN", "Collided moving right");
 			break;
+		case KeyEvent.KEYCODE_SPACE:
+			Bomb b = new Bomb(player.getX(), player.getY(), 3, 2, level.getGrid(), this);
+			b.scale();
+			bombs.add(b);
+			break;
 		}
 		thread.run();
 		return super.onKeyDown(keyCode, event);
@@ -190,10 +238,60 @@ public class MainGamePanel extends SurfaceView implements
 		canvas.drawColor(Color.WHITE);
 		level.draw(canvas);
 		player.draw(canvas);
-		int numDroids = droids.length;
-		for (int i = 0; i < numDroids; i++) {
-			droids[i].draw(canvas);
+		
+		for(Bomb b : bombs){
+			b.draw(canvas);
 		}
+
+		for(Character c : droids){
+			c.draw(canvas);
+		}
+	}
+	
+	public void updateMobs(){
+		Random r;
+		int t;
+		for(Bomb b : bombs){
+			t=b.tick();
+			if(t == 0){
+				b.explode();
+				for(Character c : droids){
+					if(((b.getY()==c.getY()) && (b.getX()+b.getRange() >= c.getX()) &&  
+					    (b.getX()-b.getRange() <= c.getX())) ||
+					   ((b.getX()==c.getX()) && (b.getY()+b.getRange() >= c.getY()) &&  
+						(b.getY()-b.getRange() <= c.getY()))){
+						
+						droids.remove(c);
+					}
+					
+				}
+			}else if(t==-1) {
+				bombs.remove(b);
+			}
+		}
+		
+		for(Character c : droids){
+			r = new Random();
+			switch(r.nextInt(4)){
+				case 0:{
+					c.moveUp();
+					break;
+				}
+				case 1:{
+					c.moveLeft();
+					break;
+				}
+				case 2:{
+					c.moveRight();
+					break;
+				}
+				case 3:{
+					c.moveDown();
+					break;
+				}
+			}
+		}
+		thread.run();
 	}
 
 }
