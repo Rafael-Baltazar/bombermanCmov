@@ -1,5 +1,7 @@
 package com.example.bombermancmov;
 
+import com.example.bombermancmov.model.DroidAI;
+
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -18,6 +20,9 @@ public class GameLoopThread extends Thread {
 	// The actual view that handles inputs
 	// and draws to the surface
 	private MainGamePanel gamePanel;
+	
+	// Make the droids move at every frame
+	private DroidAI droidAI;
 
 	// flag to hold game state
 	private boolean running;
@@ -32,10 +37,11 @@ public class GameLoopThread extends Thread {
 		this.running = running;
 	}
 
-	public GameLoopThread(SurfaceHolder surfaceHolder, MainGamePanel gamePanel) {
+	public GameLoopThread(SurfaceHolder surfaceHolder, MainGamePanel gamePanel, DroidAI droidAI) {
 		super();
 		this.surfaceHolder = surfaceHolder;
 		this.gamePanel = gamePanel;
+		this.droidAI = droidAI;
 	}
 
 	/**
@@ -56,6 +62,7 @@ public class GameLoopThread extends Thread {
 				canvas = this.surfaceHolder.lockCanvas();
 				synchronized (surfaceHolder) {
 					// update game state
+					droidAI.moveRandomly();
 					// render state to the screen
 					// draws the canvas on the panel
 					if (canvas != null) {

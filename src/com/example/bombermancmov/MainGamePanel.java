@@ -1,5 +1,6 @@
 package com.example.bombermancmov;
 
+import com.example.bombermancmov.model.DroidAI;
 import com.example.bombermancmov.model.Level;
 import com.example.bombermancmov.model.Character;
 
@@ -43,9 +44,10 @@ public class MainGamePanel extends SurfaceView implements
 		Character droid = new Character(1.0f, 2.0f, 0.25f, level.getGrid(),
 				this);
 		droids = new Character[] { droid };
+		DroidAI droidAI = new DroidAI(droids);
 
 		// create the game loop thread
-		thread = new GameLoopThread(surfaceHolder, this);
+		thread = new GameLoopThread(surfaceHolder, this, droidAI);
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
@@ -59,8 +61,7 @@ public class MainGamePanel extends SurfaceView implements
 		Log.d(TAG, "Surface changed");
 		level.scale();
 		player.scale();
-		int numDroids = droids.length;
-		for (int i = 0; i < numDroids; i++) {
+		for (int i = 0; i < droids.length; i++) {
 			droids[i].scale();
 		}
 	}
@@ -72,8 +73,7 @@ public class MainGamePanel extends SurfaceView implements
 
 		level.scale();
 		player.scale();
-		int numDroids = droids.length;
-		for (int i = 0; i < numDroids; i++) {
+		for (int i = 0; i < droids.length; i++) {
 			droids[i].scale();
 		}
 		thread.start();
@@ -195,8 +195,7 @@ public class MainGamePanel extends SurfaceView implements
 		canvas.drawColor(Color.WHITE);
 		level.draw(canvas);
 		player.draw(canvas);
-		int numDroids = droids.length;
-		for (int i = 0; i < numDroids; i++) {
+		for (int i = 0; i < droids.length; i++) {
 			droids[i].draw(canvas);
 		}
 	}
