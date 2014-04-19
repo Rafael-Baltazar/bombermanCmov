@@ -40,8 +40,9 @@ public class MainGamePanel extends SurfaceView implements
 		player = new Character(1.0f, 1.0f, 0.25f, level.getGrid(), this);
 
 		// create the enemy droids
-		droids = new Character[] { new Character(1.0f, 2.0f, 0.25f,
-				level.getGrid(), this) };
+		Character droid = new Character(1.0f, 2.0f, 0.25f, level.getGrid(),
+				this);
+		droids = new Character[] { droid };
 
 		// create the game loop thread
 		thread = new GameLoopThread(surfaceHolder, this);
@@ -59,8 +60,6 @@ public class MainGamePanel extends SurfaceView implements
 		level.scale();
 		player.scale();
 		droids[0].scale();
-
-		thread.run();
 	}
 
 	@Override
@@ -72,7 +71,7 @@ public class MainGamePanel extends SurfaceView implements
 		player.scale();
 		droids[0].scale();
 
-		thread.run();
+		thread.start();
 	}
 
 	@Override
@@ -100,28 +99,28 @@ public class MainGamePanel extends SurfaceView implements
 			float pointerX = event.getX(pointerIndex);
 			float pointerY = event.getY(pointerIndex);
 			Log.d(TAG, "X: " + pointerX + " Y: " + pointerY);
-			// Translate the origin (0,0) to the middle of the 
+			// Translate the origin (0,0) to the middle of the
 			// surface
-			//TODO: Are the values given by getX and getY absolute 
+			// TODO: Are the values given by getX and getY absolute
 			// in screen or surface?
 			float surfaceWidth = this.getWidth();
 			float surfaceHeight = this.getHeight();
-			pointerX -= surfaceWidth/2;
-			pointerY -= surfaceHeight/2;
-			float slope = surfaceHeight/surfaceWidth;
-			// Scale the coordinates, so y is negative in the 
-			// lower part of the screen and positive in the 
+			pointerX -= surfaceWidth / 2;
+			pointerY -= surfaceHeight / 2;
+			float slope = surfaceHeight / surfaceWidth;
+			// Scale the coordinates, so y is negative in the
+			// lower part of the screen and positive in the
 			// upper part
 			pointerY *= -1;
-			// Use simple linear functions (f(x) = y = x 
-			// and f(x) = y = -x) to divide the view in four 
+			// Use simple linear functions (f(x) = y = x
+			// and f(x) = y = -x) to divide the view in four
 			// parts and then determine where to move the player
 			boolean upperLeftTriangle = pointerY > slope * pointerX;
 			boolean upperRightTriangle = pointerY > -slope * pointerX;
 			boolean leftTriangle = upperLeftTriangle && !upperRightTriangle;
 			boolean rightTriangle = upperRightTriangle && !upperLeftTriangle;
-			if(upperLeftTriangle) {
-				if(leftTriangle) {
+			if (upperLeftTriangle) {
+				if (leftTriangle) {
 					Log.d(TAG, "leftTriangle");
 					player.moveLeft();
 				} else {
@@ -129,7 +128,7 @@ public class MainGamePanel extends SurfaceView implements
 					player.moveUp();
 				}
 			} else {
-				if(rightTriangle) {
+				if (rightTriangle) {
 					Log.d(TAG, "rightTriangle");
 					player.moveRight();
 				} else {
@@ -137,7 +136,6 @@ public class MainGamePanel extends SurfaceView implements
 					player.moveDown();
 				}
 			}
-			thread.run();
 		}
 		return isTouch;
 	}
@@ -176,7 +174,6 @@ public class MainGamePanel extends SurfaceView implements
 				Log.d("KEY_DOWN", "Collided moving right");
 			break;
 		}
-		thread.run();
 		return super.onKeyDown(keyCode, event);
 	}
 
@@ -186,7 +183,7 @@ public class MainGamePanel extends SurfaceView implements
 		drawGameModel(canvas);
 	}
 
-	private void drawGameModel(Canvas canvas) {
+	public void drawGameModel(Canvas canvas) {
 		canvas.drawColor(Color.WHITE);
 		level.draw(canvas);
 		player.draw(canvas);

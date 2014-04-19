@@ -1,6 +1,5 @@
 package com.example.bombermancmov;
 
-import android.annotation.SuppressLint;
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -23,6 +22,9 @@ public class GameLoopThread extends Thread {
 	// flag to hold game state
 	private boolean running;
 
+	// duration of a frame (in milliseconds)
+	private long frameDuration = 100;
+
 	public void setRunning(boolean running) {
 		this.running = running;
 	}
@@ -33,26 +35,46 @@ public class GameLoopThread extends Thread {
 		this.gamePanel = gamePanel;
 	}
 
-	@SuppressLint("WrongCall")
+	/**
+	 * Implements the game loop.
+	 * 
+	 * @see java.lang.Thread#run()
+	 */
 	@Override
 	public void run() {
-		if (!running)
-			return;
+		while (running) {
+			long beginTime = System.currentTimeMillis();
+			// draw step
+			Canvas canvas = null;
+			try {
+				// try locking the canvas for exclusive pixel editing
+				// in the surface
+				canvas = this.surfaceHolder.lockCanvas();
+				synchronized (surfaceHolder) {
+					// update game state
+					// render state to the screen
+					// draws the canvas on the panel
+					this.gamePanel.drawGameModel(canvas);
+				}
+			} finally {
+				// the surface is not left in an inconsistent state
+				if (canvas != null) {
+					surfaceHolder.unlockCanvasAndPost(canvas);
+				}
+			}
+			// To get the constant frame rate of frameDuration, get the time
+			// spent drawing and sleep for the remainder.
+			long timeSpent = System.currentTimeMillis() - beginTime;
+			try {
+				// sleep to get constant frame rate
+				if (timeSpent < frameDuration) {
+					long sleepTime = frameDuration - timeSpent;
+					sleep(sleepTime);
+				}
+			} catch (InterruptedException e) {
+				Log.d(TAG, "Interrupted sleep");
+			}
+		}
 
-		Canvas canvas = null;
-		Log.d(TAG, "Drawing canvas on GamePanel");
-		// try locking the canvas for exclusive pixel editing
-		// in the surface
-		canvas = this.surfaceHolder.lockCanvas();
-		synchronized (surfaceHolder) {
-			// update game state
-			// render state to the screen
-			// draws the canvas on the panel
-			this.gamePanel.onDraw(canvas);
-		}
-		// the surface is not left in an inconsistent state
-		if (canvas != null) {
-			surfaceHolder.unlockCanvasAndPost(canvas);
-		}
 	}
 }
