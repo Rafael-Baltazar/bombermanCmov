@@ -2,7 +2,6 @@ package com.example.bombermancmov.model;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -18,30 +17,25 @@ public class Bomb extends GameObject {
 	private SurfaceView surfaceView;
 	private LevelGrid level;
 	private int time;
-	private int range;
+	private float range;
 	private boolean isExploding;
 	private int actRange[];
 
 	
-	public int getRange() {
+	public float getRange() {
 		return range;
 	}
 
-	public Bomb(float x, float y, int time, int range, LevelGrid level, SurfaceView surfaceView) {
+	public Bomb(Bitmap [] bitmaps, float x, float y, int time, float range, LevelGrid level, SurfaceView surfaceView) {
 		super(null, x, y);
-		Bitmap bitmap0 = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.bomb_0); //normal
-		Bitmap bitmap1 = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.bomb_1); //nearly exploding
-		Bitmap bitmap2 = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.bomb_2); //exploding
-		this.bitmaps = new Bitmap[3];
-		bitmaps[0] = bitmap0;
-		bitmaps[1] = bitmap1;
-		bitmaps[2] = bitmap2;
+		this.bitmaps = bitmaps;
 		this.actRange = new int[4];
 		this.time = time;
 		this.level = level;
 		this.range = range;
 		this.isExploding = false;
 		this.surfaceView = surfaceView;
+		scale();
 	}
 
 	public void draw(Canvas canvas){
@@ -78,23 +72,19 @@ public class Bomb extends GameObject {
 				" ScaledF height: " + newHeight + " real: " + bitmaps[0].getHeight());
 	}
 
-	public int tick(){
+	public float tick(){
+		//time = (float) (time - 1.0f);
 		return time--;
 	}
-	
 	
 	public int[] explode(Context context){
 		boolean blockUp = false, blockDown = false, blockLeft = false, blockRight = false;
 		int i;
 		
 		SoundPool sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
-
-		int iTmp = sp.load(context, R.raw.sound_bomb_1, 1); // in 2nd param u have to pass your desire ringtone
-
+		int iTmp = sp.load(context, R.raw.sound_bomb_1, 1);
 		sp.play(iTmp, 1, 1, 0, 0, 1);
-
-		MediaPlayer mPlayer = MediaPlayer.create(context, R.raw.sound_bomb_1); // in 2nd param u have to pass your desire ringtone
-		//mPlayer.prepare();
+		MediaPlayer mPlayer = MediaPlayer.create(context, R.raw.sound_bomb_1);
 		mPlayer.start();
 		
 		Log.d("BOMB", "Draw explosion in X: " + getX() + " Y: " + getY());
