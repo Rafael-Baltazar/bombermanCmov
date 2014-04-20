@@ -49,7 +49,6 @@ public class MainGamePanel extends SurfaceView implements
 
 		// create the enemy droids
 		droids = new ArrayList<Character>(); 
-		
 		droids.add(new Character(1.0f, 2.0f, 1.0f, level.getGrid(), this));
 		
 
@@ -81,7 +80,6 @@ public class MainGamePanel extends SurfaceView implements
 
 		Log.d(TAG, "constructor");
 	}
-
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
@@ -114,6 +112,7 @@ public class MainGamePanel extends SurfaceView implements
 		for(Bomb b : bombs){
 			b.scale();
 		}
+		
 		thread.run();
 	}
 
@@ -239,6 +238,7 @@ public class MainGamePanel extends SurfaceView implements
 		level.draw(canvas);
 		player.draw(canvas);
 		
+		// BAD ARCH - MUST CHANGE THESE DRAW TO LEVEL.DRAW(Canvas);
 		for(Bomb b : bombs){
 			b.draw(canvas);
 		}
@@ -251,25 +251,29 @@ public class MainGamePanel extends SurfaceView implements
 	public void updateMobs(){
 		Random r;
 		int t;
+		int[] expBlocks;
+		List<Bomb> toRemove = new ArrayList<Bomb>(); //STUPID HACK TO PREVENT MULTI-BOMB CRASH
 		for(Bomb b : bombs){
 			t=b.tick();
 			if(t == 0){
-				b.explode();
+				expBlocks = b.explode(this.getContext());
 				for(Character c : droids){
-					if(((b.getY()==c.getY()) && (b.getX()+b.getRange() >= c.getX()) &&  
-					    (b.getX()-b.getRange() <= c.getX())) ||
-					   ((b.getX()==c.getX()) && (b.getY()+b.getRange() >= c.getY()) &&  
-						(b.getY()-b.getRange() <= c.getY()))){
-						
+					if(((b.getY()==c.getY()) && (expBlocks[2] <= c.getX()) &&  
+					    (expBlocks[3] >= c.getX())) ||
+					   ((b.getX()==c.getX()) && (expBlocks[0] <= c.getY()) &&  
+						(expBlocks[1] >= c.getY()))){
 						droids.remove(c);
 					}
-					
 				}
 			}else if(t==-1) {
-				bombs.remove(b);
+				toRemove.add(b);
 			}
 		}
-		
+		for(Bomb b : toRemove){
+			bombs.remove(b);
+		}
+		toRemove.clear();
+
 		for(Character c : droids){
 			r = new Random();
 			switch(r.nextInt(4)){

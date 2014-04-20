@@ -1,22 +1,27 @@
 package com.example.bombermancmov.model;
 
-import com.example.bombermancmov.R;
-
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.util.Log;
 import android.view.SurfaceView;
 
+import com.example.bombermancmov.R;
+
 public class Bomb extends GameObject {
 
+	private Bitmap[] bitmaps;
 	private SurfaceView surfaceView;
 	private LevelGrid level;
 	private int time;
 	private int range;
 	private boolean isExploding;
+	private int actRange[];
 
-	
 	
 	public int getRange() {
 		return range;
@@ -24,8 +29,14 @@ public class Bomb extends GameObject {
 
 	public Bomb(float x, float y, int time, int range, LevelGrid level, SurfaceView surfaceView) {
 		super(null, x, y);
-		Bitmap bitmap = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.bomb_0);
-		this.setBitmap(bitmap);
+		Bitmap bitmap0 = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.bomb_0); //normal
+		Bitmap bitmap1 = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.bomb_1); //nearly exploding
+		Bitmap bitmap2 = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.bomb_2); //exploding
+		this.bitmaps = new Bitmap[3];
+		bitmaps[0] = bitmap0;
+		bitmaps[1] = bitmap1;
+		bitmaps[2] = bitmap2;
+		this.actRange = new int[4];
 		this.time = time;
 		this.level = level;
 		this.range = range;
@@ -34,35 +45,23 @@ public class Bomb extends GameObject {
 	}
 
 	public void draw(Canvas canvas){
-		Bitmap map;
+		
 		if(isExploding){
-			map = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.bomb_2);
-			Bitmap expMap = Bitmap.createScaledBitmap(map, getBitmap().getWidth(), getBitmap().getHeight(), false);
-			float i;
-			for(i= getX()-range; i<=getX()+range; ++i){
-				if(i>0 && 
-						i<level.getRowSize() && 
-						(level.getGridCell((int) Math.rint(i), (int) Math.rint(getY())) == LevelGrid.EMPTY))
-				{
-
-					Log.d("BOMB", "Draw explosion in X: " + i + " Y: " + getY());
-					canvas.drawBitmap(expMap, i*getBitmap().getWidth(), getY()*getBitmap().getHeight(), null);
-				}
-
+			int i;
+			canvas.drawBitmap(bitmaps[2], getX()*bitmaps[2].getWidth(), getY()*bitmaps[2].getHeight(), null);
+			Log.d("BOMB", "Draw explosion in X: " + getX() + " Y: " + getY());
+			for(i=actRange[0]; i<=actRange[1]; ++i){
+				canvas.drawBitmap(bitmaps[2], getX()*bitmaps[2].getWidth(), i*bitmaps[2].getHeight(), null);
 			}
-			for(i= getY()-range; i<=getY()+range; ++i){
-				if(i>0 && 
-						i<level.getCollSize() && 
-						(level.getGridCell((int) Math.rint(i), (int) Math.rint(getY())) == LevelGrid.EMPTY))
-				{
-					Log.d("BOMB", "Draw explosion in X: " + getX() + " Y: " + i);
-					canvas.drawBitmap(expMap, getX()*getBitmap().getWidth(), i*getBitmap().getHeight(), null);
-				}
+			for(i=actRange[2]; i<=actRange[3]; ++i){
+				canvas.drawBitmap(bitmaps[2], +i*bitmaps[2].getWidth(), getY()*bitmaps[2].getHeight(), null);
 			}
-			
-		}else {
-			map = getBitmap();
-			canvas.drawBitmap(map, getX()*map.getWidth(), getY()*map.getHeight(), null);
+		}else if(time == 0){
+			//draw nearly exploded
+			canvas.drawBitmap(bitmaps[1], getX()*bitmaps[1].getWidth(), getY()*bitmaps[1].getHeight(), null);
+		}else{
+			//draw normal bomb
+			canvas.drawBitmap(bitmaps[0], getX()*bitmaps[0].getWidth(), getY()*bitmaps[0].getHeight(), null);
 		}
 
 	}
@@ -70,9 +69,13 @@ public class Bomb extends GameObject {
 	public void scale() {
 		int newWidth = surfaceView.getWidth() / level.getRowSize();
 		int newHeight = surfaceView.getHeight() / level.getCollSize();
-		this.setBitmap(Bitmap.createScaledBitmap(this.getBitmap(), newWidth, newHeight, false));
-		Log.d("SCALE", "ScaledF width: " + newWidth + " real: " + this.getBitmap().getWidth() + 
-				" ScaledF height: " + newHeight + " real: " + this.getBitmap().getHeight());
+		int bmp;
+		for(bmp = 0; bmp<bitmaps.length; ++bmp){
+			bitmaps[bmp] = (Bitmap.createScaledBitmap(bitmaps[bmp], newWidth, newHeight, false));
+		}
+		
+		Log.d("SCALE", "ScaledF width: " + newWidth + " real: " + bitmaps[0].getWidth() + 
+				" ScaledF height: " + newHeight + " real: " + bitmaps[0].getHeight());
 	}
 
 	public int tick(){
@@ -80,10 +83,83 @@ public class Bomb extends GameObject {
 	}
 	
 	
-	public void explode(){
-		isExploding = true;
-		Log.d("BOMB", "Bomb exploded in X: " + this.getX() + " Y: " + this.getY());
-	}
+	public int[] explode(Context context){
+		boolean blockUp = false, blockDown = false, blockLeft = false, blockRight = false;
+		int i;
+		
+		SoundPool sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
 
+		int iTmp = sp.load(context, R.raw.sound_bomb_1, 1); // in 2nd param u have to pass your desire ringtone
+
+		sp.play(iTmp, 1, 1, 0, 0, 1);
+
+		MediaPlayer mPlayer = MediaPlayer.create(context, R.raw.sound_bomb_1); // in 2nd param u have to pass your desire ringtone
+		//mPlayer.prepare();
+		mPlayer.start();
+		
+		Log.d("BOMB", "Draw explosion in X: " + getX() + " Y: " + getY());
+		for(i=0; i<=range; ++i){
+			//up
+			if(!blockUp && getY()-i>0 &&
+					(level.getGridCell((int) Math.rint(getY()-i), (int) Math.rint(getX())) == LevelGrid.EMPTY))
+			{
+				actRange[0] = (int) Math.rint(getY()-i);
+			}else {
+				if(!blockUp && level.getGridCell((int) Math.rint(getY()-i), (int) Math.rint(getX())) == LevelGrid.OBSTACLE){
+					actRange[0] = (int) Math.rint(getY()-i);
+					level.setGridCell((int) Math.rint(getY()-i), (int) Math.rint(getX()), LevelGrid.EMPTY);
+				}
+				blockUp = true;
+			}
+
+			//down
+			if(!blockDown && 
+					getY()+i>0 &&
+					(level.getGridCell((int) Math.rint(getY()+i), (int) Math.rint(getX())) == LevelGrid.EMPTY))
+			{
+				actRange[1] = (int) Math.rint(getY()+i);
+
+			}else {
+
+				if(!blockDown && level.getGridCell((int) Math.rint(getY()+i), (int) Math.rint(getX())) == LevelGrid.OBSTACLE){
+					actRange[1] = (int) Math.rint(getY()+i);
+					level.setGridCell((int) Math.rint(getY()+i), (int) Math.rint(getX()), LevelGrid.EMPTY);
+				}
+				blockDown = true;
+			}
+
+			//left
+			if(!blockLeft && 
+					getX()-i>0 &&
+					(level.getGridCell((int) Math.rint(getY()), (int) Math.rint(getX()-i)) == LevelGrid.EMPTY))
+			{
+				actRange[2] = (int) Math.rint(getX()-i);
+
+			}else {
+				if(!blockLeft && level.getGridCell((int) Math.rint(getY()), (int) Math.rint(getX()-i)) == LevelGrid.OBSTACLE){
+					actRange[2] = (int) Math.rint(getX()-i);
+					level.setGridCell((int) Math.rint(getY()), (int) Math.rint(getX()-i), LevelGrid.EMPTY);
+				}
+				blockLeft = true;
+			}
+			//right
+			if(!blockRight && 
+					getX()+i>0 &&
+					(level.getGridCell((int) Math.rint(getY()), (int) Math.rint(getX()+i)) == LevelGrid.EMPTY))
+			{
+				actRange[3] = (int) Math.rint(getX()+i);
+			}else {
+				if(!blockRight && level.getGridCell((int) Math.rint(getY()), (int) Math.rint(getX()+i)) == LevelGrid.OBSTACLE){
+					actRange[3] = (int) Math.rint(getX()+i);
+					level.setGridCell((int) Math.rint(getY()), (int) Math.rint(getX()+i), LevelGrid.EMPTY);
+				}
+				blockRight = true;
+			}
+			
+			Log.d("BOMB", "Bomb exploded in X: " + this.getX() + " Y: " + this.getY());
+		}
+		isExploding = true;
+		return actRange;
+	}
 }
 

@@ -1,12 +1,15 @@
 package com.example.bombermancmov.model;
 
-import com.example.bombermancmov.R;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.SurfaceView;
+
+import com.example.bombermancmov.R;
 
 public class Level {
 	private String levelName;
@@ -19,9 +22,16 @@ public class Level {
 	private float pointsPerOpponentKilled;
 	private LevelGrid grid = new LevelGrid();
 	
+	private Character player;
+	private List<Character> droids;
+	private List<Bomb> bombs;
+	
 	/* Drawing */
 	private Bitmap wallBitMap;
+	private Bitmap obstacleBitmap;
 	private SurfaceView surfaceView;
+	
+	
 	
 	public LevelGrid getGrid() {
 		return grid;
@@ -43,26 +53,37 @@ public class Level {
 		this.robotSpeed = 1; // 1 cell per second
 		this.pointsPerRobotKilled = 1;
 		this.pointsPerOpponentKilled = 2;
-		this.grid.setGridLayout(new char[][] {{'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'},
-											  {'W', '-', '-', '-', '-', '-', '-', '-', 'W'},
-											  {'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W'},
-											  {'W', '-', '-', '-', '-', '-', '-', '-', 'W'},
-											  {'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W'},
-											  {'W', '-', '-', '-', '-', '-', '-', '-', 'W'},
-											  {'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W'},
-											  {'W', '-', '-', '-', '-', '-', '-', '-', 'W'},
-											  {'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'}}, 9, 9);
+		this.grid.setGridLayout(new char[][] {{'W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W'},
+											  {'W','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','O','O','W'},
+											  {'W','W','-','W','-','W','-','W','-','W','-','W','-','W','-','W','-','W','W'},
+											  {'W','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','W'},
+											  {'W','W','-','W','O','W','-','W','-','W','-','W','-','W','-','W','-','W','W'},
+											  {'W','-','-','-','O','-','-','-','-','-','-','-','-','-','-','-','-','-','W'},
+											  {'W','W','-','W','-','W','-','W','-','W','-','W','-','W','-','W','-','W','W'},
+											  {'W','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','W'},
+											  {'W','W','-','W','-','W','-','W','-','W','-','W','-','W','-','W','-','W','W'},
+											  {'W','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','-','W'},
+											  {'W','W','-','W','O','W','-','W','-','W','-','W','-','W','-','W','-','W','W'},
+											  {'W','-','-','-','O','-','-','-','-','-','-','-','-','-','-','-','-','-','W'},
+											  {'W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W'}}, 19, 13);
 		this.surfaceView = surfaceView;
 		this.wallBitMap = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.wall_1);
+		this.obstacleBitmap = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.obstacle_0);
+		
 	}
 	
 	public void draw(Canvas canvas){
 		for(int rowNum = 0; rowNum < grid.getRowSize(); ++rowNum){
 			for(int collNum = 0; collNum < grid.getCollSize(); ++collNum){
 				switch(grid.getGridCell(collNum, rowNum)){
-					case 'W':
+					case LevelGrid.WALL:
 					{
 						canvas.drawBitmap(wallBitMap, rowNum*wallBitMap.getWidth(), collNum*wallBitMap.getHeight(), null);
+						break;
+					}
+					case LevelGrid.OBSTACLE:
+					{
+						canvas.drawBitmap(obstacleBitmap, rowNum*obstacleBitmap.getWidth(), collNum*obstacleBitmap.getHeight(), null);
 						break;
 					}
 				}
@@ -74,6 +95,8 @@ public class Level {
 		int newWidth = surfaceView.getWidth() / grid.getRowSize();
 		int newHeight = surfaceView.getHeight() / grid.getCollSize();
 		wallBitMap = Bitmap.createScaledBitmap(wallBitMap, newWidth, newHeight, false);
+		obstacleBitmap = Bitmap.createScaledBitmap(obstacleBitmap, newWidth, newHeight, false);
+		
 		Log.d("SCALE", "Scaled Level width: " + newWidth + " real: " + wallBitMap.getWidth() + 
 				" Scaled Level height: " + newHeight + " real: " + wallBitMap.getHeight());
 	}
