@@ -1,37 +1,42 @@
 package com.example.bombermancmov;
 
-import android.support.v7.app.ActionBarActivity;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.FrameLayout;
 
 public class BomberActivity extends ActionBarActivity {
 	
 	private static final String TAG = GameLoopThread.class.getSimpleName();
+	private FrameLayout frm;
+	private Button leftButton, rightButton, upButton, downButton, bombButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+        setContentView(R.layout.activity_main);
         // requesting to turn the title OFF
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
         // making it full screen
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        // set our MainGamePanel as the View
-        setContentView(new MainGamePanel(this));
-        Log.d(TAG, "View added");
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN, WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+        // set our MainGamePanel as the View~
+		frm=(FrameLayout)findViewById(R.id.frameLayout);
+	    frm.addView(new MainGamePanel(this));
+        
+        //setContentView(new MainGamePanel(this));
 		
 		/*if (savedInstanceState == null) {
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.container, new PlaceholderFragment()).commit();
 		}*/
+        Log.d(TAG, "View added");
 	}
 
 	@Override
