@@ -1,6 +1,5 @@
 package com.example.bombermancmov;
 
-import com.example.bombermancmov.model.DroidAI;
 import com.example.bombermancmov.model.Level;
 import com.example.bombermancmov.model.Character;
 
@@ -21,13 +20,15 @@ public class MainGamePanel extends SurfaceView implements
 		SurfaceHolder.Callback {
 
 	private static final String TAG = MainGamePanel.class.getSimpleName();
+	private static final int ROUND_TIME = 700;//ms
 
 	private GameLoopThread thread;
 	private SurfaceHolder surfaceHolder = getHolder();
 
 	/* Game model */
 	private Level level;
-	private Character player, droids[];
+	private Character player;
+
 
 	public MainGamePanel(Context context) {
 		super(context);
@@ -37,45 +38,58 @@ public class MainGamePanel extends SurfaceView implements
 		// create level
 		level = new Level(this);
 
-		// create player
-		player = new Character(1.0f, 1.0f, 0.25f, level.getGrid(), this);
-
 		// create the enemy droids
-		Character droid = new Character(1.0f, 2.0f, 0.25f, level.getGrid(),
+		/*Character droid = new Character(1.0f, 2.0f, 0.25f, level.getGrid(),
 				this);
 		droids = new Character[] { droid };
-		DroidAI droidAI = new DroidAI(droids);
+		DroidAI droidAI = new DroidAI(droids);*/
 
+		// create player
+		player = new Character(1.0f, 1.0f, 1.0f, level.getGrid(), this);
+		
 		// create the game loop thread
-		thread = new GameLoopThread(surfaceHolder, this, droidAI);
+		thread = new GameLoopThread(surfaceHolder, this);
+		
+		// create env thread
+		new Thread(new Runnable(){
+			@Override
+			public void run(){
+				while(level.nextRound()){
+					try {
+						Thread.sleep(ROUND_TIME);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
 
 		Log.d(TAG, "constructor");
 	}
-
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		Log.d(TAG, "Surface changed");
 		level.scale();
 		player.scale();
-		for (int i = 0; i < droids.length; i++) {
+		/*for (int i = 0; i < droids.length; i++) {
 			droids[i].scale();
-		}
+		}*/
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.d(TAG, "Surface is being created");
 		thread.setRunning(true);
-
 		level.scale();
 		player.scale();
-		for (int i = 0; i < droids.length; i++) {
+		/*for (int i = 0; i < droids.length; i++) {
 			droids[i].scale();
-		}
+		}*/
 		thread.start();
 	}
 
@@ -84,6 +98,7 @@ public class MainGamePanel extends SurfaceView implements
 		Log.d(TAG, "Surface is being destroyed");
 		// tell the thread to shut down
 		thread.setRunning(false);
+		
 		while (true) {
 			try {
 				thread.join();
@@ -181,6 +196,9 @@ public class MainGamePanel extends SurfaceView implements
 			else
 				Log.d("KEY_DOWN", "Collided moving right");
 			break;
+		case KeyEvent.KEYCODE_SPACE:
+			level.placeBomb(player.getX(), player.getY());
+			break;
 		}
 		return super.onKeyDown(keyCode, event);
 	}
@@ -195,9 +213,8 @@ public class MainGamePanel extends SurfaceView implements
 		canvas.drawColor(Color.WHITE);
 		level.draw(canvas);
 		player.draw(canvas);
-		for (int i = 0; i < droids.length; i++) {
+		/*for (int i = 0; i < droids.length; i++) {
 			droids[i].draw(canvas);
-		}
+		}*/
 	}
-
 }

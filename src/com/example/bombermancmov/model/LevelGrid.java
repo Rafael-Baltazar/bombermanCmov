@@ -6,6 +6,7 @@ public class LevelGrid {
 	public static final char WALL = 'W';
 	public static final char OBSTACLE = 'O';
 	public static final char ROBOT = 'R';
+	public static final char BOMB = 'B';
 	/**
 	 * 1-3 Players
 	 */

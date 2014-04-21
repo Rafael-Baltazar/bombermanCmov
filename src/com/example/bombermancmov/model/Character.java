@@ -92,7 +92,7 @@ public class Character extends GameObject {
 	public boolean move(float x, float y) {
 		int intX = (int) Math.rint(x);
 		int intY = (int) Math.rint(y);
-		if (level.getGridCell(intX, intY) == LevelGrid.EMPTY) {
+		if (level.getGridCell(intY, intX) == LevelGrid.EMPTY) {
 			setX(x);
 			setY(y);
 			return true;
@@ -122,4 +122,8 @@ public class Character extends GameObject {
 		Log.d("SCALE", "ScaledB width: " + newWidth + " real: " + bitmaps[BACK].getWidth() + 
 				" ScaledB height: " + newHeight + " real: " + bitmaps[BACK].getHeight());
 	}
+	
+	public void placeBomb(){
+	}
+	
 }

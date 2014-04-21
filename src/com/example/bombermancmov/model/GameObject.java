@@ -1,9 +1,8 @@
 package com.example.bombermancmov.model;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 
-public class GameObject {
+public abstract class GameObject {
 	private Bitmap bitmap;
 	private float x, y;
 	/**
@@ -34,9 +33,5 @@ public class GameObject {
 	}
 	public void setY(float y) {
 		this.y = y;
-	}
-	
-	public void draw(Canvas canvas) {
-		canvas.drawBitmap(bitmap, x - (bitmap.getWidth() / 2), y - (bitmap.getHeight() / 2), null);
 	}
 }

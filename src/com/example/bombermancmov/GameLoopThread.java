@@ -1,7 +1,5 @@
 package com.example.bombermancmov;
 
-import com.example.bombermancmov.model.DroidAI;
-
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -20,9 +18,6 @@ public class GameLoopThread extends Thread {
 	// The actual view that handles inputs
 	// and draws to the surface
 	private MainGamePanel gamePanel;
-	
-	// Make the droids move at every frame
-	private DroidAI droidAI;
 
 	// flag to hold game state
 	private boolean running;
@@ -30,18 +25,14 @@ public class GameLoopThread extends Thread {
 	// duration of a frame (in milliseconds)
 	private long frameDuration = 100;
 
-	// max frame skip
-	private int maxFrameSkip = 1;
-
 	public void setRunning(boolean running) {
 		this.running = running;
 	}
 
-	public GameLoopThread(SurfaceHolder surfaceHolder, MainGamePanel gamePanel, DroidAI droidAI) {
+	public GameLoopThread(SurfaceHolder surfaceHolder, MainGamePanel gamePanel) {
 		super();
 		this.surfaceHolder = surfaceHolder;
 		this.gamePanel = gamePanel;
-		this.droidAI = droidAI;
 	}
 
 	/**
@@ -51,7 +42,6 @@ public class GameLoopThread extends Thread {
 	 */
 	@Override
 	public void run() {
-		int framesSkipped = 0;
 		while (running) {
 			long beginTime = System.currentTimeMillis();
 			// draw step
@@ -62,7 +52,6 @@ public class GameLoopThread extends Thread {
 				canvas = this.surfaceHolder.lockCanvas();
 				synchronized (surfaceHolder) {
 					// update game state
-					droidAI.moveRandomly();
 					// render state to the screen
 					// draws the canvas on the panel
 					if (canvas != null) {
@@ -75,7 +64,7 @@ public class GameLoopThread extends Thread {
 					surfaceHolder.unlockCanvasAndPost(canvas);
 				}
 			}
-			// To get constant frame rate, get the time spent 
+			// To get constant frame rate, get the time spent
 			// drawing and sleep for the remainder.
 			long timeSpent = System.currentTimeMillis() - beginTime;
 			try {
