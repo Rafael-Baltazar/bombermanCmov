@@ -4,12 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.example.bombermancmov.model.Character;
 import com.example.bombermancmov.model.Level;
 
 /**
@@ -24,22 +21,31 @@ public class MainGamePanel extends SurfaceView implements
 
 	private GameLoopThread thread;
 	private SurfaceHolder surfaceHolder = getHolder();
+	
+	private String playerName = "Rafael Baltazar"; //DEFAULT NAME
 
 	/* Game model */
 	private Level level;
-	private Character player;
+	
+	private BomberActivity act; //HORRIBLE HACK!
+
 
 
 	public MainGamePanel(Context context) {
 		super(context);
+		act = (BomberActivity) context;
+		act.setPlayerName(playerName);
+		
 		// adding the callback(this) to the surface holder to intercept events
 		surfaceHolder.addCallback(this);
 
 		// create level
 		level = new Level(this);
-
-		// create player
-		player = new Character(1.0f, 1.0f, 1.0f, level.getGrid(), this);
+		
+		act.setPlayerScore(level.getPlayer().getPoints());
+		act.setTimeLeft(level.getTimeLeft());
+		act.setNumPlayers(level.getNumberPlayers());
+		
 		
 		// create the game loop thread
 		thread = new GameLoopThread(surfaceHolder, this);
@@ -70,7 +76,6 @@ public class MainGamePanel extends SurfaceView implements
 			int height) {
 		Log.d(TAG, "Surface changed");
 		level.scale();
-		player.scale();
 		thread.run();
 	}
 
@@ -79,7 +84,6 @@ public class MainGamePanel extends SurfaceView implements
 		Log.d(TAG, "Surface is being created");
 		thread.setRunning(true);
 		level.scale();
-		player.scale();
 		thread.run();
 	}
 
@@ -99,7 +103,7 @@ public class MainGamePanel extends SurfaceView implements
 		}
 		Log.d(TAG, "Thread was shut down cleanly");
 	}
-
+	/*
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		int motionAction = event.getActionMasked();
@@ -190,7 +194,40 @@ public class MainGamePanel extends SurfaceView implements
 		}
 		thread.run();
 		return super.onKeyDown(keyCode, event);
+	}*/
+	
+	
+	public boolean doAction(int actionCode){
+		switch(actionCode){
+			case 0:{
+				level.getPlayer().moveUp();
+				break;
+			}
+			case 1:{
+				level.getPlayer().moveDown();
+				break;
+			}
+			case 2:{
+				level.getPlayer().moveLeft();
+				break;
+			}
+			case 3:{
+				level.getPlayer().moveRight();
+				break;
+			}
+			case 4:{
+				level.placeBomb(level.getPlayer().getX(), level.getPlayer().getY());
+				break;
+			}
+			default:{
+				return false;
+			}
+		}
+		
+		thread.run();
+		return true;
 	}
+	
 
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -201,6 +238,5 @@ public class MainGamePanel extends SurfaceView implements
 	private void drawGameModel(Canvas canvas) {
 		canvas.drawColor(Color.WHITE);
 		level.draw(canvas);
-		player.draw(canvas);
 	}
 }

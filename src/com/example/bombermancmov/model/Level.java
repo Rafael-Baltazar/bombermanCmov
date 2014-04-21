@@ -23,6 +23,7 @@ public class Level {
 	private float robotSpeed;
 	private float pointsPerRobotKilled;
 	private float pointsPerOpponentKilled;
+	private int numberPlayers;
 	private LevelGrid grid = new LevelGrid();
 	
 	private Character player;
@@ -36,6 +37,19 @@ public class Level {
 	private SurfaceView surfaceView;
 	
 	
+	
+	
+	public Character getPlayer() {
+		return player;
+	}
+
+	public int getNumberPlayers() {
+		return numberPlayers;
+	}
+
+	public float getTimeLeft(){
+		return gameDuration - totalTime;
+	}
 	
 	public LevelGrid getGrid() {
 		return grid;
@@ -52,12 +66,13 @@ public class Level {
 		this.levelName = "defaultLevelName";
 		this.gameDuration = 180000; // three minutes?
 		this.totalTime = 0;
-		this.explosionTimeout = 1500;
+		this.explosionTimeout = 4;
 		this.explosionDuration = 1000;
 		this.explosionRange = 1;
 		this.robotSpeed = 1; // 1 cell per second
 		this.pointsPerRobotKilled = 1;
 		this.pointsPerOpponentKilled = 2;
+		this.numberPlayers = 1; //so far
 		this.grid.setGridLayout(new char[][] {{'W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W'},
 											  {'W','-','-','-','-','1','-','-','-','-','-','-','-','-','-','-','O','O','W'},
 											  {'W','W','-','W','-','W','-','W','-','W','-','W','-','W','-','W','-','W','W'},
@@ -81,8 +96,10 @@ public class Level {
 		this.bombBitmap[1] = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.bomb_1); //nearly exploding
 		this.bombBitmap[2] = BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.bomb_2); //exploding
 		
-		
-		this.droids.add(new Character(1.0f, 1.0f, 1.0f, grid, surfaceView));
+
+		// create player
+		player = new Character(1.0f, 1.0f, 1.0f, grid, surfaceView);
+		this.droids.add(new Character(1.0f, 1.0f, robotSpeed, grid, surfaceView));
 		
 	}
 	
@@ -103,6 +120,8 @@ public class Level {
 				}
 			}	
 		}
+		player.draw(canvas);
+		
 		for(Bomb b : bombs){
 			b.draw(canvas);
 		}
@@ -117,6 +136,7 @@ public class Level {
 		wallBitMap = Bitmap.createScaledBitmap(wallBitMap, newWidth, newHeight, false);
 		obstacleBitmap = Bitmap.createScaledBitmap(obstacleBitmap, newWidth, newHeight, false);
 		
+		player.scale();
 		
 		for(Bomb b : bombs){
 			b.scale();
@@ -131,7 +151,7 @@ public class Level {
 	}
 	
 	public void placeBomb(float x, float y){
-		bombs.add(new Bomb(bombBitmap, x, y, 4, explosionRange, this.grid, surfaceView));
+		bombs.add(new Bomb(bombBitmap, x, y, explosionTimeout, explosionRange, this.grid, surfaceView));
 	}
 	
 	public boolean nextRound(){
@@ -153,6 +173,7 @@ public class Level {
 					   ((b.getX()==c.getX()) && (expBlocks[0] <= c.getY()) &&  
 						(expBlocks[1] >= c.getY()))){
 						droids.remove(c);
+						player.setPoints(player.getSpeed()+pointsPerRobotKilled);
 					}
 				}
 			}else if(t==-1) {

@@ -8,35 +8,88 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 public class BomberActivity extends ActionBarActivity {
 	
 	private static final String TAG = GameLoopThread.class.getSimpleName();
 	private FrameLayout frm;
 	private Button leftButton, rightButton, upButton, downButton, bombButton;
+	private TextView playerNameTextView, playerScoreTextView, timeLeftTextView, numPlayersTextView;
+	private MainGamePanel mGamePanel;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // requesting to turn the title OFF
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
-        // making it full screen
-        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN, WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-        // set our MainGamePanel as the View~
-		frm=(FrameLayout)findViewById(R.id.frameLayout);
-	    frm.addView(new MainGamePanel(this));
         
-        //setContentView(new MainGamePanel(this));
-		
-		/*if (savedInstanceState == null) {
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}*/
+        playerNameTextView =(TextView)findViewById(R.id.playerName);
+        playerScoreTextView =(TextView)findViewById(R.id.playerScore);
+        timeLeftTextView =(TextView)findViewById(R.id.timeLeft);
+        numPlayersTextView = (TextView)findViewById(R.id.numberPlayers);
+        
+	    upButton=(Button)findViewById(R.id.buttonUp);
+	    upButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mGamePanel.doAction(0);
+			}
+		});
+	    
+	    downButton=(Button)findViewById(R.id.buttonDown);
+	    downButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mGamePanel.doAction(1);
+			}
+		});
+	    
+	    leftButton=(Button)findViewById(R.id.buttonLeft);
+	    leftButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mGamePanel.doAction(2);
+			}
+		});
+	    
+	    rightButton=(Button)findViewById(R.id.buttonRight);
+	    rightButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mGamePanel.doAction(3);
+			}
+		});
+	    
+	    bombButton=(Button)findViewById(R.id.buttonBomb);
+	    bombButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				mGamePanel.doAction(4);
+			}
+		});
+	    
+		frm=(FrameLayout)findViewById(R.id.frameLayout);
+		mGamePanel = new MainGamePanel(this);
+	    frm.addView(mGamePanel);
+	    
         Log.d(TAG, "View added");
+	}
+	
+	public void setPlayerName(String playerName){
+		playerNameTextView.setText(playerName);
+	}
+	public void setPlayerScore(float playerScore){
+		playerScoreTextView.setText(Float.toString(playerScore));
+	}
+	public void setTimeLeft(float timeLeft){
+		timeLeftTextView.setText(Float.toString(timeLeft));
+	}
+	public void setNumPlayers(int numPlayers){
+		numPlayersTextView.setText(Integer.toString(numPlayers));
 	}
 
 	@Override
