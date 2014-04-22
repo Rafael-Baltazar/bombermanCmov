@@ -25,9 +25,9 @@ public class MainGamePanel extends SurfaceView implements
 	 * Update and render game model in a separate thread.
 	 */
 	private GameLoopThread thread;
-	
-	// Run level.nextRound() every x milliseconds 
-	private Thread levelNextRound;
+
+	// Run level.nextRound() every x milliseconds
+	private LevelNextRoundThread levelNextRound;
 
 	private SurfaceHolder surfaceHolder;
 
@@ -53,24 +53,12 @@ public class MainGamePanel extends SurfaceView implements
 		act.setPlayerScore(level.getPlayer().getPoints());
 		act.setTimeLeft(level.getTimeLeft());
 		act.setNumPlayers(level.getNumberPlayers());
-		
+
 		// create the game loop thread
 		thread = new GameLoopThread(surfaceHolder, this);
 
 		// create env thread
-		levelNextRound = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				while (level.nextRound()) {
-					try {
-						Thread.sleep(ROUND_TIME);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		});
+		levelNextRound = new LevelNextRoundThread(level, ROUND_TIME);
 		levelNextRound.start();
 
 		// make the GamePanel focusable so it can handle events
@@ -97,9 +85,8 @@ public class MainGamePanel extends SurfaceView implements
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		Log.d(TAG, "Surface is being destroyed");
-		// tell the thread to shut down
+		// shut down all the threads
 		thread.setRunning(false);
-
 		while (true) {
 			try {
 				thread.join();
@@ -108,7 +95,17 @@ public class MainGamePanel extends SurfaceView implements
 				Log.d(TAG, "Interrupted exception at surface destroyed.");
 			}
 		}
-		Log.d(TAG, "Thread was shut down cleanly");
+		Log.d(TAG, "Game loop thread was shut down cleanly");
+		levelNextRound.setRunning(false);
+		while (true) {
+			try {
+				levelNextRound.join();
+				break;
+			} catch (InterruptedException e) {
+				Log.d(TAG, "Interrupted exception at surface destroyed.");
+			}
+		}
+		Log.d(TAG, "Level next round thread was shut down cleanly");
 	}
 
 	public boolean doAction(int actionCode) {
