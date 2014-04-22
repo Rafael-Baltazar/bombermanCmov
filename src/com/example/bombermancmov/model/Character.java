@@ -13,6 +13,9 @@ public class Character extends GameObject {
 	private LevelGrid level;
 	private Bitmap[] bitmaps;
 	private SurfaceView surfaceView;
+	private float points;
+	
+	private String name;
 	
 	private static int FRONT = 0;
 	private static int LEFT = 1;
@@ -32,6 +35,7 @@ public class Character extends GameObject {
 		super(null, x, y);
 		this.speed = speed;
 		this.level = level;
+		this.points = 0;
 		this.surfaceView = surfaceView;
 		bitmaps = new Bitmap[4];
 		bitmaps[FRONT] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_0);
@@ -41,6 +45,22 @@ public class Character extends GameObject {
 		activeSprite = FRONT;
 	}
 	
+	
+	
+	public String getName() {
+		return name;
+	}
+
+
+
+	public float getPoints() {
+		return points;
+	}
+
+	public void setPoints(float points) {
+		this.points = points;
+	}
+
 	public Bitmap getActiveSprite(){
 		return bitmaps[activeSprite];
 	}

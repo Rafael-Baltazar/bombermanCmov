@@ -1,0 +1,126 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff" >
+
+        <!-- Display Player Name -->
+
+        <TextView
+            android:id="@+id/displayPlayerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/display_player_name" />
+
+        <TextView
+            android:id="@+id/playerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/displayPlayerName" />
+
+        <!-- Display Player Score -->
+
+        <TextView
+            android:id="@+id/displayPlayerScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/displayPlayerName"
+            android:text="@string/display_player_score" />
+
+        <TextView
+            android:id="@+id/playerScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/displayPlayerName"
+            android:layout_toRightOf="@id/displayPlayerScore" />
+
+        <!-- Display Time Left -->
+
+        <TextView
+            android:id="@+id/displayTimeLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/displayPlayerScore"
+            android:text="@string/display_time_left" />
+
+        <TextView
+            android:id="@+id/timeLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/displayPlayerScore"
+            android:layout_toRightOf="@id/displayTimeLeft" />
+
+        <!-- Display Number of Players -->
+
+        <TextView
+            android:id="@+id/displayNumPlayers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/displayTimeLeft"
+            android:text="@string/display_num_players" />
+
+        <TextView
+            android:id="@+id/numberPlayers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/displayTimeLeft"
+            android:layout_toRightOf="@id/displayNumPlayers" />
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffffff" >
+
+        <Button
+            android:id="@+id/buttonLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="@string/left_button_text" />
+
+        <Button
+            android:id="@+id/buttonUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/buttonLeft"
+            android:text="@string/up_button_text" />
+
+        <Button
+            android:id="@+id/buttonDown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/buttonUp"
+            android:layout_toRightOf="@id/buttonLeft"
+            android:text="@string/down_button_text" />
+
+        <Button
+            android:id="@+id/buttonRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/buttonDown"
+            android:text="@string/right_button_text" />
+
+        <Button
+            android:id="@+id/buttonBomb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/buttonRight"
+            android:text="@string/bomb_button_text" />
+    </RelativeLayout>
+
+</LinearLayout>
