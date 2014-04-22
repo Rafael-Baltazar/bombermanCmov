@@ -27,7 +27,7 @@ public class Bomb extends GameObject {
 
 	public Bomb(Bitmap[] bitmaps, float x, float y, int time, float range,
 			LevelGrid level, SurfaceView surfaceView) {
-		super(null, x, y);
+		super(x, y);
 		this.bitmaps = bitmaps;
 		this.actRange = new int[4];
 		this.time = time;

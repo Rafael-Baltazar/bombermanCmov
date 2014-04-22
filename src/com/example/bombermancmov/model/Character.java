@@ -1,19 +1,23 @@
 package com.example.bombermancmov.model;
 
 import com.example.bombermancmov.R;
+import com.example.bombermancmov.model.component.DrawableComponent;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.util.Log;
 import android.view.SurfaceView;
 
 public class Character extends GameObject {
 	private float speed = 0.3f;
 	private LevelGrid level;
-	private Bitmap[] bitmaps;
 	private SurfaceView surfaceView;
 	private float points;
+	
+	/**
+	 * Handles draw and scale methods.
+	 */
+	DrawableComponent drawableComponent;
 	
 	private String name;
 	
@@ -22,8 +26,6 @@ public class Character extends GameObject {
 	private static int RIGHT = 2;
 	private static int BACK = 3;
 	
-	private int activeSprite;
-
 	/**
 	 * @param x
 	 * @param y
@@ -32,26 +34,23 @@ public class Character extends GameObject {
 	 * @param surfaceView
 	 */
 	public Character(float x, float y, float speed, LevelGrid level, SurfaceView surfaceView) {
-		super(null, x, y);
+		super(x, y);
 		this.speed = speed;
 		this.level = level;
 		this.points = 0;
 		this.surfaceView = surfaceView;
-		bitmaps = new Bitmap[4];
+		
+		Bitmap bitmaps[] = new Bitmap[4];
 		bitmaps[FRONT] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_0);
 		bitmaps[LEFT] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_1);
 		bitmaps[RIGHT] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_2);
 		bitmaps[BACK] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_3);
-		activeSprite = FRONT;
+		drawableComponent = new DrawableComponent(this, bitmaps, FRONT);
 	}
-	
-	
 	
 	public String getName() {
 		return name;
 	}
-
-
 
 	public float getPoints() {
 		return points;
@@ -59,10 +58,6 @@ public class Character extends GameObject {
 
 	public void setPoints(float points) {
 		this.points = points;
-	}
-
-	public Bitmap getActiveSprite(){
-		return bitmaps[activeSprite];
 	}
 
 	public float getSpeed() {
@@ -82,22 +77,22 @@ public class Character extends GameObject {
 	}
 	
 	public boolean moveDown(){
-		activeSprite = FRONT;
+		drawableComponent.setActiveBitmapIndex(FRONT);
 		return move(getX(), getY()+speed);
 	}
 	
 	public boolean moveUp(){
-		activeSprite = BACK;
+		drawableComponent.setActiveBitmapIndex(BACK);
 		return move(getX(), getY()-speed);
 	}
 	
 	public boolean moveLeft(){
-		activeSprite = LEFT;
+		drawableComponent.setActiveBitmapIndex(LEFT);
 		return move(getX()-speed, getY());
 	}
 	
 	public boolean moveRight(){
-		activeSprite = RIGHT;
+		drawableComponent.setActiveBitmapIndex(RIGHT);
 		return move(getX()+speed, getY());
 	}
 
@@ -122,25 +117,13 @@ public class Character extends GameObject {
 	}
 	
 	public void draw(Canvas canvas){
-		Bitmap activeBitMap = bitmaps[activeSprite];
-		canvas.drawBitmap(activeBitMap, getX()*activeBitMap.getWidth(), getY()*activeBitMap.getHeight(), null);
+		drawableComponent.draw(canvas);
 	}
 	
 	public void scale() {
 		int newWidth = surfaceView.getWidth() / level.getRowSize();
 		int newHeight = surfaceView.getHeight() / level.getCollSize();
-		bitmaps[FRONT] =  Bitmap.createScaledBitmap(bitmaps[FRONT], newWidth, newHeight, false);
-		bitmaps[LEFT] =  Bitmap.createScaledBitmap(bitmaps[LEFT], newWidth, newHeight, false);
-		bitmaps[RIGHT] =  Bitmap.createScaledBitmap(bitmaps[RIGHT], newWidth, newHeight, false);
-		bitmaps[BACK] =  Bitmap.createScaledBitmap(bitmaps[BACK], newWidth, newHeight, false);
-		Log.d("SCALE", "ScaledF width: " + newWidth + " real: " + bitmaps[FRONT].getWidth() + 
-				" ScaledF height: " + newHeight + " real: " + bitmaps[FRONT].getHeight());
-		Log.d("SCALE", "ScaledL width: " + newWidth + " real: " + bitmaps[LEFT].getWidth() + 
-				" ScaledL height: " + newHeight + " real: " + bitmaps[LEFT].getHeight());
-		Log.d("SCALE", "ScaledR width: " + newWidth + " real: " + bitmaps[RIGHT].getWidth() + 
-				" ScaledR height: " + newHeight + " real: " + bitmaps[RIGHT].getHeight());
-		Log.d("SCALE", "ScaledB width: " + newWidth + " real: " + bitmaps[BACK].getWidth() + 
-				" ScaledB height: " + newHeight + " real: " + bitmaps[BACK].getHeight());
+		drawableComponent.scale(newWidth, newHeight);
 	}
 	
 	public void placeBomb(){
