@@ -103,112 +103,19 @@ public class MainGamePanel extends SurfaceView implements
 		}
 		Log.d(TAG, "Thread was shut down cleanly");
 	}
-	/*
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		int motionAction = event.getActionMasked();
-		boolean isTouch = motionAction == MotionEvent.ACTION_DOWN;
-		if (isTouch) {
-			int pointerIndex = event.getActionIndex();
-			float pointerX = event.getX(pointerIndex);
-			float pointerY = event.getY(pointerIndex);
-			Log.d(TAG, "X: " + pointerX + " Y: " + pointerY);
-			// Translate the origin (0,0) to the middle of the 
-			// surface
-			//TODO: Are the values given by getX and getY absolute 
-			// in screen or surface?
-			float surfaceWidth = this.getWidth();
-			float surfaceHeight = this.getHeight();
-			pointerX -= surfaceWidth/2;
-			pointerY -= surfaceHeight/2;
-			float slope = surfaceHeight/surfaceWidth;
-			// Scale the coordinates, so y is negative in the 
-			// lower part of the screen and positive in the 
-			// upper part
-			pointerY *= -1;
-			// Use simple linear functions (f(x) = y = x 
-			// and f(x) = y = -x) to divide the view in four 
-			// parts and then determine where to move the player
-			boolean upperLeftTriangle = pointerY > slope * pointerX;
-			boolean upperRightTriangle = pointerY > -slope * pointerX;
-			boolean leftTriangle = upperLeftTriangle && !upperRightTriangle;
-			boolean rightTriangle = upperRightTriangle && !upperLeftTriangle;
-			if(upperLeftTriangle) {
-				if(leftTriangle) {
-					Log.d(TAG, "leftTriangle");
-					player.moveLeft();
-				} else {
-					Log.d(TAG, "upperTriangle");
-					player.moveUp();
-				}
-			} else {
-				if(rightTriangle) {
-					Log.d(TAG, "rightTriangle");
-					player.moveRight();
-				} else {
-					Log.d(TAG, "downTriangle");
-					player.moveDown();
-				}
-			}
-			thread.run();
-		}
-		return isTouch;
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		int keyaction = event.getKeyCode();
-
-		switch (keyaction) {
-		case KeyEvent.KEYCODE_W:
-		case KeyEvent.KEYCODE_DPAD_UP:
-			if (player.moveUp())
-				Log.d("KEY_DOWN", "Moved Up");
-			else
-				Log.d("KEY_DOWN", "Collided moving up");
-			break;
-		case KeyEvent.KEYCODE_S:
-		case KeyEvent.KEYCODE_DPAD_DOWN:
-			if (player.moveDown())
-				Log.d("KEY_DOWN", "Moved Down");
-			else
-				Log.d("KEY_DOWN", "Collided moving down");
-			break;
-		case KeyEvent.KEYCODE_A:
-		case KeyEvent.KEYCODE_DPAD_LEFT:
-			if (player.moveLeft())
-				Log.d("KEY_DOWN", "Moved Left");
-			else
-				Log.d("KEY_DOWN", "Collided moving left");
-			break;
-		case KeyEvent.KEYCODE_D:
-		case KeyEvent.KEYCODE_DPAD_RIGHT:
-			if (player.moveRight())
-				Log.d("KEY_DOWN", "Moved Right");
-			else
-				Log.d("KEY_DOWN", "Collided moving right");
-			break;
-		case KeyEvent.KEYCODE_SPACE:
-			level.placeBomb(player.getX(), player.getY());
-			break;
-		}
-		thread.run();
-		return super.onKeyDown(keyCode, event);
-	}*/
-	
 	
 	public boolean doAction(int actionCode){
 		switch(actionCode){
 			case 0:{
-				level.getPlayer().moveUp();
+				level.getPlayer().moveLeft();
 				break;
 			}
 			case 1:{
-				level.getPlayer().moveDown();
+				level.getPlayer().moveUp();
 				break;
 			}
 			case 2:{
-				level.getPlayer().moveLeft();
+				level.getPlayer().moveDown();
 				break;
 			}
 			case 3:{
@@ -219,9 +126,7 @@ public class MainGamePanel extends SurfaceView implements
 				level.placeBomb(level.getPlayer().getX(), level.getPlayer().getY());
 				break;
 			}
-			default:{
-				return false;
-			}
+			default: return false;
 		}
 		
 		thread.run();

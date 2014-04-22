@@ -1,15 +1,12 @@
 package com.example.bombermancmov;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -25,31 +22,42 @@ public class BomberActivity extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_game);
         
+        // save for posterior use
         playerNameTextView =(TextView)findViewById(R.id.playerName);
         playerScoreTextView =(TextView)findViewById(R.id.playerScore);
         timeLeftTextView =(TextView)findViewById(R.id.timeLeft);
         numPlayersTextView = (TextView)findViewById(R.id.numberPlayers);
         
-	    upButton=(Button)findViewById(R.id.buttonUp);
-	    upButton.setOnClickListener(new OnClickListener() {
+	    setOnClickListenersToButtons();
+	    
+		frm=(FrameLayout)findViewById(R.id.frameLayout);
+		mGamePanel = new MainGamePanel(this);
+	    frm.addView(mGamePanel);
+	    
+        Log.d(TAG, "View added");
+	}
+
+	private void setOnClickListenersToButtons() {
+		leftButton=(Button)findViewById(R.id.buttonLeft);
+	    leftButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mGamePanel.doAction(0);
 			}
 		});
 	    
-	    downButton=(Button)findViewById(R.id.buttonDown);
-	    downButton.setOnClickListener(new OnClickListener() {
+		upButton=(Button)findViewById(R.id.buttonUp);
+	    upButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mGamePanel.doAction(1);
 			}
 		});
 	    
-	    leftButton=(Button)findViewById(R.id.buttonLeft);
-	    leftButton.setOnClickListener(new OnClickListener() {
+	    downButton=(Button)findViewById(R.id.buttonDown);
+	    downButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mGamePanel.doAction(2);
@@ -71,12 +79,6 @@ public class BomberActivity extends ActionBarActivity {
 				mGamePanel.doAction(4);
 			}
 		});
-	    
-		frm=(FrameLayout)findViewById(R.id.frameLayout);
-		mGamePanel = new MainGamePanel(this);
-	    frm.addView(mGamePanel);
-	    
-        Log.d(TAG, "View added");
 	}
 	
 	public void setPlayerName(String playerName){
@@ -109,23 +111,6 @@ public class BomberActivity extends ActionBarActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
-			return rootView;
-		}
 	}
 
 }

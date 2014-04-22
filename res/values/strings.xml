@@ -2,12 +2,14 @@
 <resources>
 
     <string name="app_name">bomberman cmov</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="left_button_text">Left</string>
     <string name="right_button_text">Right</string>
     <string name="up_button_text">Up</string>
     <string name="down_button_text">Down</string>
     <string name="bomb_button_text">Bomb</string>
+    <string name="display_time_left">Time left:</string><string name="display_player_name">Player Name:</string>
+    <string name="display_player_score">Player Score:</string>
+    <string name="display_num_players">Number of Players:</string>
 
 </resources>
