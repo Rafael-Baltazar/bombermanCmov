@@ -13,10 +13,12 @@ public class DrawableComponent implements Drawable {
 	 * The gameObject to draw.
 	 */
 	GameObject owner;
+	
 	/**
 	 * The collection of bitmaps for this component.
 	 */
 	private Bitmap bitmaps[];
+	
 	/**
 	 * The bitmap to draw.
 	 */
@@ -45,6 +47,10 @@ public class DrawableComponent implements Drawable {
 		this.bitmaps = bitmaps;
 		this.activeBitmapIndex = 0;
 	}
+	
+	public Bitmap[] getBitmaps() {
+		return bitmaps;
+	}
 
 	public void setActiveBitmapIndex(int activeBitmapIndex) {
 		this.activeBitmapIndex = activeBitmapIndex;
@@ -62,8 +68,8 @@ public class DrawableComponent implements Drawable {
 	public void scale(int newWidth, int newHeight) {
 		for (int i = 0; i < bitmaps.length; ++i) {
 			bitmaps[i] = Bitmap.createScaledBitmap(bitmaps[i], newWidth, newHeight, false);
-			Log.d(TAG, "Scaled" + i + " dsrW: " + newWidth + " realW: " + bitmaps[i].getWidth());
-			Log.d(TAG, "Scaled" + i + " dsrH: " + newHeight + " realH: " + bitmaps[i].getHeight());
+			Log.d(TAG, "Scaled" + i + " dsrW: " + newWidth + ", realW: " + bitmaps[i].getWidth());
+			Log.d(TAG, "Scaled" + i + " dsrH: " + newHeight + ", realH: " + bitmaps[i].getHeight());
 		}
 	}
 

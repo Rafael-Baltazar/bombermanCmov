@@ -1,10 +1,8 @@
 package com.example.bombermancmov.model;
 
-import com.example.bombermancmov.R;
 import com.example.bombermancmov.model.component.DrawableComponent;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.view.SurfaceView;
 
@@ -21,10 +19,10 @@ public class Character extends GameObject {
 	
 	private String name;
 	
-	private static int FRONT = 0;
-	private static int LEFT = 1;
-	private static int RIGHT = 2;
-	private static int BACK = 3;
+	public static int FRONT = 0;
+	public static int LEFT = 1;
+	public static int RIGHT = 2;
+	public static int BACK = 3;
 	
 	/**
 	 * @param x
@@ -33,19 +31,14 @@ public class Character extends GameObject {
 	 * @param level
 	 * @param surfaceView
 	 */
-	public Character(float x, float y, float speed, LevelGrid level, SurfaceView surfaceView) {
+	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid level, SurfaceView surfaceView) {
 		super(x, y);
 		this.speed = speed;
 		this.level = level;
 		this.points = 0;
 		this.surfaceView = surfaceView;
 		
-		Bitmap bitmaps[] = new Bitmap[4];
-		bitmaps[FRONT] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_0);
-		bitmaps[LEFT] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_1);
-		bitmaps[RIGHT] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_2);
-		bitmaps[BACK] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_3);
-		drawableComponent = new DrawableComponent(this, bitmaps, FRONT);
+		drawableComponent = new DrawableComponent(this, bitmap, FRONT);
 	}
 	
 	public String getName() {

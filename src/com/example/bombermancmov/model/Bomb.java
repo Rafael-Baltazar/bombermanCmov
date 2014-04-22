@@ -10,16 +10,26 @@ import android.util.Log;
 import android.view.SurfaceView;
 
 import com.example.bombermancmov.R;
+import com.example.bombermancmov.model.component.DrawableComponent;
+import com.example.bombermancmov.model.component.DrawableExplosionComponent;
 
 public class Bomb extends GameObject {
+	public static int NORMAL = 0;
+	public static int NEARLY= 1;
+	public static int EXPLODING = 2;
 
 	private Bitmap[] bitmaps;
 	private SurfaceView surfaceView;
 	private LevelGrid level;
-	private int time;
+	private int timeToExplode;
 	private float range;
 	private boolean isExploding;
 	private int actRange[];
+	
+	/**
+	 * Handles draw and scale methods.
+	 */
+	DrawableExplosionComponent drawableComponent;
 
 	public float getRange() {
 		return range;
@@ -30,39 +40,22 @@ public class Bomb extends GameObject {
 		super(x, y);
 		this.bitmaps = bitmaps;
 		this.actRange = new int[4];
-		this.time = time;
+		this.timeToExplode = time;
 		this.level = level;
 		this.range = range;
 		this.isExploding = false;
 		this.surfaceView = surfaceView;
+		
+		drawableComponent = new DrawableExplosionComponent(this, bitmaps, NORMAL);
 		scale();
 	}
 
 	public void draw(Canvas canvas) {
-
 		if (isExploding) {
-			int i;
-			canvas.drawBitmap(bitmaps[2], getX() * bitmaps[2].getWidth(),
-					getY() * bitmaps[2].getHeight(), null);
-			Log.d("BOMB", "Draw explosion in X: " + getX() + " Y: " + getY());
-			for (i = actRange[0]; i <= actRange[1]; ++i) {
-				canvas.drawBitmap(bitmaps[2], getX() * bitmaps[2].getWidth(), i
-						* bitmaps[2].getHeight(), null);
-			}
-			for (i = actRange[2]; i <= actRange[3]; ++i) {
-				canvas.drawBitmap(bitmaps[2], +i * bitmaps[2].getWidth(),
-						getY() * bitmaps[2].getHeight(), null);
-			}
-		} else if (time == 0) {
-			// draw nearly exploded
-			canvas.drawBitmap(bitmaps[1], getX() * bitmaps[1].getWidth(),
-					getY() * bitmaps[1].getHeight(), null);
+			drawableComponent.draw(canvas, range);
 		} else {
-			// draw normal bomb
-			canvas.drawBitmap(bitmaps[0], getX() * bitmaps[0].getWidth(),
-					getY() * bitmaps[0].getHeight(), null);
+			drawableComponent.draw(canvas);
 		}
-
 	}
 
 	/**
@@ -71,20 +64,19 @@ public class Bomb extends GameObject {
 	public void scale() {
 		int newWidth = surfaceView.getWidth() / level.getRowSize();
 		int newHeight = surfaceView.getHeight() / level.getCollSize();
-		for (int bmp = 0; bmp < bitmaps.length; ++bmp) {
-			bitmaps[bmp] = (Bitmap.createScaledBitmap(bitmaps[bmp], newWidth,
-					newHeight, false));
-		}
-
-		Log.d("SCALE",
-				"ScaledF width: " + newWidth + " real: "
-						+ bitmaps[0].getWidth() + " ScaledF height: "
-						+ newHeight + " real: " + bitmaps[0].getHeight());
+		drawableComponent.scale(newWidth, newHeight);
 	}
 
 	public float tick() {
-		// time = (float) (time - 1.0f);
-		return time--;
+		if(timeToExplode > 1) {
+			drawableComponent.setActiveBitmapIndex(NORMAL);
+		} else if(timeToExplode == 1) {
+			drawableComponent.setActiveBitmapIndex(NEARLY);
+		} else {
+			drawableComponent.setActiveBitmapIndex(EXPLODING);
+			isExploding = true;
+		}
+		return timeToExplode--;
 	}
 
 	public int[] explode(Context context) {
