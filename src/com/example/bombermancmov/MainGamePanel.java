@@ -1,13 +1,13 @@
 package com.example.bombermancmov;
 
+import com.example.bombermancmov.model.Level;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
-import com.example.bombermancmov.model.Level;
 
 /**
  * This is the main surface that handles the ontouch events and draws the image
@@ -21,8 +21,13 @@ public class MainGamePanel extends SurfaceView implements
 	private static final String TAG = MainGamePanel.class.getSimpleName();
 	private static final int ROUND_TIME = 700;// ms
 
-	// update and render game model in a separate thread
+	/**
+	 * Update and render game model in a separate thread.
+	 */
 	private GameLoopThread thread;
+	
+	// Run level.nextRound() every x milliseconds 
+	private Thread levelNextRound;
 
 	private SurfaceHolder surfaceHolder;
 
@@ -48,16 +53,15 @@ public class MainGamePanel extends SurfaceView implements
 		act.setPlayerScore(level.getPlayer().getPoints());
 		act.setTimeLeft(level.getTimeLeft());
 		act.setNumPlayers(level.getNumberPlayers());
-
+		
 		// create the game loop thread
 		thread = new GameLoopThread(surfaceHolder, this);
 
 		// create env thread
-		new Thread(new Runnable() {
+		levelNextRound = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				while (level.nextRound()) {
-					thread.run();
 					try {
 						Thread.sleep(ROUND_TIME);
 					} catch (InterruptedException e) {
@@ -66,7 +70,8 @@ public class MainGamePanel extends SurfaceView implements
 					}
 				}
 			}
-		}).start();
+		});
+		levelNextRound.start();
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
@@ -79,15 +84,14 @@ public class MainGamePanel extends SurfaceView implements
 			int height) {
 		Log.d(TAG, "Surface changed");
 		level.scale();
-		thread.run();
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.d(TAG, "Surface is being created");
-		thread.setRunning(true);
 		level.scale();
-		thread.run();
+		thread.setRunning(true);
+		thread.start();
 	}
 
 	@Override
@@ -132,8 +136,6 @@ public class MainGamePanel extends SurfaceView implements
 		default:
 			return false;
 		}
-
-		thread.run();
 		return true;
 	}
 
@@ -143,7 +145,7 @@ public class MainGamePanel extends SurfaceView implements
 		drawGameModel(canvas);
 	}
 
-	private void drawGameModel(Canvas canvas) {
+	public void drawGameModel(Canvas canvas) {
 		canvas.drawColor(Color.WHITE);
 		level.draw(canvas);
 	}
