@@ -10,51 +10,53 @@ import android.view.SurfaceView;
 import com.example.bombermancmov.model.Level;
 
 /**
- * @author impaler This is the main surface that handles the ontouch events and
- *         draws the image to the screen.
+ * This is the main surface that handles the ontouch events and draws the image
+ * to the screen.
+ * 
+ * @author impaler
  */
 public class MainGamePanel extends SurfaceView implements
 		SurfaceHolder.Callback {
 
 	private static final String TAG = MainGamePanel.class.getSimpleName();
-	private static final int ROUND_TIME = 700;//ms
+	private static final int ROUND_TIME = 700;// ms
 
+	// update and render game model in a separate thread
 	private GameLoopThread thread;
-	private SurfaceHolder surfaceHolder = getHolder();
-	
-	private String playerName = "Rafael Baltazar"; //DEFAULT NAME
+
+	private SurfaceHolder surfaceHolder;
+
+	private String playerName = "Rafael Baltazar"; // DEFAULT NAME
 
 	/* Game model */
 	private Level level;
-	
-	private BomberActivity act; //HORRIBLE HACK!
 
-
+	private BomberActivity act; // HORRIBLE HACK!
 
 	public MainGamePanel(Context context) {
 		super(context);
+		surfaceHolder = getHolder();
 		act = (BomberActivity) context;
 		act.setPlayerName(playerName);
-		
+
 		// adding the callback(this) to the surface holder to intercept events
 		surfaceHolder.addCallback(this);
 
 		// create level
 		level = new Level(this);
-		
+
 		act.setPlayerScore(level.getPlayer().getPoints());
 		act.setTimeLeft(level.getTimeLeft());
 		act.setNumPlayers(level.getNumberPlayers());
-		
-		
+
 		// create the game loop thread
 		thread = new GameLoopThread(surfaceHolder, this);
-		
+
 		// create env thread
-		new Thread(new Runnable(){
+		new Thread(new Runnable() {
 			@Override
-			public void run(){
-				while(level.nextRound()){
+			public void run() {
+				while (level.nextRound()) {
 					thread.run();
 					try {
 						Thread.sleep(ROUND_TIME);
@@ -71,6 +73,7 @@ public class MainGamePanel extends SurfaceView implements
 
 		Log.d(TAG, "constructor");
 	}
+
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
@@ -92,7 +95,7 @@ public class MainGamePanel extends SurfaceView implements
 		Log.d(TAG, "Surface is being destroyed");
 		// tell the thread to shut down
 		thread.setRunning(false);
-		
+
 		while (true) {
 			try {
 				thread.join();
@@ -103,36 +106,36 @@ public class MainGamePanel extends SurfaceView implements
 		}
 		Log.d(TAG, "Thread was shut down cleanly");
 	}
-	
-	public boolean doAction(int actionCode){
-		switch(actionCode){
-			case 0:{
-				level.getPlayer().moveLeft();
-				break;
-			}
-			case 1:{
-				level.getPlayer().moveUp();
-				break;
-			}
-			case 2:{
-				level.getPlayer().moveDown();
-				break;
-			}
-			case 3:{
-				level.getPlayer().moveRight();
-				break;
-			}
-			case 4:{
-				level.placeBomb(level.getPlayer().getX(), level.getPlayer().getY());
-				break;
-			}
-			default: return false;
+
+	public boolean doAction(int actionCode) {
+		switch (actionCode) {
+		case 0: {
+			level.getPlayer().moveLeft();
+			break;
 		}
-		
+		case 1: {
+			level.getPlayer().moveUp();
+			break;
+		}
+		case 2: {
+			level.getPlayer().moveDown();
+			break;
+		}
+		case 3: {
+			level.getPlayer().moveRight();
+			break;
+		}
+		case 4: {
+			level.placeBomb(level.getPlayer().getX(), level.getPlayer().getY());
+			break;
+		}
+		default:
+			return false;
+		}
+
 		thread.run();
 		return true;
 	}
-	
 
 	@Override
 	protected void onDraw(Canvas canvas) {
