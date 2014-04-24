@@ -12,13 +12,13 @@ public class DroidAI {
 		for(int i = 0; i < droids.length; i++) {
 			double rnd = Math.random();
 			if(rnd < 0.25) {
-				droids[i].moveDown();
+				droids[i].moveDown(10);
 			} else if(rnd < 0.5) {
-				droids[i].moveLeft();
+				droids[i].moveLeft(10);
 			} else if(rnd < 0.75) {
-				droids[i].moveRight();
+				droids[i].moveRight(10);
 			} else {
-				droids[i].moveUp();
+				droids[i].moveUp(10);
 			}
 		}
 	}

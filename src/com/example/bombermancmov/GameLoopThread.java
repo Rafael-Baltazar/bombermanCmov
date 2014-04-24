@@ -23,7 +23,7 @@ public class GameLoopThread extends Thread {
 	private boolean running;
 
 	// duration of a frame (in milliseconds)
-	private long frameDuration = 100;
+	private long frameDuration = 5;
 
 	public void setRunning(boolean running) {
 		this.running = running;
@@ -55,6 +55,7 @@ public class GameLoopThread extends Thread {
 					// render state to the screen
 					// draws the canvas on the panel
 					if (canvas != null) {
+						this.gamePanel.updateLayer(10);
 						this.gamePanel.drawGameModel(canvas);
 					}
 				}

@@ -81,24 +81,39 @@ public class Character extends GameObject {
 		this.level = level;
 	}
 	
-	public boolean moveDown(){
+	private int speedx = 0;
+	private int speedy = 0;
+	
+	public void moveDown(long timePassed){
 		activeSprite = FRONT;
-		return move(getX(), getY()+speed);
+		speedy = +1;
+		speedx = 0;
+		float curSpeed = (float) speed*timePassed/1000.0f;
+		move(getX()+curSpeed*speedx, getY()+curSpeed*speedy);
 	}
 	
-	public boolean moveUp(){
+	public void moveUp(long timePassed){
 		activeSprite = BACK;
-		return move(getX(), getY()-speed);
+		speedy = -1;
+		speedx = 0;
+		float curSpeed = (float) speed*timePassed/1000.0f;
+		move(getX()+curSpeed*speedx, getY()+curSpeed*speedy);
 	}
 	
-	public boolean moveLeft(){
+	public void moveLeft(long timePassed){
 		activeSprite = LEFT;
-		return move(getX()-speed, getY());
+		speedy = 0;
+		speedx = -1;
+		float curSpeed = (float) speed*timePassed/1000.0f;
+		move(getX()+curSpeed*speedx, getY()+curSpeed*speedy);
 	}
 	
-	public boolean moveRight(){
+	public void moveRight(long timePassed){
 		activeSprite = RIGHT;
-		return move(getX()+speed, getY());
+		speedy = 0;
+		speedx = +1;
+		float curSpeed = (float) speed*timePassed/1000.0f;
+		move(getX()+curSpeed*speedx, getY()+curSpeed*speedy);
 	}
 
 	/**
@@ -112,13 +127,28 @@ public class Character extends GameObject {
 	public boolean move(float x, float y) {
 		int intX = (int) Math.rint(x);
 		int intY = (int) Math.rint(y);
-		if (level.getGridCell(intY, intX) == LevelGrid.EMPTY) {
+		if (level.getGridCell(intY, intX) != LevelGrid.WALL && level.getGridCell(intY, intX) != LevelGrid.OBSTACLE) {
 			setX(x);
 			setY(y);
+			Log.d("CHAR", "X: " + getX() + " :::: Y: "+ getY());
 			return true;
 		} else {
 			return false;
 		}
+	}
+	
+	float movedDist = 0;
+	
+	public boolean update(long timePassed) {
+		if(movedDist > speed){
+			speedx = 0;
+			speedy = 0;
+			movedDist = 0;
+			return false;
+		}
+		float curSpeed = (float) speed*timePassed/1000.0f;
+		movedDist += curSpeed;
+		return move(getX()+curSpeed*speedx, getY()+curSpeed*speedy);
 	}
 	
 	public void draw(Canvas canvas){

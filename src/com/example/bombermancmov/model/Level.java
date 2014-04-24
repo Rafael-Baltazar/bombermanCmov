@@ -113,7 +113,7 @@ public class Level {
 		for(int i = 0; i < 13; i++) {
 			for(int j = 0; j < 19; j++) {
 				if(gamefield[i][j] == '1') {
-					player = new Character(j, i, 1.0f, grid, surfaceView);				
+					player = new Character(j, i, 25.0f, grid, surfaceView);				
 				}
 				if(gamefield[i][j] == 'R') {
 					this.droids.add(new Character(j, i, robotSpeed, grid, surfaceView));
@@ -174,7 +174,7 @@ public class Level {
 				+ " real: " + wallBitMap.getHeight());
 	}
 
-	public void placeBomb(float x, float y) {
+	public void placeBomb(int x, int y) {
 		bombs.add(new Bomb(bombBitmap, x, y, explosionTimeout, explosionRange,
 				this.grid, surfaceView));
 	}
@@ -183,6 +183,8 @@ public class Level {
 		if (totalTime == gameDuration) {
 			return false;
 		}
+
+		
 		
 		/*for (Character c : droids) {
 			if(this.player.getX() == c.getX() && this.player.getY() == c.getY()) {
@@ -191,6 +193,7 @@ public class Level {
 		}*/
 		
 		Log.d("ROUND", "Num bombs:" + bombs.isEmpty());
+
 		Random r;
 		float t;
 		int[] expBlocks;
@@ -201,11 +204,10 @@ public class Level {
 			if (t == 0) {
 				expBlocks = b.explode(surfaceView.getContext());
 				for (Character c : droids) {
-					if (((b.getY() == c.getY()) && (expBlocks[2] <= c.getX()) && (expBlocks[3] >= c
-							.getX()))
-							|| ((b.getX() == c.getX())
-									&& (expBlocks[0] <= c.getY()) && (expBlocks[1] >= c
-									.getY()))) {
+					if (((Math.rint(b.getY()) == Math.rint(c.getY())) && (expBlocks[2] <= Math.rint(c.getX())) && (expBlocks[3] >= Math.rint(c.getX())))
+							|| 
+						((Math.rint(b.getX()) == Math.rint(c.getX())) && (expBlocks[0] <= Math.rint(c.getY())) && (expBlocks[1] >= Math.rint(c.getY())))) {
+						
 						droids.remove(c);
 						player.setPoints(player.getSpeed()
 								+ pointsPerRobotKilled);
@@ -223,19 +225,19 @@ public class Level {
 			r = new Random();
 			switch (r.nextInt(4)) {
 			case 0: {
-				c.moveUp();
+				c.moveUp(10);
 				break;
 			}
 			case 1: {
-				c.moveLeft();
+				c.moveLeft(10);
 				break;
 			}
 			case 2: {
-				c.moveRight();
+				c.moveRight(10);
 				break;
 			}
 			case 3: {
-				c.moveDown();
+				c.moveDown(10);
 				break;
 			}
 			}

@@ -100,13 +100,12 @@ public class Bomb extends GameObject {
 			// up
 			if (!blockUp
 					&& getY() - i > 0
-					&& (level.getGridCell((int) Math.rint(getY() - i),
-							(int) Math.rint(getX())) == LevelGrid.EMPTY)) {
+					&& (level.getGridCell((int) Math.rint(getY() - i), (int) Math.rint(getX())) != LevelGrid.OBSTACLE &&
+						level.getGridCell((int) Math.rint(getY() - i), (int) Math.rint(getX())) != LevelGrid.WALL)) {
 				actRange[0] = (int) Math.rint(getY() - i);
 			} else {
 				if (!blockUp
-						&& level.getGridCell((int) Math.rint(getY() - i),
-								(int) Math.rint(getX())) == LevelGrid.OBSTACLE) {
+						&& level.getGridCell((int) Math.rint(getY() - i), (int) Math.rint(getX())) == LevelGrid.OBSTACLE) {
 					actRange[0] = (int) Math.rint(getY() - i);
 					level.setGridCell((int) Math.rint(getY() - i),
 							(int) Math.rint(getX()), LevelGrid.EMPTY);
@@ -117,15 +116,14 @@ public class Bomb extends GameObject {
 			// down
 			if (!blockDown
 					&& getY() + i > 0
-					&& (level.getGridCell((int) Math.rint(getY() + i),
-							(int) Math.rint(getX())) == LevelGrid.EMPTY)) {
+					&& (level.getGridCell((int) Math.rint(getY() + i), (int) Math.rint(getX())) != LevelGrid.OBSTACLE &&
+						level.getGridCell((int) Math.rint(getY() + i), (int) Math.rint(getX())) != LevelGrid.WALL)) {
 				actRange[1] = (int) Math.rint(getY() + i);
 
 			} else {
 
 				if (!blockDown
-						&& level.getGridCell((int) Math.rint(getY() + i),
-								(int) Math.rint(getX())) == LevelGrid.OBSTACLE) {
+						&& level.getGridCell((int) Math.rint(getY() + i), (int) Math.rint(getX())) == LevelGrid.OBSTACLE) {
 					actRange[1] = (int) Math.rint(getY() + i);
 					level.setGridCell((int) Math.rint(getY() + i),
 							(int) Math.rint(getX()), LevelGrid.EMPTY);
@@ -136,14 +134,13 @@ public class Bomb extends GameObject {
 			// left
 			if (!blockLeft
 					&& getX() - i > 0
-					&& (level.getGridCell((int) Math.rint(getY()),
-							(int) Math.rint(getX() - i)) == LevelGrid.EMPTY)) {
+					&& (level.getGridCell((int) Math.rint(getY()), (int) Math.rint(getX() - i)) != LevelGrid.OBSTACLE &&
+						level.getGridCell((int) Math.rint(getY()), (int) Math.rint(getX() - i)) != LevelGrid.WALL)) {
 				actRange[2] = (int) Math.rint(getX() - i);
 
 			} else {
 				if (!blockLeft
-						&& level.getGridCell((int) Math.rint(getY()),
-								(int) Math.rint(getX() - i)) == LevelGrid.OBSTACLE) {
+						&& level.getGridCell((int) Math.rint(getY()), (int) Math.rint(getX() - i)) == LevelGrid.OBSTACLE) {
 					actRange[2] = (int) Math.rint(getX() - i);
 					level.setGridCell((int) Math.rint(getY()),
 							(int) Math.rint(getX() - i), LevelGrid.EMPTY);
@@ -153,13 +150,12 @@ public class Bomb extends GameObject {
 			// right
 			if (!blockRight
 					&& getX() + i > 0
-					&& (level.getGridCell((int) Math.rint(getY()),
-							(int) Math.rint(getX() + i)) == LevelGrid.EMPTY)) {
+					&& (level.getGridCell((int) Math.rint(getY()), (int) Math.rint(getX() + i)) != LevelGrid.OBSTACLE &&
+							level.getGridCell((int) Math.rint(getY()), (int) Math.rint(getX() + i)) != LevelGrid.WALL)) {
 				actRange[3] = (int) Math.rint(getX() + i);
 			} else {
 				if (!blockRight
-						&& level.getGridCell((int) Math.rint(getY()),
-								(int) Math.rint(getX() + i)) == LevelGrid.OBSTACLE) {
+						&& level.getGridCell((int) Math.rint(getY()), (int) Math.rint(getX() + i)) == LevelGrid.OBSTACLE) {
 					actRange[3] = (int) Math.rint(getX() + i);
 					level.setGridCell((int) Math.rint(getY()),
 							(int) Math.rint(getX() + i), LevelGrid.EMPTY);

@@ -19,7 +19,7 @@ public class MainGamePanel extends SurfaceView implements
 		SurfaceHolder.Callback {
 
 	private static final String TAG = MainGamePanel.class.getSimpleName();
-	private static final int ROUND_TIME = 700;// ms
+	private static final int ROUND_TIME = 1000;// ms
 
 	/**
 	 * Update and render game model in a separate thread.
@@ -30,6 +30,7 @@ public class MainGamePanel extends SurfaceView implements
 	private LevelNextRoundThread levelNextRound;
 
 	private SurfaceHolder surfaceHolder;
+	private boolean[] tryDirection; /*FIXME: HACK*/
 
 	private String playerName = "Rafael Baltazar"; // DEFAULT NAME
 
@@ -40,6 +41,7 @@ public class MainGamePanel extends SurfaceView implements
 
 	public MainGamePanel(Context context) {
 		super(context);
+		tryDirection = new boolean[]{false, false, false, false};
 		surfaceHolder = getHolder();
 		act = (BomberActivity) context;
 		act.setPlayerName(playerName);
@@ -111,29 +113,60 @@ public class MainGamePanel extends SurfaceView implements
 	public boolean doAction(int actionCode) {
 		switch (actionCode) {
 		case 0: {
-			level.getPlayer().moveLeft();
+			level.getPlayer().moveLeft(10);
 			break;
 		}
 		case 1: {
-			level.getPlayer().moveUp();
+			level.getPlayer().moveUp(10);
 			break;
 		}
 		case 2: {
-			level.getPlayer().moveDown();
+			level.getPlayer().moveDown(10);
 			break;
 		}
 		case 3: {
-			level.getPlayer().moveRight();
+			level.getPlayer().moveRight(10);
 			break;
 		}
 		case 4: {
-			level.placeBomb(level.getPlayer().getX(), level.getPlayer().getY());
+			level.placeBomb((int)Math.rint(level.getPlayer().getX()), (int)Math.rint(level.getPlayer().getY()));
 			break;
 		}
 		default:
 			return false;
 		}
 		return true;
+	}
+	public void tryStop(){
+		int b;
+		for(b=0; b<4; ++b){
+			tryDirection[b]=false;
+			Log.d("CHAR", "stopping");
+		}
+	}
+	
+	public void tryWalk(int dir){
+		int b;
+		for(b=0; b<4; ++b){
+			if(b==dir){
+				tryDirection[b]=true;
+				Log.d("CHAR", "walking " + b);
+			}else {
+				tryDirection[b]=false;
+			}
+		}
+		
+	}
+
+	public void updateLayer(long frameDu) {
+		int b;
+		for(b=0; b<4; ++b){
+			if(tryDirection[b]){
+				this.doAction(b);
+				break;
+			}
+
+		}
 	}
 
 	@Override
