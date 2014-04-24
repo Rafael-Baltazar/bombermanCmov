@@ -75,33 +75,7 @@ public class Level {
 		this.pointsPerRobotKilled = 1;
 		this.pointsPerOpponentKilled = 2;
 		this.numberPlayers = 1; // so far
-		this.grid.setGridLayout(new char[][] {
-				{ 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W',
-						'W', 'W', 'W', 'W', 'W', 'W', 'W' },
-				{ 'W', '-', '-', '-', '-', '1', '-', '-', '-', '-', '-', '-',
-						'-', '-', '-', '-', 'O', 'O', 'W' },
-				{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W',
-						'-', 'W', '-', 'W', '-', 'W', 'W' },
-				{ 'W', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-',
-						'-', '-', '-', '-', '-', '-', 'W' },
-				{ 'W', 'W', '-', 'W', 'O', 'W', '-', 'W', '-', 'W', '-', 'W',
-						'-', 'W', '-', 'W', '-', 'W', 'W' },
-				{ 'W', '-', '-', '-', 'O', '-', '-', '-', '-', '-', '-', '-',
-						'-', '-', '-', '-', '-', '-', 'W' },
-				{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W',
-						'-', 'W', '-', 'W', '-', 'W', 'W' },
-				{ 'W', '-', 'R', '-', '-', '-', '-', '-', '-', '-', '-', '-',
-						'-', '-', '-', '-', '-', '-', 'W' },
-				{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W',
-						'-', 'W', '-', 'W', '-', 'W', 'W' },
-				{ 'W', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-',
-						'-', '-', '-', '-', '-', '-', 'W' },
-				{ 'W', 'W', '-', 'W', 'O', 'W', '-', 'W', '-', 'W', '-', 'W',
-						'-', 'W', '-', 'W', '-', 'W', 'W' },
-				{ 'W', '-', '-', '-', 'O', '-', '-', '-', '-', '-', '-', '-',
-						'-', '-', '-', '-', '-', '-', 'W' },
-				{ 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W',
-						'W', 'W', 'W', 'W', 'W', 'W', 'W' } }, 19, 13);
+		
 		this.surfaceView = surfaceView;
 		this.bombs = new ArrayList<Bomb>();
 		this.droids = new ArrayList<Character>();
@@ -117,12 +91,35 @@ public class Level {
 																// exploding
 		this.bombBitmap[2] = BitmapFactory.decodeResource(
 				surfaceView.getResources(), R.drawable.bomb_2); // exploding
-
-		// create player
-		player = new Character(1.0f, 1.0f, 1.0f, grid, surfaceView);
-		this.droids
-				.add(new Character(1.0f, 1.0f, robotSpeed, grid, surfaceView));
-
+		
+		//awful dynamic position getting for player & droid
+		char [][] gamefield = new char [][] {
+				{ 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W' },
+				{ 'W', '-', '-', '-', '-', '1', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'O', 'O', 'W' },
+				{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
+				{ 'W', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
+				{ 'W', 'W', '-', 'W', 'O', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
+				{ 'W', '-', '-', '-', 'O', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
+				{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
+				{ 'W', '-', 'R', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
+				{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
+				{ 'W', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
+				{ 'W', 'W', '-', 'W', 'O', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
+				{ 'W', '-', '-', '-', 'O', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
+				{ 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W' } 
+				};		
+		this.grid.setGridLayout(gamefield, 19, 13);
+		
+		for(int i = 0; i < 13; i++) {
+			for(int j = 0; j < 19; j++) {
+				if(gamefield[i][j] == '1') {
+					player = new Character(j, i, 1.0f, grid, surfaceView);				
+				}
+				if(gamefield[i][j] == 'R') {
+					this.droids.add(new Character(j, i, robotSpeed, grid, surfaceView));
+				}
+			}
+		}
 	}
 
 	public void draw(Canvas canvas) {
@@ -186,6 +183,13 @@ public class Level {
 		if (totalTime == gameDuration) {
 			return false;
 		}
+		
+		/*for (Character c : droids) {
+			if(this.player.getX() == c.getX() && this.player.getY() == c.getY()) {
+				return false;
+			}			
+		}*/
+		
 		Log.d("ROUND", "Num bombs:" + bombs.isEmpty());
 		Random r;
 		float t;
