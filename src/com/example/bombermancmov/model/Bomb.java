@@ -10,13 +10,17 @@ import android.util.Log;
 import android.view.SurfaceView;
 
 import com.example.bombermancmov.R;
-import com.example.bombermancmov.model.component.DrawableComponent;
 import com.example.bombermancmov.model.component.DrawableExplosionComponent;
 
 public class Bomb extends GameObject {
-	public static int NORMAL = 0;
-	public static int NEARLY= 1;
-	public static int EXPLODING = 2;
+	public static final int RANGE_UP = 0;
+	public static final int RANGE_DOWN = 1;
+	public static final int RANGE_LEFT = 2;
+	public static final int RANGE_RIGHT = 3;
+	
+	public static final int NORMAL = 0;
+	public static final int NEARLY= 1;
+	public static final int EXPLODING = 2;
 
 	private Bitmap[] bitmaps;
 	private SurfaceView surfaceView;
@@ -52,7 +56,7 @@ public class Bomb extends GameObject {
 
 	public void draw(Canvas canvas) {
 		if (isExploding) {
-			drawableComponent.draw(canvas, range);
+			drawableComponent.draw(canvas, actRange);
 		} else {
 			drawableComponent.draw(canvas);
 		}

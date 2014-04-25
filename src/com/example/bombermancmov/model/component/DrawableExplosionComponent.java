@@ -13,7 +13,7 @@ public class DrawableExplosionComponent extends DrawableComponent {
 		super(owner, bitmaps, activeBitmapIndex);
 	}
 
-	public void draw(Canvas canvas, float range) {
+	public void draw(Canvas canvas, int[] actRange) {
 		Bitmap bitmap = getBitmaps()[Bomb.EXPLODING];
 		int bx = bitmap.getWidth();
 		int by = bitmap.getHeight();
@@ -21,11 +21,12 @@ public class DrawableExplosionComponent extends DrawableComponent {
 		float y = owner.getY() * by;
 		canvas.drawBitmap(bitmap, x, y, null);
 
-		for (int i = 0; i < range; ++i) {
-			canvas.drawBitmap(bitmap, x + (i + 1) * bx, y, null);
-			canvas.drawBitmap(bitmap, x - (i + 1) * bx, y, null);
-			canvas.drawBitmap(bitmap, x, y + (i + 1) * by, null);
-			canvas.drawBitmap(bitmap, x, y - (i + 1) * by, null);
+		for (int i = actRange[Bomb.RANGE_LEFT]; i <= actRange[Bomb.RANGE_RIGHT]; ++i) {
+			canvas.drawBitmap(bitmap, i * bx, y, null);
+		}
+
+		for (int i = actRange[Bomb.RANGE_UP]; i <= actRange[Bomb.RANGE_DOWN]; ++i) {
+			canvas.drawBitmap(bitmap, x, i * by, null);
 		}
 	}
 
