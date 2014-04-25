@@ -23,7 +23,7 @@ public class GameLoopThread extends Thread {
 	private boolean running;
 
 	// duration of a frame (in milliseconds)
-	private long frameDuration = 5;
+	private long frameDuration = 50;
 
 	public void setRunning(boolean running) {
 		this.running = running;

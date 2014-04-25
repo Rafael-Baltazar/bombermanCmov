@@ -1,9 +1,8 @@
 package com.example.bombermancmov.model;
 
-import com.example.bombermancmov.R;
+import com.example.bombermancmov.model.component.DrawableComponent;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -11,19 +10,21 @@ import android.view.SurfaceView;
 public class Character extends GameObject {
 	private float speed = 0.3f;
 	private LevelGrid level;
-	private Bitmap[] bitmaps;
 	private SurfaceView surfaceView;
 	private float points;
 	
+	/**
+	 * Handles draw and scale methods.
+	 */
+	DrawableComponent drawableComponent;
+	
 	private String name;
 	
-	private static int FRONT = 0;
-	private static int LEFT = 1;
-	private static int RIGHT = 2;
-	private static int BACK = 3;
+	public static int FRONT = 0;
+	public static int LEFT = 1;
+	public static int RIGHT = 2;
+	public static int BACK = 3;
 	
-	private int activeSprite;
-
 	/**
 	 * @param x
 	 * @param y
@@ -31,27 +32,19 @@ public class Character extends GameObject {
 	 * @param level
 	 * @param surfaceView
 	 */
-	public Character(float x, float y, float speed, LevelGrid level, SurfaceView surfaceView) {
-		super(null, x, y);
+	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid level, SurfaceView surfaceView) {
+		super(x, y);
 		this.speed = speed;
 		this.level = level;
 		this.points = 0;
 		this.surfaceView = surfaceView;
-		bitmaps = new Bitmap[4];
-		bitmaps[FRONT] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_0);
-		bitmaps[LEFT] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_1);
-		bitmaps[RIGHT] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_2);
-		bitmaps[BACK] =  BitmapFactory.decodeResource(surfaceView.getResources(), R.drawable.c0_3);
-		activeSprite = FRONT;
+		
+		drawableComponent = new DrawableComponent(this, bitmap, FRONT);
 	}
-	
-	
 	
 	public String getName() {
 		return name;
 	}
-
-
 
 	public float getPoints() {
 		return points;
@@ -59,10 +52,6 @@ public class Character extends GameObject {
 
 	public void setPoints(float points) {
 		this.points = points;
-	}
-
-	public Bitmap getActiveSprite(){
-		return bitmaps[activeSprite];
 	}
 
 	public float getSpeed() {
@@ -85,7 +74,7 @@ public class Character extends GameObject {
 	private int speedy = 0;
 	
 	public void moveDown(long timePassed){
-		activeSprite = FRONT;
+		drawableComponent.setActiveBitmapIndex(FRONT);
 		speedy = +1;
 		speedx = 0;
 		float curSpeed = (float) speed*timePassed/1000.0f;
@@ -93,7 +82,7 @@ public class Character extends GameObject {
 	}
 	
 	public void moveUp(long timePassed){
-		activeSprite = BACK;
+		drawableComponent.setActiveBitmapIndex(BACK);
 		speedy = -1;
 		speedx = 0;
 		float curSpeed = (float) speed*timePassed/1000.0f;
@@ -101,7 +90,7 @@ public class Character extends GameObject {
 	}
 	
 	public void moveLeft(long timePassed){
-		activeSprite = LEFT;
+		drawableComponent.setActiveBitmapIndex(LEFT);
 		speedy = 0;
 		speedx = -1;
 		float curSpeed = (float) speed*timePassed/1000.0f;
@@ -109,7 +98,7 @@ public class Character extends GameObject {
 	}
 	
 	public void moveRight(long timePassed){
-		activeSprite = RIGHT;
+		drawableComponent.setActiveBitmapIndex(RIGHT);
 		speedy = 0;
 		speedx = +1;
 		float curSpeed = (float) speed*timePassed/1000.0f;
@@ -152,25 +141,13 @@ public class Character extends GameObject {
 	}
 	
 	public void draw(Canvas canvas){
-		Bitmap activeBitMap = bitmaps[activeSprite];
-		canvas.drawBitmap(activeBitMap, getX()*activeBitMap.getWidth(), getY()*activeBitMap.getHeight(), null);
+		drawableComponent.draw(canvas);
 	}
 	
 	public void scale() {
 		int newWidth = surfaceView.getWidth() / level.getRowSize();
 		int newHeight = surfaceView.getHeight() / level.getCollSize();
-		bitmaps[FRONT] =  Bitmap.createScaledBitmap(bitmaps[FRONT], newWidth, newHeight, false);
-		bitmaps[LEFT] =  Bitmap.createScaledBitmap(bitmaps[LEFT], newWidth, newHeight, false);
-		bitmaps[RIGHT] =  Bitmap.createScaledBitmap(bitmaps[RIGHT], newWidth, newHeight, false);
-		bitmaps[BACK] =  Bitmap.createScaledBitmap(bitmaps[BACK], newWidth, newHeight, false);
-		Log.d("SCALE", "ScaledF width: " + newWidth + " real: " + bitmaps[FRONT].getWidth() + 
-				" ScaledF height: " + newHeight + " real: " + bitmaps[FRONT].getHeight());
-		Log.d("SCALE", "ScaledL width: " + newWidth + " real: " + bitmaps[LEFT].getWidth() + 
-				" ScaledL height: " + newHeight + " real: " + bitmaps[LEFT].getHeight());
-		Log.d("SCALE", "ScaledR width: " + newWidth + " real: " + bitmaps[RIGHT].getWidth() + 
-				" ScaledR height: " + newHeight + " real: " + bitmaps[RIGHT].getHeight());
-		Log.d("SCALE", "ScaledB width: " + newWidth + " real: " + bitmaps[BACK].getWidth() + 
-				" ScaledB height: " + newHeight + " real: " + bitmaps[BACK].getHeight());
+		drawableComponent.scale(newWidth, newHeight);
 	}
 	
 	public void placeBomb(){

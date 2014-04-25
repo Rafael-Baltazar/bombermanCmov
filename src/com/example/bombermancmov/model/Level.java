@@ -31,9 +31,13 @@ public class Level {
 	private List<Bomb> bombs;
 
 	/* Drawing */
+	/* Load bitmaps only once to increase performance */
 	private Bitmap wallBitMap;
 	private Bitmap obstacleBitmap;
 	private Bitmap[] bombBitmap;
+	private Bitmap[] playerBitmap;
+	private Bitmap[] droidBitmap;
+
 	private SurfaceView surfaceView;
 
 	public Character getPlayer() {
@@ -69,27 +73,18 @@ public class Level {
 		this.gameDuration = 180000; // three minutes?
 		this.totalTime = 0;
 		this.explosionTimeout = 4;
-		this.explosionDuration = 1000;
-		this.explosionRange = 4;
+		this.explosionDuration = 2000;
+		this.explosionRange = 2;
 		this.robotSpeed = 1; // 1 cell per second
 		this.pointsPerRobotKilled = 1;
 		this.pointsPerOpponentKilled = 2;
 		this.numberPlayers = 1; // so far
 		this.surfaceView = surfaceView;
+		
+		decodeResources();
+		
 		this.bombs = new ArrayList<Bomb>();
 		this.droids = new ArrayList<Character>();
-		this.wallBitMap = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.wall_1);
-		this.obstacleBitmap = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.obstacle_0);
-		this.bombBitmap = new Bitmap[3];
-		this.bombBitmap[0] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.bomb_0); // normal
-		this.bombBitmap[1] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.bomb_1); // nearly
-																// exploding
-		this.bombBitmap[2] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.bomb_2); // exploding
 		
 		//awful dynamic position getting for player & droid
 		char [][] gamefield = new char [][] {
@@ -112,13 +107,83 @@ public class Level {
 		for(int i = 0; i < 13; i++) {
 			for(int j = 0; j < 19; j++) {
 				if(gamefield[i][j] == '1') {
-					player = new Character(j, i, 25.0f, grid, surfaceView);				
+					player = new Character(playerBitmap, j, i, 25.0f, grid, surfaceView);				
 				}
 				if(gamefield[i][j] == 'R') {
-					this.droids.add(new Character(j, i, robotSpeed, grid, surfaceView));
+					this.droids.add(new Character(droidBitmap, j, i, robotSpeed, grid, surfaceView));
 				}
 			}
 		}
+	}
+
+	/**
+	 * Load resources only once to increase performance.
+	 */
+	private void decodeResources() {
+		decodeWallBitmap();
+		decodeObstacleBitmap();
+		decodeBombBitmaps();
+		decodePlayerBitmaps();
+		decodeDroidBitmaps();
+	}
+
+	/**
+	 * @see #decodeResources()
+	 */
+	private void decodeWallBitmap() {
+		wallBitMap = BitmapFactory.decodeResource(surfaceView.getResources(),
+				R.drawable.wall_1);
+	}
+
+	/**
+	 * @see #decodeResources()
+	 */
+	private void decodeObstacleBitmap() {
+		obstacleBitmap = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.obstacle_0);
+	}
+
+	/**
+	 * @see #decodeResources()
+	 */
+	private void decodeBombBitmaps() {
+		bombBitmap = new Bitmap[3];
+		bombBitmap[Bomb.NORMAL] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.bomb_0);
+		bombBitmap[Bomb.NEARLY] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.bomb_1);
+		bombBitmap[Bomb.EXPLODING] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.bomb_2);		
+	}
+	
+	/**
+	 * @see #decodeResources()
+	 */
+	private void decodePlayerBitmaps() {
+		playerBitmap = new Bitmap[4];
+		playerBitmap[Character.FRONT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.c0_0);
+		playerBitmap[Character.LEFT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.c0_1);
+		playerBitmap[Character.RIGHT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.c0_2);
+		playerBitmap[Character.BACK] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.c0_3);
+	}
+
+	/**
+	 * @see #decodeResources()
+	 */
+	private void decodeDroidBitmaps() {
+		droidBitmap = new Bitmap[4];
+		droidBitmap[Character.FRONT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.c0_0);
+		droidBitmap[Character.LEFT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.c0_1);
+		droidBitmap[Character.RIGHT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.c0_2);
+		droidBitmap[Character.BACK] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.c0_3);
 	}
 
 	public void draw(Canvas canvas) {
@@ -140,8 +205,8 @@ public class Level {
 				}
 			}
 		}
+		
 		player.draw(canvas);
-
 		for (Bomb b : bombs) {
 			b.draw(canvas);
 		}
@@ -168,7 +233,7 @@ public class Level {
 			c.scale();
 		}
 
-		Log.d("SCALE", "Scaled Level width: " + newWidth + " real: "
+		Log.d("SCALE", "Scaled Wall width: " + newWidth + " real: "
 				+ wallBitMap.getWidth() + " Scaled Level height: " + newHeight
 				+ " real: " + wallBitMap.getHeight());
 	}
