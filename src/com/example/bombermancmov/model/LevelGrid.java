@@ -7,9 +7,6 @@ public class LevelGrid {
 	public static final char OBSTACLE = 'O';
 	public static final char ROBOT = 'R';
 	public static final char BOMB = 'B';
-	/**
-	 * 1-3 Players
-	 */
 	private char[][] gridLayout;
 	private int rowSize;
 	private int collSize;
