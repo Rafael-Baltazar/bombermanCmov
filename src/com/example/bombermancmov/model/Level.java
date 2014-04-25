@@ -70,12 +70,11 @@ public class Level {
 		this.totalTime = 0;
 		this.explosionTimeout = 4;
 		this.explosionDuration = 1000;
-		this.explosionRange = 1;
+		this.explosionRange = 4;
 		this.robotSpeed = 1; // 1 cell per second
 		this.pointsPerRobotKilled = 1;
 		this.pointsPerOpponentKilled = 2;
 		this.numberPlayers = 1; // so far
-		
 		this.surfaceView = surfaceView;
 		this.bombs = new ArrayList<Bomb>();
 		this.droids = new ArrayList<Character>();
