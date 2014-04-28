@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-public class BomberActivity extends ActionBarActivity {
+public class SingleGameActivity extends ActionBarActivity {
 
 	private static final String TAG = GameLoopThread.class.getSimpleName();
 	private FrameLayout frm;

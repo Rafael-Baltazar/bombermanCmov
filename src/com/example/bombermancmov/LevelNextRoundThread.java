@@ -1,13 +1,13 @@
 package com.example.bombermancmov;
 
-import com.example.bombermancmov.model.Level;
+import com.example.bombermancmov.model.Game;
 
 public class LevelNextRoundThread extends Thread {
-	private Level level;
+	private Game level;
 	private int roundTime;
 	private boolean running = true;
 
-	public LevelNextRoundThread(Level level, int roundTime) {
+	public LevelNextRoundThread(Game level, int roundTime) {
 		this.level = level;
 		this.roundTime = roundTime;
 	}

@@ -1,6 +1,6 @@
 package com.example.bombermancmov;
 
-import com.example.bombermancmov.model.Level;
+import com.example.bombermancmov.model.Game;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -35,32 +35,32 @@ public class MainGamePanel extends SurfaceView implements
 	private String playerName = "Rafael Baltazar"; // DEFAULT NAME
 
 	/* Game model */
-	private Level level;
+	private Game game;
 
-	private BomberActivity act; // HORRIBLE HACK!
+	private SingleGameActivity act; // HORRIBLE HACK!
 
 	public MainGamePanel(Context context) {
 		super(context);
 		tryDirection = new boolean[]{false, false, false, false};
 		surfaceHolder = getHolder();
-		act = (BomberActivity) context;
+		act = (SingleGameActivity) context;
 		act.setPlayerName(playerName);
 
 		// adding the callback(this) to the surface holder to intercept events
 		surfaceHolder.addCallback(this);
 
 		// create level
-		level = new Level(this);
+		game = new Game(this);
 
-		act.setPlayerScore(level.getPlayer().getPoints());
-		act.setTimeLeft(level.getTimeLeft());
-		act.setNumPlayers(level.getNumberPlayers());
+		act.setPlayerScore(game.getPlayer().getPoints());
+		act.setTimeLeft(game.getTimeLeft());
+		act.setNumPlayers(game.getLevel().getMaxNumberPlayers());
 
 		// create the game loop thread
 		thread = new GameLoopThread(surfaceHolder, this);
 
 		// create env thread
-		levelNextRound = new LevelNextRoundThread(level, ROUND_TIME);
+		levelNextRound = new LevelNextRoundThread(game, ROUND_TIME);
 		levelNextRound.start();
 
 		// make the GamePanel focusable so it can handle events
@@ -73,13 +73,13 @@ public class MainGamePanel extends SurfaceView implements
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		Log.d(TAG, "Surface changed");
-		level.scale();
+		game.scale();
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.d(TAG, "Surface is being created");
-		level.scale();
+		game.scale();
 		thread.setRunning(true);
 		thread.start();
 	}
@@ -113,23 +113,23 @@ public class MainGamePanel extends SurfaceView implements
 	public boolean doAction(int actionCode) {
 		switch (actionCode) {
 		case 0: {
-			level.getPlayer().moveLeft(10);
+			game.getPlayer().moveLeft(10);
 			break;
 		}
 		case 1: {
-			level.getPlayer().moveUp(10);
+			game.getPlayer().moveUp(10);
 			break;
 		}
 		case 2: {
-			level.getPlayer().moveDown(10);
+			game.getPlayer().moveDown(10);
 			break;
 		}
 		case 3: {
-			level.getPlayer().moveRight(10);
+			game.getPlayer().moveRight(10);
 			break;
 		}
 		case 4: {
-			level.placeBomb((int)Math.rint(level.getPlayer().getX()), (int)Math.rint(level.getPlayer().getY()));
+			game.placeBomb((int)Math.rint(game.getPlayer().getX()), (int)Math.rint(game.getPlayer().getY()));
 			break;
 		}
 		default:
@@ -177,6 +177,6 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void drawGameModel(Canvas canvas) {
 		canvas.drawColor(Color.WHITE);
-		level.draw(canvas);
+		game.draw(canvas);
 	}
 }

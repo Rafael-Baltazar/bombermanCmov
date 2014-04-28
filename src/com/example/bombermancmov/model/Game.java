@@ -12,19 +12,12 @@ import android.view.SurfaceView;
 
 import com.example.bombermancmov.R;
 
-public class Level {
-
-	private String levelName;
+public class Game {
+	
 	private float gameDuration;
 	private float totalTime;
-	private int explosionTimeout;
-	private float explosionDuration;
-	private float explosionRange;
-	private float robotSpeed;
-	private float pointsPerRobotKilled;
-	private float pointsPerOpponentKilled;
-	private int numberPlayers;
-	private LevelGrid grid = new LevelGrid();
+	
+	private Level level;
 
 	private Character player;
 	private List<Droid> droids;
@@ -44,20 +37,8 @@ public class Level {
 		return player;
 	}
 
-	public int getNumberPlayers() {
-		return numberPlayers;
-	}
-
 	public float getTimeLeft() {
 		return gameDuration - totalTime;
-	}
-
-	public LevelGrid getGrid() {
-		return grid;
-	}
-
-	public void setGrid(LevelGrid grid) {
-		this.grid = grid;
 	}
 
 	public Bitmap getWallBitMap() {
@@ -67,18 +48,21 @@ public class Level {
 	/**
 	 * To test.
 	 */
-	public Level(SurfaceView surfaceView) {
+	public Game(SurfaceView surfaceView) {
 		super();
-		this.levelName = "defaultLevelName";
 		this.gameDuration = 180000; // three minutes?
 		this.totalTime = 0;
-		this.explosionTimeout = 4;
-		this.explosionDuration = 2000;
-		this.explosionRange = 2;
-		this.robotSpeed = 1; // 1 cell per second
-		this.pointsPerRobotKilled = 1;
-		this.pointsPerOpponentKilled = 2;
-		this.numberPlayers = 1; // so far
+		
+		this.level = new Level();
+		this.level.setLevelName("default");
+		this.level.setExplosionTimeout(4);
+		this.level.setExplosionDuration(2000);
+		this.level.setExplosionRange(2);
+		this.level.setRobotSpeed(1);
+		this.level.setPointsPerOpponentKilled(2);
+		this.level.setPointsPerRobotKilled(1);
+		this.level.setMaxNumberPlayers(1);		
+		
 		this.surfaceView = surfaceView;
 		
 		decodeResources();
@@ -86,31 +70,14 @@ public class Level {
 		this.bombs = new ArrayList<Bomb>();
 		this.droids = new ArrayList<Droid>();
 		
-		//awful dynamic position getting for player & droid
-		char [][] gamefield = new char [][] {
-				{ 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W' },
-				{ 'W', '-', '-', '-', '-', '1', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'O', 'O', 'W' },
-				{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
-				{ 'W', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
-				{ 'W', 'W', '-', 'W', 'O', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
-				{ 'W', '-', '-', '-', 'O', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
-				{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
-				{ 'W', '-', 'R', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
-				{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
-				{ 'W', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
-				{ 'W', 'W', '-', 'W', 'O', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
-				{ 'W', '-', '-', '-', 'O', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
-				{ 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W' } 
-				};		
-		this.grid.setGridLayout(gamefield, 19, 13);
-		
+		//awful dynamic position getting for player & droid		
 		for(int i = 0; i < 13; i++) {
 			for(int j = 0; j < 19; j++) {
-				if(gamefield[i][j] == '1') {
-					player = new Character(playerBitmap, j, i, 25.0f, grid, surfaceView);				
+				if(this.level.getGrid().getGridCell(i, j) == '1') {
+					player = new Character(playerBitmap, j, i, 25.0f, this.level.getGrid(), surfaceView);				
 				}
-				if(gamefield[i][j] == 'R') {
-					this.droids.add(new Droid(droidBitmap, j, i, robotSpeed, grid, surfaceView));
+				if(this.level.getGrid().getGridCell(i, j) == 'R') {
+					this.droids.add(new Droid(droidBitmap, j, i, this.level.getRobotSpeed(), this.level.getGrid(), surfaceView));
 				}
 			}
 		}
@@ -187,9 +154,9 @@ public class Level {
 	}
 
 	public void draw(Canvas canvas) {
-		for (int rowNum = 0; rowNum < grid.getRowSize(); ++rowNum) {
-			for (int collNum = 0; collNum < grid.getCollSize(); ++collNum) {
-				switch (grid.getGridCell(collNum, rowNum)) {
+		for (int rowNum = 0; rowNum < this.level.getGrid().getRowSize(); ++rowNum) {
+			for (int collNum = 0; collNum < this.level.getGrid().getCollSize(); ++collNum) {
+				switch (this.level.getGrid().getGridCell(collNum, rowNum)) {
 				case LevelGrid.WALL: {
 					canvas.drawBitmap(wallBitMap,
 							rowNum * wallBitMap.getWidth(), collNum
@@ -216,8 +183,8 @@ public class Level {
 	}
 
 	public void scale() {
-		int newWidth = surfaceView.getWidth() / grid.getRowSize();
-		int newHeight = surfaceView.getHeight() / grid.getCollSize();
+		int newWidth = surfaceView.getWidth() / this.level.getGrid().getRowSize();
+		int newHeight = surfaceView.getHeight() / this.level.getGrid().getCollSize();
 		wallBitMap = Bitmap.createScaledBitmap(wallBitMap, newWidth, newHeight,
 				false);
 		obstacleBitmap = Bitmap.createScaledBitmap(obstacleBitmap, newWidth,
@@ -239,8 +206,8 @@ public class Level {
 	}
 
 	public void placeBomb(int x, int y) {
-		bombs.add(new Bomb(bombBitmap, x, y, explosionTimeout, explosionRange,
-				this.grid, surfaceView));
+		bombs.add(new Bomb(bombBitmap, x, y, this.level.getExplosionTimeout(), this.level.getExplosionRange(),
+				this.level.getGrid(), surfaceView));
 	}
 
 	public boolean nextRound() {
@@ -266,7 +233,7 @@ public class Level {
 						
 						droids.remove(c);
 						player.setPoints(player.getSpeed()
-								+ pointsPerRobotKilled);
+								+ this.level.getPointsPerRobotKilled());
 					}
 				}
 			} else if (t == -1) {
@@ -284,5 +251,16 @@ public class Level {
 		
 		return true;
 	}
+	
+	/**
+	 * GETTERS &
+	 * SETTERS
+	 */
+	public Level getLevel() {
+		return level;
+	}
 
+	public void setLevel(Level level) {
+		this.level = level;
+	}
 }

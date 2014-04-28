@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class Menu extends Activity implements OnClickListener{
+public class MainMenuActivity extends Activity implements OnClickListener{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
@@ -31,12 +31,9 @@ public class Menu extends Activity implements OnClickListener{
 	            finish();
 	            break;
 	        case R.id.bSingle:
-	            Intent intent = new Intent(this, BomberActivity.class);
+	            Intent intent = new Intent(this, SingleGameActivity.class);
 	            this.startActivity(intent);
 	            break;	        
 	    }
 	}
-
-
-
 }
