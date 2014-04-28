@@ -27,7 +27,7 @@ public class Level {
 	private LevelGrid grid = new LevelGrid();
 
 	private Character player;
-	private List<Character> droids;
+	private List<Droid> droids;
 	private List<Bomb> bombs;
 
 	/* Drawing */
@@ -84,7 +84,7 @@ public class Level {
 		decodeResources();
 		
 		this.bombs = new ArrayList<Bomb>();
-		this.droids = new ArrayList<Character>();
+		this.droids = new ArrayList<Droid>();
 		
 		//awful dynamic position getting for player & droid
 		char [][] gamefield = new char [][] {
@@ -110,7 +110,7 @@ public class Level {
 					player = new Character(playerBitmap, j, i, 25.0f, grid, surfaceView);				
 				}
 				if(gamefield[i][j] == 'R') {
-					this.droids.add(new Character(droidBitmap, j, i, robotSpeed, grid, surfaceView));
+					this.droids.add(new Droid(droidBitmap, j, i, robotSpeed, grid, surfaceView));
 				}
 			}
 		}
@@ -247,14 +247,6 @@ public class Level {
 		if (totalTime == gameDuration) {
 			return false;
 		}
-
-		
-		
-		/*for (Character c : droids) {
-			if(this.player.getX() == c.getX() && this.player.getY() == c.getY()) {
-				return false;
-			}			
-		}*/
 		
 		Log.d("ROUND", "Num bombs:" + bombs.isEmpty());
 
@@ -281,31 +273,15 @@ public class Level {
 				toRemove.add(b);
 			}
 		}
+		
 		for (Bomb b : toRemove) {
 			bombs.remove(b);
 		}
 
-		for (Character c : droids) {
-			r = new Random();
-			switch (r.nextInt(4)) {
-			case 0: {
-				c.moveUp(10);
-				break;
-			}
-			case 1: {
-				c.moveLeft(10);
-				break;
-			}
-			case 2: {
-				c.moveRight(10);
-				break;
-			}
-			case 3: {
-				c.moveDown(10);
-				break;
-			}
-			}
+		for (Droid d : droids) {
+			d.moveRandomly();
 		}
+		
 		return true;
 	}
 
