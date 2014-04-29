@@ -71,7 +71,7 @@ public class Bomb extends GameObject {
 	 */
 	public void scale() {
 		int newWidth = surfaceView.getWidth() / level.getRowSize();
-		int newHeight = surfaceView.getHeight() / level.getCollSize();
+		int newHeight = surfaceView.getHeight() / level.getColSize();
 		drawableComponent.scale(newWidth, newHeight);
 	}
 
@@ -123,7 +123,7 @@ public class Bomb extends GameObject {
 		}
 		// Find act range down
 		for (int i = 0; i <= range; ++i) {
-			if (getY() + i > level.getCollSize() - 1) {
+			if (getY() + i > level.getColSize() - 1) {
 				break;
 			}
 			int y = (int) Math.rint(getY() + i);

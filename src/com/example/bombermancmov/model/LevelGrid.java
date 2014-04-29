@@ -7,11 +7,34 @@ public class LevelGrid {
 	public static final char OBSTACLE = 'O';
 	public static final char ROBOT = 'R';
 	public static final char BOMB = 'B';
+	
 	private char[][] gridLayout;
 	private int rowSize;
-	private int collSize;
+	private int colSize;
 
-	public LevelGrid() {
+	public LevelGrid(char[][] gridLayout) {
+		if(gridLayout == null) {
+			//Default game field
+			this.gridLayout = new char [][] {
+					{ 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W' },
+					{ 'W', '-', '-', '-', '-', '1', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'O', 'O', 'W' },
+					{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
+					{ 'W', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
+					{ 'W', 'W', '-', 'W', 'O', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
+					{ 'W', '-', '-', '-', 'O', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
+					{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
+					{ 'W', '-', 'R', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
+					{ 'W', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
+					{ 'W', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
+					{ 'W', 'W', '-', 'W', 'O', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', '-', 'W', 'W' },
+					{ 'W', '-', '-', '-', 'O', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', '-', 'W' },
+					{ 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W' } 
+					};
+		} else {
+			this.gridLayout = gridLayout;
+		}
+		this.colSize = this.gridLayout.length;
+		this.rowSize = this.gridLayout[0].length;
 	}
 
 	public char[][] getGridLayout() {
@@ -22,14 +45,14 @@ public class LevelGrid {
 		return rowSize;
 	}
 	
-	public int getCollSize(){
-		return collSize;
+	public int getColSize(){
+		return colSize;
 	}
 
-	public void setGridLayout(char[][] gridLayout, int rowSize, int collSize) {
-		this.gridLayout = gridLayout;
-		this.rowSize = rowSize;
-		this.collSize = collSize;
+	public void setGridLayout(char[][] gridLayout) {		
+		this.gridLayout = gridLayout;		
+		this.colSize = this.gridLayout.length;
+		this.rowSize = this.gridLayout[0].length;
 	}
 
 	public char getGridCell(int x, int y) {

@@ -146,7 +146,7 @@ public class Character extends GameObject {
 	
 	public void scale() {
 		int newWidth = surfaceView.getWidth() / level.getRowSize();
-		int newHeight = surfaceView.getHeight() / level.getCollSize();
+		int newHeight = surfaceView.getHeight() / level.getColSize();
 		drawableComponent.scale(newWidth, newHeight);
 	}
 	

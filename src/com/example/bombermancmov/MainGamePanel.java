@@ -52,7 +52,8 @@ public class MainGamePanel extends SurfaceView implements
 		// create level
 		game = new Game(this);
 
-		act.setPlayerScore(game.getPlayer().getPoints());
+		//for single player, TODO for multiplayer
+		act.setPlayerScore(game.getPlayerByNumber(0).getPoints());
 		act.setTimeLeft(game.getTimeLeft());
 		act.setNumPlayers(game.getLevel().getMaxNumberPlayers());
 
@@ -110,26 +111,27 @@ public class MainGamePanel extends SurfaceView implements
 		Log.d(TAG, "Level next round thread was shut down cleanly");
 	}
 
+	//TODO: multiplayer approach
 	public boolean doAction(int actionCode) {
 		switch (actionCode) {
 		case 0: {
-			game.getPlayer().moveLeft(10);
+			game.getPlayerByNumber(0).moveLeft(10);
 			break;
 		}
 		case 1: {
-			game.getPlayer().moveUp(10);
+			game.getPlayerByNumber(0).moveUp(10);
 			break;
 		}
 		case 2: {
-			game.getPlayer().moveDown(10);
+			game.getPlayerByNumber(0).moveDown(10);
 			break;
 		}
 		case 3: {
-			game.getPlayer().moveRight(10);
+			game.getPlayerByNumber(0).moveRight(10);
 			break;
 		}
 		case 4: {
-			game.placeBomb((int)Math.rint(game.getPlayer().getX()), (int)Math.rint(game.getPlayer().getY()));
+			game.placeBomb((int)Math.rint(game.getPlayerByNumber(0).getX()), (int)Math.rint(game.getPlayerByNumber(0).getY()));
 			break;
 		}
 		default:

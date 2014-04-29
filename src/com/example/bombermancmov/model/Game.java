@@ -2,7 +2,6 @@ package com.example.bombermancmov.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,7 +18,9 @@ public class Game {
 	
 	private Level level;
 
-	private Character player;
+	//private Character player;
+	private List<Character> players;
+
 	private List<Droid> droids;
 	private List<Bomb> bombs;
 
@@ -33,8 +34,12 @@ public class Game {
 
 	private SurfaceView surfaceView;
 
-	public Character getPlayer() {
+	/*public Character getPlayer() {
 		return player;
+	}*/
+	
+	public Character getPlayerByNumber(int i) {
+		return players.get(i);
 	}
 
 	public float getTimeLeft() {
@@ -67,14 +72,22 @@ public class Game {
 		
 		decodeResources();
 		
+		//Create Lists for filling
 		this.bombs = new ArrayList<Bomb>();
 		this.droids = new ArrayList<Droid>();
+		this.players = new ArrayList<Character>();
 		
-		//awful dynamic position getting for player & droid		
+		//Creating Player and Robots on their starting position (maybe rework later)
 		for(int i = 0; i < 13; i++) {
 			for(int j = 0; j < 19; j++) {
-				if(this.level.getGrid().getGridCell(i, j) == '1') {
-					player = new Character(playerBitmap, j, i, 25.0f, this.level.getGrid(), surfaceView);				
+				//Check if a player is on this cell
+				if(this.level.getGrid().getGridCell(i, j) == '1' || this.level.getGrid().getGridCell(i, j) == '2' ||
+						this.level.getGrid().getGridCell(i, j) == '3') {
+					//Check if additional player is possible for this map
+					if(this.players.size() <= this.level.getMaxNumberPlayers()) {
+						players.add(new Character(playerBitmap, j, i, 25.0f, this.level.getGrid(), surfaceView));
+					}					
+					//player = new Character(playerBitmap, j, i, 25.0f, this.level.getGrid(), surfaceView);				
 				}
 				if(this.level.getGrid().getGridCell(i, j) == 'R') {
 					this.droids.add(new Droid(droidBitmap, j, i, this.level.getRobotSpeed(), this.level.getGrid(), surfaceView));
@@ -155,7 +168,7 @@ public class Game {
 
 	public void draw(Canvas canvas) {
 		for (int rowNum = 0; rowNum < this.level.getGrid().getRowSize(); ++rowNum) {
-			for (int collNum = 0; collNum < this.level.getGrid().getCollSize(); ++collNum) {
+			for (int collNum = 0; collNum < this.level.getGrid().getColSize(); ++collNum) {
 				switch (this.level.getGrid().getGridCell(collNum, rowNum)) {
 				case LevelGrid.WALL: {
 					canvas.drawBitmap(wallBitMap,
@@ -173,7 +186,10 @@ public class Game {
 			}
 		}
 		
-		player.draw(canvas);
+		for (Character c : players) {
+			c.draw(canvas);
+		}
+		//player.draw(canvas);
 		for (Bomb b : bombs) {
 			b.draw(canvas);
 		}
@@ -184,14 +200,17 @@ public class Game {
 
 	public void scale() {
 		int newWidth = surfaceView.getWidth() / this.level.getGrid().getRowSize();
-		int newHeight = surfaceView.getHeight() / this.level.getGrid().getCollSize();
+		int newHeight = surfaceView.getHeight() / this.level.getGrid().getColSize();
 		wallBitMap = Bitmap.createScaledBitmap(wallBitMap, newWidth, newHeight,
 				false);
 		obstacleBitmap = Bitmap.createScaledBitmap(obstacleBitmap, newWidth,
 				newHeight, false);
 
-		player.scale();
-
+		//player.scale();
+		for (Character c : players) {
+			c.scale();
+		}
+		
 		for (Bomb b : bombs) {
 			b.scale();
 		}
@@ -217,7 +236,6 @@ public class Game {
 		
 		Log.d("ROUND", "Num bombs:" + bombs.isEmpty());
 
-		Random r;
 		float t;
 		int[] expBlocks;
 		List<Bomb> toRemove = new ArrayList<Bomb>(); // STUPID HACK TO PREVENT
@@ -231,9 +249,9 @@ public class Game {
 							|| 
 						((Math.rint(b.getX()) == Math.rint(c.getX())) && (expBlocks[0] <= Math.rint(c.getY())) && (expBlocks[1] >= Math.rint(c.getY())))) {
 						
-						droids.remove(c);
-						player.setPoints(player.getSpeed()
-								+ this.level.getPointsPerRobotKilled());
+						droids.remove(c);						
+						//TODO which player? this is for single player:
+						players.get(0).setPoints(players.get(0).getSpeed() + this.level.getPointsPerRobotKilled());
 					}
 				}
 			} else if (t == -1) {
@@ -262,5 +280,13 @@ public class Game {
 
 	public void setLevel(Level level) {
 		this.level = level;
+	}
+	
+	public List<Character> getPlayers() {
+		return players;
+	}
+
+	public void setPlayers(List<Character> players) {
+		this.players = players;
 	}
 }
