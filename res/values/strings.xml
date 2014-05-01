@@ -17,5 +17,6 @@
     <string name="display_num_players">Number of Players:</string>
     <string name="hint_player_name">Insert a nickname here</string>
     <string name="background_main_menu_description">Bomberman front view</string>
+    <string name="quit_button_text">Quit</string>
 
 </resources>

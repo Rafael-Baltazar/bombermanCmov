@@ -13,7 +13,7 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_weight="1"
             android:background="#ffffff"
             android:orientation="vertical" >
@@ -34,9 +34,9 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:background="#ffffff"
+            android:background="#666699"
             android:orientation="vertical" >
 
             <TextView
@@ -55,9 +55,9 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:background="#ffffff"
+            android:background="#666666"
             android:orientation="vertical" >
 
             <TextView
@@ -76,9 +76,9 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_weight="1"
-            android:background="#ffffff"
+            android:background="#666633"
             android:orientation="vertical" >
 
             <TextView
