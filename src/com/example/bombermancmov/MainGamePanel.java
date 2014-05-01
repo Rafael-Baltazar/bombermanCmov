@@ -30,9 +30,9 @@ public class MainGamePanel extends SurfaceView implements
 	private LevelNextRoundThread levelNextRound;
 
 	private SurfaceHolder surfaceHolder;
-	private boolean[] tryDirection; /*FIXME: HACK*/
+	private boolean[] tryDirection; /* FIXME: HACK */
 
-	private String playerName = "Rafael Baltazar"; // DEFAULT NAME
+	private String playerName; // DEFAULT NAME
 
 	/* Game model */
 	private Game game;
@@ -41,7 +41,7 @@ public class MainGamePanel extends SurfaceView implements
 
 	public MainGamePanel(Context context) {
 		super(context);
-		tryDirection = new boolean[]{false, false, false, false};
+		tryDirection = new boolean[] { false, false, false, false };
 		surfaceHolder = getHolder();
 		mActivity = (SingleGameActivity) context;
 		playerName = mActivity.getIntent().getStringExtra("PlayerName");
@@ -53,17 +53,10 @@ public class MainGamePanel extends SurfaceView implements
 		// create level
 		game = new Game(this);
 
-		//for single player, TODO for multiplayer
+		// for single player, TODO for multiplayer
 		mActivity.setPlayerScore(game.getPlayerByNumber(0).getPoints());
 		mActivity.setTimeLeft(game.getTimeLeft());
 		mActivity.setNumPlayers(game.getLevel().getMaxNumberPlayers());
-
-		// create the game loop thread
-		thread = new GameLoopThread(surfaceHolder, this);
-
-		// create env thread
-		levelNextRound = new LevelNextRoundThread(game, ROUND_TIME);
-		levelNextRound.start();
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
@@ -81,9 +74,17 @@ public class MainGamePanel extends SurfaceView implements
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.d(TAG, "Surface is being created");
-		game.scale();
+		startThreads();
+	}
+
+	private void startThreads() {
+		// create the game loop thread
+		thread = new GameLoopThread(surfaceHolder, this);
 		thread.setRunning(true);
 		thread.start();
+		// create env thread
+		levelNextRound = new LevelNextRoundThread(game, ROUND_TIME);
+		levelNextRound.start();
 	}
 
 	@Override
@@ -91,6 +92,14 @@ public class MainGamePanel extends SurfaceView implements
 		Log.d(TAG, "Surface is being destroyed");
 		// shut down all the threads
 		thread.setRunning(false);
+		shutDown(thread);
+		Log.d(TAG, "Game loop thread was shut down cleanly");
+		levelNextRound.setRunning(false);
+		shutDown(levelNextRound);
+		Log.d(TAG, "Level next round thread was shut down cleanly");
+	}
+
+	private void shutDown(Thread thread) {
 		while (true) {
 			try {
 				thread.join();
@@ -99,20 +108,9 @@ public class MainGamePanel extends SurfaceView implements
 				Log.d(TAG, "Interrupted exception at surface destroyed.");
 			}
 		}
-		Log.d(TAG, "Game loop thread was shut down cleanly");
-		levelNextRound.setRunning(false);
-		while (true) {
-			try {
-				levelNextRound.join();
-				break;
-			} catch (InterruptedException e) {
-				Log.d(TAG, "Interrupted exception at surface destroyed.");
-			}
-		}
-		Log.d(TAG, "Level next round thread was shut down cleanly");
 	}
 
-	//TODO: multiplayer approach
+	// TODO: multiplayer approach
 	public boolean doAction(int actionCode) {
 		switch (actionCode) {
 		case 0: {
@@ -132,7 +130,8 @@ public class MainGamePanel extends SurfaceView implements
 			break;
 		}
 		case 4: {
-			game.placeBomb((int)Math.rint(game.getPlayerByNumber(0).getX()), (int)Math.rint(game.getPlayerByNumber(0).getY()));
+			game.placeBomb((int) Math.rint(game.getPlayerByNumber(0).getX()),
+					(int) Math.rint(game.getPlayerByNumber(0).getY()));
 			break;
 		}
 		default:
@@ -140,31 +139,32 @@ public class MainGamePanel extends SurfaceView implements
 		}
 		return true;
 	}
-	public void tryStop(){
+
+	public void tryStop() {
 		int b;
-		for(b=0; b<4; ++b){
-			tryDirection[b]=false;
+		for (b = 0; b < 4; ++b) {
+			tryDirection[b] = false;
 			Log.d("CHAR", "stopping");
 		}
 	}
-	
-	public void tryWalk(int dir){
+
+	public void tryWalk(int dir) {
 		int b;
-		for(b=0; b<4; ++b){
-			if(b==dir){
-				tryDirection[b]=true;
+		for (b = 0; b < 4; ++b) {
+			if (b == dir) {
+				tryDirection[b] = true;
 				Log.d("CHAR", "walking " + b);
-			}else {
-				tryDirection[b]=false;
+			} else {
+				tryDirection[b] = false;
 			}
 		}
-		
+
 	}
 
 	public void updateLayer(long frameDu) {
 		int b;
-		for(b=0; b<4; ++b){
-			if(tryDirection[b]){
+		for (b = 0; b < 4; ++b) {
+			if (tryDirection[b]) {
 				this.doAction(b);
 				break;
 			}
