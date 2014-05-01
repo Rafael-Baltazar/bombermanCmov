@@ -15,5 +15,7 @@
     <string name="display_time_left">Time left:</string><string name="display_player_name">Player Name:</string>
     <string name="display_player_score">Player Score:</string>
     <string name="display_num_players">Number of Players:</string>
+    <string name="hint_player_name">Insert a nickname here</string>
+    <string name="background_main_menu_description">Bomberman front view</string>
 
 </resources>

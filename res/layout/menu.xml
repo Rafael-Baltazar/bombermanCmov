@@ -1,27 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:gravity="center_vertical">
-    <Button android:id="@+id/bSingle"
+    android:layout_height="fill_parent" >
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:contentDescription="@string/background_main_menu_description"
+        android:src="@drawable/c0_0" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical" >
+
+        <EditText
+            android:id="@+id/ePlayerName"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:hint="@string/hint_player_name"
+            android:padding="5dp" />
+
+        <Button
+            android:id="@+id/bSingle"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="newSingleGame"
             android:padding="5dp"
             android:text="@string/btn_single" />
-    <Button android:id="@+id/bMulti"
+
+        <Button
+            android:id="@+id/bMulti"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:text="@string/btn_multi" />
-    <Button android:id="@+id/bOptions"
-		    android:layout_width="fill_parent"
-		    android:layout_height="wrap_content"
-		    android:padding="5dp"
-		    android:text="@string/btn_options" />    
-    <Button android:id="@+id/bExit"
+
+        <Button
+            android:id="@+id/bOptions"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
+            android:text="@string/btn_options" />
+
+        <Button
+            android:id="@+id/bExit"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:onClick="exit"
+            android:padding="5dp"
             android:text="@string/btn_exit" />
-</LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
