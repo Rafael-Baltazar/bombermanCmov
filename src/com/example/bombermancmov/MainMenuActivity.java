@@ -12,12 +12,14 @@ import android.widget.EditText;
 public class MainMenuActivity extends Activity {
 	private static final String TAG = MainMenuActivity.class.getSimpleName();
 
+	private EditText ePlayerName;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.menu);
 
-		EditText ePlayerName = (EditText) findViewById(R.id.ePlayerName);
+		ePlayerName = (EditText) findViewById(R.id.ePlayerName);
 		ePlayerName.setOnKeyListener(sendPlayerName);
 	}
 
@@ -39,7 +41,9 @@ public class MainMenuActivity extends Activity {
 	};
 
 	public void newSingleGame(View v) {
+		String name = ePlayerName.getText().toString();
 		Intent intent = new Intent(this, SingleGameActivity.class);
+		intent.putExtra("PlayerName", name);
 		this.startActivity(intent);
 	}
 

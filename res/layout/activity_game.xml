@@ -4,73 +4,95 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffff" >
+        android:baselineAligned="false" >
 
         <!-- Display Player Name -->
 
-        <TextView
-            android:id="@+id/displayPlayerName"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/display_player_name" />
+            android:layout_weight="1"
+            android:background="#ffffff"
+            android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/playerName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/displayPlayerName" />
+            <TextView
+                android:id="@+id/displayPlayerName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/display_player_name" />
+
+            <TextView
+                android:id="@+id/playerName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
         <!-- Display Player Score -->
 
-        <TextView
-            android:id="@+id/displayPlayerScore"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/displayPlayerName"
-            android:text="@string/display_player_score" />
+            android:layout_weight="1"
+            android:background="#ffffff"
+            android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/playerScore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/displayPlayerName"
-            android:layout_toRightOf="@id/displayPlayerScore" />
+            <TextView
+                android:id="@+id/displayPlayerScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/display_player_score" />
+
+            <TextView
+                android:id="@+id/playerScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
         <!-- Display Time Left -->
 
-        <TextView
-            android:id="@+id/displayTimeLeft"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/displayPlayerScore"
-            android:text="@string/display_time_left" />
+            android:layout_weight="1"
+            android:background="#ffffff"
+            android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/timeLeft"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/displayPlayerScore"
-            android:layout_toRightOf="@id/displayTimeLeft" />
+            <TextView
+                android:id="@+id/displayTimeLeft"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/display_time_left" />
+
+            <TextView
+                android:id="@+id/timeLeft"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
         <!-- Display Number of Players -->
 
-        <TextView
-            android:id="@+id/displayNumPlayers"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/displayTimeLeft"
-            android:text="@string/display_num_players" />
+            android:layout_weight="1"
+            android:background="#ffffff"
+            android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/numberPlayers"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/displayTimeLeft"
-            android:layout_toRightOf="@id/displayNumPlayers" />
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/displayNumPlayers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/display_num_players" />
+
+            <TextView
+                android:id="@+id/numberPlayers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
 
     <FrameLayout
         android:id="@+id/frameLayout"
@@ -84,11 +106,18 @@
         android:layout_height="wrap_content"
         android:background="#ffffff" >
 
+        <Button android:id="@+id/buttonQuit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="quitGame"
+            android:text="@string/quit_button_text"
+            android:layout_centerVertical="true"/>
         <Button
             android:id="@+id/buttonLeft"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/buttonQuit"
             android:text="@string/left_button_text" />
 
         <Button

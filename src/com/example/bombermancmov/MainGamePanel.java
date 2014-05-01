@@ -37,14 +37,15 @@ public class MainGamePanel extends SurfaceView implements
 	/* Game model */
 	private Game game;
 
-	private SingleGameActivity act; // HORRIBLE HACK!
+	private SingleGameActivity mActivity; // HORRIBLE HACK!
 
 	public MainGamePanel(Context context) {
 		super(context);
 		tryDirection = new boolean[]{false, false, false, false};
 		surfaceHolder = getHolder();
-		act = (SingleGameActivity) context;
-		act.setPlayerName(playerName);
+		mActivity = (SingleGameActivity) context;
+		playerName = mActivity.getIntent().getStringExtra("PlayerName");
+		mActivity.setPlayerName(playerName);
 
 		// adding the callback(this) to the surface holder to intercept events
 		surfaceHolder.addCallback(this);
@@ -53,9 +54,9 @@ public class MainGamePanel extends SurfaceView implements
 		game = new Game(this);
 
 		//for single player, TODO for multiplayer
-		act.setPlayerScore(game.getPlayerByNumber(0).getPoints());
-		act.setTimeLeft(game.getTimeLeft());
-		act.setNumPlayers(game.getLevel().getMaxNumberPlayers());
+		mActivity.setPlayerScore(game.getPlayerByNumber(0).getPoints());
+		mActivity.setTimeLeft(game.getTimeLeft());
+		mActivity.setNumPlayers(game.getLevel().getMaxNumberPlayers());
 
 		// create the game loop thread
 		thread = new GameLoopThread(surfaceHolder, this);

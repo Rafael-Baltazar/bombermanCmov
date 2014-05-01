@@ -145,5 +145,9 @@ public class SingleGameActivity extends ActionBarActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	public void quitGame(View v) {
+		finish();
+	}
 
 }
