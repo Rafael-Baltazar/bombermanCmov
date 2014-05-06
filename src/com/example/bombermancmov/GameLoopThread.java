@@ -60,7 +60,7 @@ public class GameLoopThread extends Thread {
 					// render state to the screen
 					// draws the canvas on the panel
 					if (canvas != null) {
-						this.gamePanel.updateLayer(frameDuration);
+						this.gamePanel.update(frameDuration);
 						this.gamePanel.drawGameModel(canvas);
 					}
 				}

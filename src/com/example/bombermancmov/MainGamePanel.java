@@ -161,7 +161,7 @@ public class MainGamePanel extends SurfaceView implements
 
 	}
 
-	public void updateLayer(long frameDu) {
+	public void update(long frameDu) {
 		int b;
 		for (b = 0; b < 4; ++b) {
 			if (tryDirection[b]) {

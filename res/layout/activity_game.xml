@@ -101,55 +101,59 @@
         android:layout_weight="1" >
     </FrameLayout>
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffff" >
+        android:background="#ffffff"
+        android:gravity="center_vertical" >
 
-        <Button android:id="@+id/buttonQuit"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/buttonQuit"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:onClick="quitGame"
-            android:text="@string/quit_button_text"
-            android:layout_centerVertical="true"/>
+            android:text="@string/quit_button_text" />
+
         <Button
             android:id="@+id/buttonLeft"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/buttonQuit"
+            android:layout_weight="1"
             android:text="@string/left_button_text" />
 
-        <Button
-            android:id="@+id/buttonUp"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/buttonLeft"
-            android:text="@string/up_button_text" />
+            android:layout_weight="1"
+            android:orientation="vertical" >
 
-        <Button
-            android:id="@+id/buttonDown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/buttonUp"
-            android:layout_toRightOf="@id/buttonLeft"
-            android:text="@string/down_button_text" />
+            <Button
+                android:id="@+id/buttonUp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/up_button_text" />
+
+            <Button
+                android:id="@+id/buttonDown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/down_button_text" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/buttonRight"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/buttonDown"
+            android:layout_weight="1"
             android:text="@string/right_button_text" />
 
         <Button
             android:id="@+id/buttonBomb"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/buttonRight"
+            android:layout_weight="1"
             android:text="@string/bomb_button_text" />
-    </RelativeLayout>
+    </LinearLayout>
 
 </LinearLayout>

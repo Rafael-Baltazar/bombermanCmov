@@ -6,17 +6,23 @@
     <string name="btn_multi">Multi Player</string>
     <string name="btn_options">Options</string>
     <string name="btn_exit">Exit</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Settings</string><string name="quit_button_text">Quit</string>
     <string name="left_button_text">Left</string>
     <string name="right_button_text">Right</string>
     <string name="up_button_text">Up</string>
     <string name="down_button_text">Down</string>
     <string name="bomb_button_text">Bomb</string>
-    <string name="display_time_left">Time left:</string><string name="display_player_name">Player Name:</string>
+    <string name="display_time_left">Time left:</string>
+    <string name="display_player_name">Player Name:</string>
     <string name="display_player_score">Player Score:</string>
     <string name="display_num_players">Number of Players:</string>
     <string name="hint_player_name">Insert a nickname here</string>
     <string name="background_main_menu_description">Bomberman front view</string>
-    <string name="quit_button_text">Quit</string>
+    
+    <string name="title_activity_server">ServerActivity</string>
+    <string name="btn_req_peers">Request Peers</string>
+    <string name="et_player_name">Player name will appear here</string>
+    <string name="btn_accept">Accept new player</string>
+    <string name="btn_server">Server</string>
 
 </resources>
