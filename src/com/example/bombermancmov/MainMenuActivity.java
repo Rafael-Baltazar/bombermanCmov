@@ -55,16 +55,9 @@ public class MainMenuActivity extends Activity {
 
 	// Layout
 	private OnKeyListener sendPlayerName = new OnKeyListener() {
-
 		public boolean onKey(View v, int keyCode, KeyEvent event) {
-			if (event.getAction() == KeyEvent.ACTION_DOWN
-					&& keyCode == KeyEvent.KEYCODE_ENTER) {
-				String name = ePlayerName.getText().toString();
-				ePlayerName.setText("Connecting...");
-				Log.d(TAG, "player name: " + name);
-				mWifi.getManager().requestPeers(mWifi.getChannel(),
-						mWifi.getPeerRequester());
-				new WriteToTask().execute(new String[] { "192.168.0.2", name });
+			if (keyCode == KeyEvent.KEYCODE_ENTER) {
+				// Ignore Enter
 				return true;
 			}
 			return false;
@@ -76,6 +69,11 @@ public class MainMenuActivity extends Activity {
 		Intent intent = new Intent(this, SingleGameActivity.class);
 		intent.putExtra("PlayerName", name);
 		this.startActivity(intent);
+	}
+	
+	public void newMultiPlayerGame(View v) {
+		String name = ePlayerName.getText().toString();
+		new WriteToTask().execute(new String[] { "192.168.0.2", name });
 	}
 
 	public void newServer(View v) {

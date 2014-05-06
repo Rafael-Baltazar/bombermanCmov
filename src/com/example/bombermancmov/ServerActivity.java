@@ -23,7 +23,6 @@ public class ServerActivity extends ActionBarActivity {
 	private static final String TAG = ServerActivity.class.getSimpleName();
 
 	// WifiP2p
-	private static final int REMOTE_PORT = 10001;
 	private static final int SERVER_PORT = 10001;
 	private SimWifiP2pSocketServer mSrvSocket;
 	private WifiConnection mWifi = new WifiConnection(this);
@@ -85,7 +84,6 @@ public class ServerActivity extends ActionBarActivity {
 	}
 
 	public void acceptClient(View v) {
-
 		new ReadFromTask().execute(mSrvSocket);
 	}
 
@@ -95,6 +93,10 @@ public class ServerActivity extends ActionBarActivity {
 	}
 
 	// WifiP2p
+	public void processWifiMessage(String message) {
+		String prevTxt = eRcvText.getText().toString();
+		eRcvText.setText(message + prevTxt);
+	}
 	/**
 	 * Receive a message and store it in eRcvText.
 	 */
@@ -128,7 +130,7 @@ public class ServerActivity extends ActionBarActivity {
 		protected void onPostExecute(String result) {
 			if (result != null) {
 				Log.d(TAG, result);
-				eRcvText.setText(result);
+				processWifiMessage(result);
 			}
 			super.onPostExecute(result);
 		}
