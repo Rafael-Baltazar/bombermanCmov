@@ -198,35 +198,81 @@ public class Game {
 		}
 	}
 
-	public void scale() {
+	/**
+	 * Scale bitmaps only once to increase performance.
+	 */
+	public void scaleResources() {
 		int newWidth = surfaceView.getWidth() / this.level.getGrid().getRowSize();
 		int newHeight = surfaceView.getHeight() / this.level.getGrid().getColSize();
-		wallBitMap = Bitmap.createScaledBitmap(wallBitMap, newWidth, newHeight,
-				false);
-		obstacleBitmap = Bitmap.createScaledBitmap(obstacleBitmap, newWidth,
-				newHeight, false);
-
-		//player.scale();
-		for (Character c : players) {
-			c.scale();
-		}
-		
-		for (Bomb b : bombs) {
-			b.scale();
-		}
-
-		for (Character c : droids) {
-			c.scale();
-		}
-
-		Log.d("SCALE", "Scaled Wall width: " + newWidth + " real: "
-				+ wallBitMap.getWidth() + " Scaled Level height: " + newHeight
-				+ " real: " + wallBitMap.getHeight());
+		scaleWallBitmap(newWidth, newHeight);
+		scaleObstacleBitmap(newWidth, newHeight);
+		scaleBombBitmaps(newWidth, newHeight);
+		scalePlayerBitmaps(newWidth, newHeight);
+		scaleDroidBitmaps(newWidth, newHeight);
 	}
 
+	/**
+	 * @param newWidth
+	 * @param newHeight
+	 * @see #scaleResources()
+	 */
+	private void scaleWallBitmap(int newWidth, int newHeight) {
+		wallBitMap = Bitmap.createScaledBitmap(wallBitMap, newWidth, newHeight,
+				false);
+	}
+	
+	/**
+	 * @param newWidth
+	 * @param newHeight
+	 * @see #scaleResources()
+	 */
+	private void scaleObstacleBitmap(int newWidth, int newHeight) {
+		obstacleBitmap = Bitmap.createScaledBitmap(obstacleBitmap, newWidth,
+				newHeight, false);
+	}
+	
+	/**
+	 * @param newWidth
+	 * @param newHeight
+	 * @see #scaleResources()
+	 */
+	private void scaleBombBitmaps(int newWidth, int newHeight) {
+		scaleBitmapArray(newWidth, newHeight, bombBitmap);
+	}
+	
+	/**
+	 * @param newWidth
+	 * @param newHeight
+	 * @see #scaleResources()
+	 */
+	private void scalePlayerBitmaps(int newWidth, int newHeight) {
+		scaleBitmapArray(newWidth, newHeight, playerBitmap);
+	}
+	
+	/**
+	 * @param newWidth
+	 * @param newHeight
+	 * @see #scaleResources()
+	 */
+	private void scaleDroidBitmaps(int newWidth, int newHeight) {
+		scaleBitmapArray(newWidth, newHeight, droidBitmap);
+	}
+
+	/**
+	 * Scales all given bitmaps to the new width and height.
+	 * @param newWidth The new desired width.
+	 * @param newHeight The new desired height.
+	 * @param bitmaps The bitmap array to be scaled.
+	 */
+	public void scaleBitmapArray(int newWidth, int newHeight, Bitmap[] bitmaps) {
+		for (int i = 0; i < bitmaps.length; ++i) {
+			bitmaps[i] = Bitmap.createScaledBitmap(bitmaps[i], newWidth, newHeight, false);
+		}
+	}
+	
 	public void placeBomb(int x, int y) {
 		bombs.add(new Bomb(bombBitmap, x, y, this.level.getExplosionTimeout(), this.level.getExplosionRange(),
-				this.level.getGrid(), surfaceView));
+				this.level.getGrid()));
 	}
 
 	public boolean nextRound() {
@@ -281,7 +327,7 @@ public class Game {
 	public void setLevel(Level level) {
 		this.level = level;
 	}
-	
+
 	public List<Character> getPlayers() {
 		return players;
 	}

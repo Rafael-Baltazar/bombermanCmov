@@ -10,7 +10,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 /**
- * This is the main surface that handles the ontouch events and draws the image
+ * This is the main surface that handles the on-touch events and draws the image
  * to the screen.
  * 
  * @author impaler
@@ -19,7 +19,7 @@ public class MainGamePanel extends SurfaceView implements
 		SurfaceHolder.Callback {
 
 	private static final String TAG = MainGamePanel.class.getSimpleName();
-	private static final int ROUND_TIME = 1000;// ms
+	private static final int ROUND_TIME = 1000;// ms\
 
 	/**
 	 * Update and render game model in a separate thread.
@@ -32,7 +32,7 @@ public class MainGamePanel extends SurfaceView implements
 	private SurfaceHolder surfaceHolder;
 	private boolean[] tryDirection; /* FIXME: HACK */
 
-	private String playerName; // DEFAULT NAME
+	private String playerName;
 
 	/* Game model */
 	private Game game;
@@ -68,7 +68,7 @@ public class MainGamePanel extends SurfaceView implements
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		Log.d(TAG, "Surface changed");
-		game.scale();
+		game.scaleResources();
 	}
 
 	@Override
@@ -94,6 +94,7 @@ public class MainGamePanel extends SurfaceView implements
 		thread.setRunning(false);
 		shutDown(thread);
 		Log.d(TAG, "Game loop thread was shut down cleanly");
+		
 		levelNextRound.setRunning(false);
 		shutDown(levelNextRound);
 		Log.d(TAG, "Level next round thread was shut down cleanly");
@@ -105,7 +106,9 @@ public class MainGamePanel extends SurfaceView implements
 				thread.join();
 				break;
 			} catch (InterruptedException e) {
-				Log.d(TAG, "Interrupted exception at surface destroyed.");
+				Log.d(TAG,
+						"Interrupted exception at surface destroyed: "
+								+ e.getMessage());
 			}
 		}
 	}

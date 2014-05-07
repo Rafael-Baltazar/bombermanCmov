@@ -7,7 +7,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.Log;
-import android.view.SurfaceView;
 
 import com.example.bombermancmov.R;
 import com.example.bombermancmov.model.component.DrawableExplosionComponent;
@@ -17,18 +16,17 @@ public class Bomb extends GameObject {
 	public static final int RANGE_DOWN = 1;
 	public static final int RANGE_LEFT = 2;
 	public static final int RANGE_RIGHT = 3;
-	
+
 	public static final int NORMAL = 0;
 	public static final int NEARLY = 1;
 	public static final int EXPLODING = 2;
 
-	private SurfaceView surfaceView;
 	private LevelGrid level;
 	private int timeToExplode;
 	private float range;
 	private boolean isExploding;
 	private int actRange[];
-	
+
 	/**
 	 * Handles draw and scale methods.
 	 */
@@ -39,7 +37,7 @@ public class Bomb extends GameObject {
 	}
 
 	public Bomb(Bitmap[] bitmaps, float x, float y, int time, float range,
-			LevelGrid level, SurfaceView surfaceView) {
+			LevelGrid level) {
 		super(x, y);
 		int intx = (int) Math.rint(x);
 		int inty = (int) Math.rint(y);
@@ -52,10 +50,9 @@ public class Bomb extends GameObject {
 		this.level = level;
 		this.range = range;
 		this.isExploding = false;
-		this.surfaceView = surfaceView;
-		
-		drawableComponent = new DrawableExplosionComponent(this, bitmaps, NORMAL);
-		scale();
+
+		drawableComponent = new DrawableExplosionComponent(this, bitmaps,
+				NORMAL);
 	}
 
 	public void draw(Canvas canvas) {
@@ -66,19 +63,10 @@ public class Bomb extends GameObject {
 		}
 	}
 
-	/**
-	 * Use when surface size changes.
-	 */
-	public void scale() {
-		int newWidth = surfaceView.getWidth() / level.getRowSize();
-		int newHeight = surfaceView.getHeight() / level.getColSize();
-		drawableComponent.scale(newWidth, newHeight);
-	}
-
 	public float tick() {
-		if(timeToExplode > 1) {
+		if (timeToExplode > 1) {
 			drawableComponent.setActiveBitmapIndex(NORMAL);
-		} else if(timeToExplode == 1) {
+		} else if (timeToExplode == 1) {
 			drawableComponent.setActiveBitmapIndex(NEARLY);
 		} else {
 			drawableComponent.setActiveBitmapIndex(EXPLODING);
@@ -90,7 +78,7 @@ public class Bomb extends GameObject {
 	/**
 	 * Play the explosion sound, find the at most up, down, left and right act
 	 * range and destroy all in range obstacles. A bomb stops its explosion in a
-	 * certain direction when encountering a wall or an obstacle. Note: Updates
+	 * certain direction, when encountering a wall or an obstacle. Note: Updates
 	 * actRange field.
 	 * 
 	 * @param context
@@ -162,7 +150,7 @@ public class Bomb extends GameObject {
 			}
 			int y = (int) Math.rint(getY());
 			int x = (int) Math.rint(getX() + i);
-			if (level.getGridCell((int) Math.rint(getY()), x) == LevelGrid.WALL) {
+			if (level.getGridCell(y, x) == LevelGrid.WALL) {
 				break;
 			} else {
 				actRange[RANGE_RIGHT] = x;

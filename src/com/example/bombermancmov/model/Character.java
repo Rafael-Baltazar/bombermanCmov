@@ -144,12 +144,6 @@ public class Character extends GameObject {
 		drawableComponent.draw(canvas);
 	}
 	
-	public void scale() {
-		int newWidth = surfaceView.getWidth() / level.getRowSize();
-		int newHeight = surfaceView.getHeight() / level.getColSize();
-		drawableComponent.scale(newWidth, newHeight);
-	}
-	
 	public void placeBomb(){
 	}
 	

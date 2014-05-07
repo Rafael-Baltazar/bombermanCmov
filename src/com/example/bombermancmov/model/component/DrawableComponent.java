@@ -4,7 +4,6 @@ import com.example.bombermancmov.model.GameObject;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.util.Log;
 
 public class DrawableComponent implements Drawable {
 	private static final String TAG = DrawableComponent.class.getSimpleName();
@@ -51,15 +50,6 @@ public class DrawableComponent implements Drawable {
 		float x = owner.getX() * bitmap.getWidth();
 		float y = owner.getY() * bitmap.getHeight();
 		canvas.drawBitmap(bitmap, x, y, null);
-	}
-
-	@Override
-	public void scale(int newWidth, int newHeight) {
-		for (int i = 0; i < bitmaps.length; ++i) {
-			bitmaps[i] = Bitmap.createScaledBitmap(bitmaps[i], newWidth, newHeight, false);
-			Log.d(TAG, "Scaled" + i + " dsrW: " + newWidth + ", realW: " + bitmaps[i].getWidth());
-			Log.d(TAG, "Scaled" + i + " dsrH: " + newHeight + ", realH: " + bitmaps[i].getHeight());
-		}
 	}
 
 }
