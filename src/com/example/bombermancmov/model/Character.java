@@ -5,13 +5,12 @@ import com.example.bombermancmov.model.component.DrawableComponent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.util.Log;
-import android.view.SurfaceView;
 
 public class Character extends GameObject {
 	private float speed = 0.3f;
 	private LevelGrid level;
-	private SurfaceView surfaceView;
 	private float points;
+	float movedDist = 0;
 	
 	/**
 	 * Handles draw and scale methods.
@@ -30,15 +29,12 @@ public class Character extends GameObject {
 	 * @param y
 	 * @param speed
 	 * @param level
-	 * @param surfaceView
 	 */
-	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid level, SurfaceView surfaceView) {
+	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid level) {
 		super(x, y);
 		this.speed = speed;
 		this.level = level;
 		this.points = 0;
-		this.surfaceView = surfaceView;
-		
 		drawableComponent = new DrawableComponent(this, bitmap, FRONT);
 	}
 	
@@ -125,8 +121,6 @@ public class Character extends GameObject {
 			return false;
 		}
 	}
-	
-	float movedDist = 0;
 	
 	public boolean update(long timePassed) {
 		if(movedDist > speed){

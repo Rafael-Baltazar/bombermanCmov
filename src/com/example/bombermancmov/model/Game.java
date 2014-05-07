@@ -85,7 +85,7 @@ public class Game {
 						this.level.getGrid().getGridCell(i, j) == '3') {
 					//Check if additional player is possible for this map
 					if(this.players.size() <= this.level.getMaxNumberPlayers()) {
-						players.add(new Character(playerBitmap, j, i, 25.0f, this.level.getGrid(), surfaceView));
+						players.add(new Character(playerBitmap, j, i, 25.0f, this.level.getGrid()));
 					}					
 					//player = new Character(playerBitmap, j, i, 25.0f, this.level.getGrid(), surfaceView);				
 				}

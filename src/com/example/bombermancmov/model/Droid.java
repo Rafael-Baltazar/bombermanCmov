@@ -7,7 +7,7 @@ public class Droid extends Character {
 	
 	public Droid(Bitmap[] bitmap, float x, float y, float speed,
 			LevelGrid level, SurfaceView surfaceView) {
-		super(bitmap, x, y, speed, level, surfaceView);
+		super(bitmap, x, y, speed, level);
 	}
 
 	public void moveRandomly() {
