@@ -32,8 +32,9 @@ public class Character extends GameObject {
 	 * @param y
 	 * @param speed
 	 * @param grid
+	 * @param game TODO
 	 */
-	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid grid) {
+	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid grid, Game game) {
 		super(x, y);
 		this.speed = speed;
 		this.points = 0;

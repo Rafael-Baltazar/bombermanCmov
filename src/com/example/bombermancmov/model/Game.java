@@ -10,9 +10,16 @@ import android.util.Log;
 import android.view.SurfaceView;
 
 import com.example.bombermancmov.R;
+import com.example.bombermancmov.model.component.SoundComponent;
 
 public class Game {
 
+	// Used for bitmap purposes
+	private static final int PLAYER_1 = 0;
+	private static final int PLAYER_2 = 1;
+	private static final int PLAYER_3 = 2;
+	private static final float PLAYER_SPEED = 3.0f;
+	
 	private float gameDuration;
 	private float totalTime;
 
@@ -22,6 +29,11 @@ public class Game {
 	private List<Character> players;
 	private List<Droid> droids;
 	private List<Bomb> bombs;
+	
+	// dead players & droids
+	private List<Character> deadPlayers;
+	private List<Droid> deadDroids;
+	private List<Bomb> unusedBombs;
 
 	/** Used to choose new directions for the droids. */
 	private DroidAI droidAI;
@@ -31,11 +43,11 @@ public class Game {
 	private Bitmap wallBitMap;
 	private Bitmap obstacleBitmap;
 	private Bitmap[] bombBitmap;
-	private Bitmap[] playerBitmap;
+	private Bitmap[][] playerBitmap;
 	private Bitmap[] droidBitmap;
 
 	private SurfaceView surfaceView;
-	private static final float PLAYER_SPEED = 3.0f;
+	private SoundComponent explosionSoundComponent;
 
 	/*
 	 * public Character getPlayer() { return player; }
@@ -86,9 +98,11 @@ public class Game {
 		this.level.setRobotSpeed(1);
 		this.level.setPointsPerOpponentKilled(2);
 		this.level.setPointsPerRobotKilled(1);
-		this.level.setMaxNumberPlayers(1);
+		this.level.setMaxNumberPlayers(3);
 
 		this.surfaceView = surfaceView;
+		
+		this.explosionSoundComponent = new SoundComponent(surfaceView);
 
 		decodeResources();
 
@@ -105,16 +119,15 @@ public class Game {
 		for (int i = 0; i < 13; i++) {
 			for (int j = 0; j < 19; j++) {
 				// Check if a player is on this cell
-				if (this.level.getGrid().getGridCell(j, i) == '1'
-						|| this.level.getGrid().getGridCell(j, i) == '2'
-						|| this.level.getGrid().getGridCell(j, i) == '3') {
-					// Check if additional player is possible for this map
-					if (this.players.size() <= this.level.getMaxNumberPlayers()) {
-						players.add(new Character(playerBitmap, j, i,
-								PLAYER_SPEED, getLevel().getGrid()));
-					}
-					// player = new Character(playerBitmap, j, i, 25.0f,
-					// this.level.getGrid(), surfaceView);
+				if (this.level.getGrid().getGridCell(j, i) == '1' && this.players.size() < this.level.getMaxNumberPlayers()) {
+					players.add(new Character(playerBitmap[PLAYER_1], j, i,
+							PLAYER_SPEED, getLevel().getGrid(), this));
+				} else if(this.level.getGrid().getGridCell(j, i) == '2' && this.players.size() < this.level.getMaxNumberPlayers()) {
+					players.add(new Character(playerBitmap[PLAYER_2], j, i,
+							PLAYER_SPEED, getLevel().getGrid(), this));
+				} else if(this.level.getGrid().getGridCell(j, i) == '3' && this.players.size() < this.level.getMaxNumberPlayers()) {
+					players.add(new Character(playerBitmap[PLAYER_3], j, i,
+							PLAYER_SPEED, getLevel().getGrid(), this));
 				}
 				if (this.level.getGrid().getGridCell(j, i) == 'R') {
 					this.droids.add(new Droid(droidBitmap, j, i, this.level
@@ -133,6 +146,7 @@ public class Game {
 		decodeBombBitmaps();
 		decodePlayerBitmaps();
 		decodeDroidBitmaps();
+		decodeExplosionSound();
 	}
 
 	/**
@@ -168,15 +182,43 @@ public class Game {
 	 * @see #decodeResources()
 	 */
 	private void decodePlayerBitmaps() {
-		playerBitmap = new Bitmap[4];
-		playerBitmap[Character.FRONT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.c0_0);
-		playerBitmap[Character.LEFT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.c0_1);
-		playerBitmap[Character.RIGHT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.c0_2);
-		playerBitmap[Character.BACK] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.c0_3);
+		playerBitmap = new Bitmap[3][4];
+		decodePlayer1Bitmaps();
+		decodePlayer2Bitmaps();
+		decodeAndRetPlayer3Bitmaps();
+	}
+	
+	private void decodePlayer1Bitmaps() {
+		playerBitmap[PLAYER_1][Character.FRONT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.eevee_front);
+		playerBitmap[PLAYER_1][Character.LEFT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.eevee_left);
+		playerBitmap[PLAYER_1][Character.RIGHT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.eevee_right);
+		playerBitmap[PLAYER_1][Character.BACK] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.eevee_back);
+	}
+	
+	private void decodePlayer2Bitmaps() {
+		playerBitmap[PLAYER_2][Character.FRONT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.espeon_front);
+		playerBitmap[PLAYER_2][Character.LEFT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.espeon_left);
+		playerBitmap[PLAYER_2][Character.RIGHT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.espeon_right);
+		playerBitmap[PLAYER_2][Character.BACK] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.espeon_back);
+	}
+	
+	private void decodeAndRetPlayer3Bitmaps() {
+		playerBitmap[PLAYER_3][Character.FRONT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.flareon_front);
+		playerBitmap[PLAYER_3][Character.LEFT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.flareon_left);
+		playerBitmap[PLAYER_3][Character.RIGHT] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.flareon_right);
+		playerBitmap[PLAYER_3][Character.BACK] = BitmapFactory.decodeResource(
+				surfaceView.getResources(), R.drawable.flareon_back);
 	}
 
 	/**
@@ -192,6 +234,12 @@ public class Game {
 				surfaceView.getResources(), R.drawable.c0_2);
 		droidBitmap[Character.BACK] = BitmapFactory.decodeResource(
 				surfaceView.getResources(), R.drawable.c0_3);
+	}
+	
+	/**
+	 * @see #decodeResources()
+	 */
+	private void decodeExplosionSound() {
 	}
 
 	public void draw(Canvas canvas) {
@@ -275,7 +323,9 @@ public class Game {
 	 * @see #scaleResources()
 	 */
 	private void scalePlayerBitmaps(int newWidth, int newHeight) {
-		scaleBitmapArray(newWidth, newHeight, playerBitmap);
+		for(Bitmap[] bitmaps : playerBitmap) {
+			scaleBitmapArray(newWidth, newHeight, bitmaps);
+		}
 	}
 
 	/**
@@ -306,16 +356,13 @@ public class Game {
 
 	public void placeBomb(int x, int y) {
 		bombs.add(new Bomb(bombBitmap, x, y, this.level.getExplosionTimeout(),
-				this.level.getExplosionRange(), this.level.getGrid()));
+				this.level.getExplosionRange(), this.level.getGrid(), explosionSoundComponent));
 	}
 
 	public boolean nextRound() {
 		if (totalTime == gameDuration) {
 			return false;
 		}
-
-		Log.d("ROUND", "Num bombs:" + bombs.isEmpty());
-
 		float t;
 		int[] expBlocks;
 		List<Bomb> toRemove = new ArrayList<Bomb>(); // STUPID HACK TO PREVENT

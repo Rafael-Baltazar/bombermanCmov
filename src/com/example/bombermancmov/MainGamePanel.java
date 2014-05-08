@@ -162,6 +162,15 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void update(long timePassed) {
 		game.update(timePassed);
+		mActivity.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+            	mActivity.setPlayerScore(game.getPlayerByNumber(0).getPoints());
+        		mActivity.setTimeLeft(game.getTimeLeft());
+        		mActivity.setNumPlayers(game.getLevel().getMaxNumberPlayers());
+            }
+        });
 	}
 
 	@Override

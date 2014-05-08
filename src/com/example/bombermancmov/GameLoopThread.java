@@ -25,7 +25,7 @@ public class GameLoopThread extends Thread {
 	private static final int RESUME_FPS = 20;
 
 	/** Frames per second, when game is paused. */
-	private static final int PAUSE_FPS = 1;
+	private static final int PAUSE_FPS = 0;
 
 	/** Maximum number of frames per second. */
 	private int maxFps = RESUME_FPS;
@@ -59,7 +59,7 @@ public class GameLoopThread extends Thread {
 					// update game state
 					// render state to the screen
 					// draws the canvas on the panel
-					if (canvas != null) {
+					if (canvas != null && frameDuration > 0) {
 						this.gamePanel.update(frameDuration);
 						this.gamePanel.drawGameModel(canvas);
 					}
@@ -100,6 +100,7 @@ public class GameLoopThread extends Thread {
 	}
 
 	private long calculateFrameDuration() {
+		if(maxFps == 0) return -1;
 		return 1000 / maxFps;
 	}
 	

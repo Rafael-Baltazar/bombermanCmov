@@ -7,9 +7,11 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.Log;
+import android.view.SurfaceView;
 
 import com.example.bombermancmov.R;
 import com.example.bombermancmov.model.component.DrawableExplosionComponent;
+import com.example.bombermancmov.model.component.SoundComponent;
 
 public class Bomb extends GameObject {
 	public static final int RANGE_UP = 0;
@@ -26,10 +28,11 @@ public class Bomb extends GameObject {
 	private float range;
 	private boolean isExploding;
 	private int actRange[];
+	// Explosion sound
+	private SurfaceView surfaceView;
+	private SoundComponent mSoundComponent;
 
-	/**
-	 * Handles draw and scale methods.
-	 */
+	/** Handles draw method. */
 	DrawableExplosionComponent drawableComponent;
 
 	public float getRange() {
@@ -37,7 +40,7 @@ public class Bomb extends GameObject {
 	}
 
 	public Bomb(Bitmap[] bitmaps, float x, float y, int time, float range,
-			LevelGrid level) {
+			LevelGrid level, SoundComponent soundComponent) {
 		super(x, y);
 		int intx = (int) Math.rint(x);
 		int inty = (int) Math.rint(y);
@@ -50,6 +53,8 @@ public class Bomb extends GameObject {
 		this.level = level;
 		this.range = range;
 		this.isExploding = false;
+		// Explosion Sound load
+		mSoundComponent = soundComponent;
 
 		drawableComponent = new DrawableExplosionComponent(this, bitmaps,
 				NORMAL);
@@ -85,11 +90,7 @@ public class Bomb extends GameObject {
 	 * @return the actRange
 	 */
 	public int[] explode(Context context) {
-		SoundPool sp = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
-		int iTmp = sp.load(context, R.raw.sound_bomb_1, 1);
-		sp.play(iTmp, 1, 1, 0, 0, 1);
-		MediaPlayer mPlayer = MediaPlayer.create(context, R.raw.sound_bomb_1);
-		mPlayer.start();
+		mSoundComponent.play();
 
 		Log.d("BOMB", "Draw explosion in X: " + getX() + " Y: " + getY());
 		// Find act range up

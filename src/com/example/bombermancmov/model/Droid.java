@@ -11,7 +11,7 @@ public class Droid extends Character {
 	private Game mGame;
 
 	public Droid(Bitmap[] bitmap, float x, float y, float speed, Game game) {
-		super(bitmap, x, y, speed, game.getLevel().getGrid());
+		super(bitmap, x, y, speed, game.getLevel().getGrid(), game);
 		mGame = game;
 	}
 
