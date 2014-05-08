@@ -99,12 +99,12 @@ public class Bomb extends GameObject {
 			}
 			int y = (int) Math.rint(getY() - i);
 			int x = (int) Math.rint(getX());
-			if (level.getGridCell(y, x) == LevelGrid.WALL) {
+			if (level.getGridCell(x, y) == LevelGrid.WALL) {
 				break;
 			} else {
 				actRange[RANGE_UP] = y;
-				if (level.getGridCell(y, x) == LevelGrid.OBSTACLE) {
-					level.setGridCell(y, x, LevelGrid.EMPTY);
+				if (level.getGridCell(x, y) == LevelGrid.OBSTACLE) {
+					level.setGridCell(x, y, LevelGrid.EMPTY);
 					break;
 				}
 			}
@@ -116,12 +116,12 @@ public class Bomb extends GameObject {
 			}
 			int y = (int) Math.rint(getY() + i);
 			int x = (int) Math.rint(getX());
-			if (level.getGridCell(y, x) == LevelGrid.WALL) {
+			if (level.getGridCell(x, y) == LevelGrid.WALL) {
 				break;
 			} else {
 				actRange[RANGE_DOWN] = y;
-				if (level.getGridCell(y, x) == LevelGrid.OBSTACLE) {
-					level.setGridCell(y, x, LevelGrid.EMPTY);
+				if (level.getGridCell(x, y) == LevelGrid.OBSTACLE) {
+					level.setGridCell(x, y, LevelGrid.EMPTY);
 					break;
 				}
 			}
@@ -133,12 +133,12 @@ public class Bomb extends GameObject {
 			}
 			int y = (int) Math.rint(getY());
 			int x = (int) Math.rint(getX() - i);
-			if (level.getGridCell(y, x) == LevelGrid.WALL) {
+			if (level.getGridCell(x, y) == LevelGrid.WALL) {
 				break;
 			} else {
 				actRange[RANGE_LEFT] = x;
-				if (level.getGridCell(y, x) == LevelGrid.OBSTACLE) {
-					level.setGridCell(y, x, LevelGrid.EMPTY);
+				if (level.getGridCell(x, y) == LevelGrid.OBSTACLE) {
+					level.setGridCell(x, y, LevelGrid.EMPTY);
 					break;
 				}
 			}
@@ -150,12 +150,12 @@ public class Bomb extends GameObject {
 			}
 			int y = (int) Math.rint(getY());
 			int x = (int) Math.rint(getX() + i);
-			if (level.getGridCell(y, x) == LevelGrid.WALL) {
+			if (level.getGridCell(x, y) == LevelGrid.WALL) {
 				break;
 			} else {
 				actRange[RANGE_RIGHT] = x;
-				if (level.getGridCell(y, x) == LevelGrid.OBSTACLE) {
-					level.setGridCell(y, x, LevelGrid.EMPTY);
+				if (level.getGridCell(x, y) == LevelGrid.OBSTACLE) {
+					level.setGridCell(x, y, LevelGrid.EMPTY);
 					break;
 				}
 			}

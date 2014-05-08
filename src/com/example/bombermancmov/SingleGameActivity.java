@@ -17,7 +17,7 @@ public class SingleGameActivity extends ActionBarActivity {
 
 	private static final String TAG = GameLoopThread.class.getSimpleName();
 	private FrameLayout frm;
-	private Button leftButton, rightButton, upButton, downButton, bombButton;
+	private Button pauseButton, leftButton, rightButton, upButton, downButton, bombButton;
 	private TextView playerNameTextView, playerScoreTextView, timeLeftTextView,
 			numPlayersTextView;
 	private MainGamePanel mGamePanel;
@@ -33,6 +33,7 @@ public class SingleGameActivity extends ActionBarActivity {
 		timeLeftTextView = (TextView) findViewById(R.id.timeLeft);
 		numPlayersTextView = (TextView) findViewById(R.id.numberPlayers);
 
+		pauseButton = (Button) findViewById(R.id.buttonPause);
 		setOnClickListenersToButtons();
 
 		frm = (FrameLayout) findViewById(R.id.frameLayout);
@@ -144,6 +145,19 @@ public class SingleGameActivity extends ActionBarActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	public void pauseOrResumeGame(View b) {
+		String btnTxt = pauseButton.getText().toString();
+		String pause = getResources().getString(R.string.pause_button_text);
+		String resume = getResources().getString(R.string.resume_button_text);
+		if(btnTxt.equals(pause)) {
+			mGamePanel.pauseThread();
+			pauseButton.setText(resume);
+		} else {
+			mGamePanel.resumeThread();
+			pauseButton.setText(pause);
+		}
 	}
 	
 	public void quitGame(View v) {

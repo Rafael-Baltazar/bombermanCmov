@@ -24,7 +24,7 @@ public class MainGamePanel extends SurfaceView implements
 	/**
 	 * Update and render game model in a separate thread.
 	 */
-	private GameLoopThread thread;
+	private GameLoopThread gameLoopThread;
 
 	// Run level.nextRound() every x milliseconds
 	private LevelNextRoundThread levelNextRound;
@@ -79,9 +79,9 @@ public class MainGamePanel extends SurfaceView implements
 
 	private void startThreads() {
 		// create the game loop thread
-		thread = new GameLoopThread(surfaceHolder, this);
-		thread.setRunning(true);
-		thread.start();
+		gameLoopThread = new GameLoopThread(surfaceHolder, this);
+		gameLoopThread.setRunning(true);
+		gameLoopThread.start();
 		// create env thread
 		levelNextRound = new LevelNextRoundThread(game, ROUND_TIME);
 		levelNextRound.start();
@@ -91,8 +91,8 @@ public class MainGamePanel extends SurfaceView implements
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		Log.d(TAG, "Surface is being destroyed");
 		// shut down all the threads
-		thread.setRunning(false);
-		shutDown(thread);
+		gameLoopThread.setRunning(false);
+		shutDown(gameLoopThread);
 		Log.d(TAG, "Game loop thread was shut down cleanly");
 		
 		levelNextRound.setRunning(false);
@@ -117,24 +117,25 @@ public class MainGamePanel extends SurfaceView implements
 	public boolean doAction(int actionCode) {
 		switch (actionCode) {
 		case 0: {
-			game.getPlayerByNumber(0).moveLeft(10);
+			game.getPlayerByNumber(0).tryMoveLeft();
 			break;
 		}
 		case 1: {
-			game.getPlayerByNumber(0).moveUp(10);
+			game.getPlayerByNumber(0).tryMoveUp();
 			break;
 		}
 		case 2: {
-			game.getPlayerByNumber(0).moveDown(10);
+			game.getPlayerByNumber(0).tryMoveDown();
 			break;
 		}
 		case 3: {
-			game.getPlayerByNumber(0).moveRight(10);
+			game.getPlayerByNumber(0).tryMoveRight();
 			break;
 		}
 		case 4: {
-			game.placeBomb((int) Math.rint(game.getPlayerByNumber(0).getX()),
-					(int) Math.rint(game.getPlayerByNumber(0).getY()));
+			int x = (int) Math.rint(game.getPlayerByNumber(0).getX());
+			int y = (int) Math.rint(game.getPlayerByNumber(0).getY());
+			game.placeBomb(x,y);
 			break;
 		}
 		default:
@@ -142,37 +143,25 @@ public class MainGamePanel extends SurfaceView implements
 		}
 		return true;
 	}
+	
+	public void pauseThread() {
+		gameLoopThread.pause();
+	}
+	
+	public void resumeThread() {
+		gameLoopThread.unPause();
+	}
 
 	public void tryStop() {
-		int b;
-		for (b = 0; b < 4; ++b) {
-			tryDirection[b] = false;
-			Log.d("CHAR", "stopping");
-		}
+		game.getPlayerByNumber(0).stop();
 	}
 
 	public void tryWalk(int dir) {
-		int b;
-		for (b = 0; b < 4; ++b) {
-			if (b == dir) {
-				tryDirection[b] = true;
-				Log.d("CHAR", "walking " + b);
-			} else {
-				tryDirection[b] = false;
-			}
-		}
-
+		doAction(dir);
 	}
 
-	public void update(long frameDu) {
-		int b;
-		for (b = 0; b < 4; ++b) {
-			if (tryDirection[b]) {
-				this.doAction(b);
-				break;
-			}
-
-		}
+	public void update(long timePassed) {
+		game.update(timePassed);
 	}
 
 	@Override

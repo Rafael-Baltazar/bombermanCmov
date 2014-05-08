@@ -7,37 +7,40 @@ import android.graphics.Canvas;
 import android.util.Log;
 
 public class Character extends GameObject {
+	private static final String TAG = Character.class.getSimpleName();
 	private float speed = 0.3f;
-	private LevelGrid level;
+	private int speedx = 0;
+	private int speedy = 0;
 	private float points;
-	float movedDist = 0;
 	
+	private LevelGrid grid;
+
 	/**
-	 * Handles draw and scale methods.
+	 * Handles draw method.
 	 */
 	DrawableComponent drawableComponent;
-	
+
 	private String name;
-	
+
 	public static int FRONT = 0;
 	public static int LEFT = 1;
 	public static int RIGHT = 2;
 	public static int BACK = 3;
-	
+
 	/**
 	 * @param x
 	 * @param y
 	 * @param speed
-	 * @param level
+	 * @param grid
 	 */
-	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid level) {
+	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid grid) {
 		super(x, y);
 		this.speed = speed;
-		this.level = level;
 		this.points = 0;
+		this.grid = grid;
 		drawableComponent = new DrawableComponent(this, bitmap, FRONT);
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -58,47 +61,33 @@ public class Character extends GameObject {
 		this.speed = speed;
 	}
 
-	public LevelGrid getLevel() {
-		return level;
-	}
-
-	public void setLevel(LevelGrid level) {
-		this.level = level;
-	}
-	
-	private int speedx = 0;
-	private int speedy = 0;
-	
-	public void moveDown(long timePassed){
+	public void tryMoveDown() {
 		drawableComponent.setActiveBitmapIndex(FRONT);
 		speedy = +1;
 		speedx = 0;
-		float curSpeed = (float) speed*timePassed/1000.0f;
-		move(getX()+curSpeed*speedx, getY()+curSpeed*speedy);
 	}
-	
-	public void moveUp(long timePassed){
+
+	public void tryMoveUp() {
 		drawableComponent.setActiveBitmapIndex(BACK);
 		speedy = -1;
 		speedx = 0;
-		float curSpeed = (float) speed*timePassed/1000.0f;
-		move(getX()+curSpeed*speedx, getY()+curSpeed*speedy);
 	}
-	
-	public void moveLeft(long timePassed){
+
+	public void tryMoveLeft() {
 		drawableComponent.setActiveBitmapIndex(LEFT);
 		speedy = 0;
 		speedx = -1;
-		float curSpeed = (float) speed*timePassed/1000.0f;
-		move(getX()+curSpeed*speedx, getY()+curSpeed*speedy);
 	}
-	
-	public void moveRight(long timePassed){
+
+	public void tryMoveRight() {
 		drawableComponent.setActiveBitmapIndex(RIGHT);
 		speedy = 0;
 		speedx = +1;
-		float curSpeed = (float) speed*timePassed/1000.0f;
-		move(getX()+curSpeed*speedx, getY()+curSpeed*speedy);
+	}
+
+	public void stop() {
+		speedx = 0;
+		speedy = 0;
 	}
 
 	/**
@@ -107,38 +96,44 @@ public class Character extends GameObject {
 	 * 
 	 * @param x
 	 * @param y
-	 * @return true, if the character moved. Otherwise, false.
 	 */
-	public boolean move(float x, float y) {
+	public void move(float x, float y) {
 		int intX = (int) Math.rint(x);
 		int intY = (int) Math.rint(y);
-		if (level.getGridCell(intY, intX) != LevelGrid.WALL && level.getGridCell(intY, intX) != LevelGrid.OBSTACLE) {
+		if (!isColliding(intX, intY)) {
 			setX(x);
 			setY(y);
-			Log.d("CHAR", "X: " + getX() + " :::: Y: "+ getY());
-			return true;
-		} else {
-			return false;
 		}
 	}
-	
-	public boolean update(long timePassed) {
-		if(movedDist > speed){
-			speedx = 0;
-			speedy = 0;
-			movedDist = 0;
-			return false;
-		}
-		float curSpeed = (float) speed*timePassed/1000.0f;
-		movedDist += curSpeed;
-		return move(getX()+curSpeed*speedx, getY()+curSpeed*speedy);
+
+	private boolean isColliding(int x, int y) {
+		return grid.getGridCell(x, y) == LevelGrid.WALL
+				|| grid.getGridCell(x, y) == LevelGrid.OBSTACLE;
 	}
-	
-	public void draw(Canvas canvas){
+
+	public void update(long timePassed) {
+		float distance = (float) speed * timePassed / 1000.0f;
+		int x = (int) Math.rint(getX());
+		int y = (int) Math.rint(getY());
+		/* Search for collisions, one cell at a time. */
+		for (int i = 0; i < distance; i++) {
+			if (isColliding(x + i * speedx, y + i * speedy)) {
+				distance = i - 1;
+				break;
+			}
+		}
+		move(getX() + distance * speedx, getY() + distance * speedy);
+	}
+
+	public void draw(Canvas canvas) {
 		drawableComponent.draw(canvas);
 	}
-	
-	public void placeBomb(){
+
+	public void placeBomb() {
 	}
-	
+
+	public void kill() {
+		Log.d(TAG, "Character died.");
+	}
+
 }

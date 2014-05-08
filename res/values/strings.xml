@@ -6,7 +6,10 @@
     <string name="btn_multi">Multi Player</string>
     <string name="btn_options">Options</string>
     <string name="btn_exit">Exit</string>
-    <string name="action_settings">Settings</string><string name="quit_button_text">Quit</string>
+    <string name="action_settings">Settings</string>
+    <string name="pause_button_text">Pause</string>
+    <string name="resume_button_text">Resume</string>
+    <string name="quit_button_text">Quit</string>
     <string name="left_button_text">Left</string>
     <string name="right_button_text">Right</string>
     <string name="up_button_text">Up</string>
