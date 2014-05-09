@@ -146,7 +146,6 @@ public class Game {
 		decodeBombBitmaps();
 		decodePlayerBitmaps();
 		decodeDroidBitmaps();
-		decodeExplosionSound();
 	}
 
 	/**
@@ -234,12 +233,6 @@ public class Game {
 				surfaceView.getResources(), R.drawable.c0_2);
 		droidBitmap[Character.BACK] = BitmapFactory.decodeResource(
 				surfaceView.getResources(), R.drawable.c0_3);
-	}
-
-	/**
-	 * @see #decodeResources()
-	 */
-	private void decodeExplosionSound() {
 	}
 
 	public void draw(Canvas canvas) {
@@ -355,8 +348,9 @@ public class Game {
 	}
 
 	public void placeBomb(int x, int y) {
-		mBombs.add(new Bomb(bombBitmap, x, y, this.mLevel.getExplosionTimeout(),
-				this.mLevel.getExplosionRange(), this.mLevel.getGrid(),
+		mBombs.add(new Bomb(bombBitmap, x, y,
+				this.mLevel.getExplosionTimeout(), this.mLevel
+						.getExplosionRange(), this.mLevel.getGrid(),
 				explosionSoundComponent));
 	}
 
@@ -381,13 +375,12 @@ public class Game {
 	}
 
 	/**
-	 * Remove all droids in act range.
+	 * Remove all droids in act range and adds to player's points.
 	 * 
 	 * @param bomb
 	 * @param actRange
-	 * @return the number of droids killed.
 	 */
-	public int explosionCollision(Bomb bomb, int[] actRange) {
+	public void explosionCollision(Bomb bomb, int[] actRange) {
 		List<Droid> droidsToRemove = new ArrayList<Droid>();
 		for (Droid d : mDroids) {
 			boolean collidedHorizontally = ((Math.rint(bomb.getY()) == Math
@@ -407,7 +400,6 @@ public class Game {
 				mPlayers.get(0).getPoints() + droidsKilled
 						* mLevel.getPointsPerRobotKilled());
 		mDroids.removeAll(droidsToRemove);
-		return droidsKilled;
 	}
 
 	public void update(long timePassed) {
