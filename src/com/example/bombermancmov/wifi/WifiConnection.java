@@ -31,7 +31,8 @@ public class WifiConnection {
 			@Override
 			public void onPeersAvailable(SimWifiP2pDeviceList peers) {
 				int size = peers.getDeviceList().size();
-				Log.d(TAG, "Peer list size: " + size);
+				Log.d(TAG + ":" + callerAct.getLocalClassName(),
+						"Peer list size: " + size);
 			}
 		};
 		mConnection = new ServiceConnection() {
@@ -43,6 +44,7 @@ public class WifiConnection {
 				mChannel = mManager.initialize(act.getApplication(),
 						act.getMainLooper(), null);
 				mBound = true;
+				mManager.requestPeers(mChannel, peerRequester);
 				Log.d(TAG, "Service connected.");
 			}
 
@@ -68,6 +70,10 @@ public class WifiConnection {
 			callerAct.unbindService(mConnection);
 			mBound = false;
 		}
+	}
+
+	public void setCallerAct(Activity callerAct) {
+		this.callerAct = callerAct;
 	}
 
 	public boolean isBound() {

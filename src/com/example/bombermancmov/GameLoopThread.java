@@ -22,7 +22,7 @@ public class GameLoopThread extends Thread {
 	private boolean running;
 
 	/** Frames per second, when game is running and resumed. */
-	private static final int RESUME_FPS = 20;
+	private static final int RESUME_FPS = 25;
 
 	/** Frames per second, when game is paused. */
 	private static final int PAUSE_FPS = 0;

@@ -30,33 +30,22 @@ public class MainGamePanel extends SurfaceView implements
 	private LevelNextRoundThread levelNextRound;
 
 	private SurfaceHolder surfaceHolder;
-	private boolean[] tryDirection; /* FIXME: HACK */
-
-	private String playerName;
 
 	/* Game model */
 	private Game game;
 
-	private SingleGameActivity mActivity; // HORRIBLE HACK!
+	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
 
-	public MainGamePanel(Context context) {
+	public MainGamePanel(Context context, StatusScreenUpdater updater) {
 		super(context);
-		tryDirection = new boolean[] { false, false, false, false };
 		surfaceHolder = getHolder();
-		mActivity = (SingleGameActivity) context;
-		playerName = mActivity.getIntent().getStringExtra("PlayerName");
-		mActivity.setPlayerName(playerName);
+		mStatusScreenUpdater = updater;
 
 		// adding the callback(this) to the surface holder to intercept events
 		surfaceHolder.addCallback(this);
 
 		// create level
 		game = new Game(this);
-
-		// for single player, TODO for multiplayer
-		mActivity.setPlayerScore(game.getPlayerByNumber(0).getPoints());
-		mActivity.setTimeLeft(game.getTimeLeft());
-		mActivity.setNumPlayers(game.getLevel().getMaxNumberPlayers());
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
@@ -162,13 +151,13 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void update(long timePassed) {
 		game.update(timePassed);
-		mActivity.runOnUiThread(new Runnable() {
+		mStatusScreenUpdater.runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
-            	mActivity.setPlayerScore(game.getPlayerByNumber(0).getPoints());
-        		mActivity.setTimeLeft(game.getTimeLeft());
-        		mActivity.setNumPlayers(game.getLevel().getMaxNumberPlayers());
+            	mStatusScreenUpdater.setPlayerScore(game.getPlayerByNumber(0).getPoints());
+        		mStatusScreenUpdater.setTimeLeft(game.getTimeLeft());
+        		mStatusScreenUpdater.setNumPlayers(game.getLevel().getMaxNumberPlayers());
             }
         });
 	}

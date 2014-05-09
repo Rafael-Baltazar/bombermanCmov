@@ -6,7 +6,6 @@ import java.util.List;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.util.Log;
 import android.view.SurfaceView;
 
 import com.example.bombermancmov.R;
@@ -19,21 +18,16 @@ public class Game {
 	private static final int PLAYER_2 = 1;
 	private static final int PLAYER_3 = 2;
 	private static final float PLAYER_SPEED = 3.0f;
-	
+
 	private float gameDuration;
 	private float totalTime;
 
-	private Level level;
+	private Level mLevel;
 
 	// private Character player;
-	private List<Character> players;
-	private List<Droid> droids;
-	private List<Bomb> bombs;
-	
-	// dead players & droids
-	private List<Character> deadPlayers;
-	private List<Droid> deadDroids;
-	private List<Bomb> unusedBombs;
+	private List<Character> mPlayers;
+	private List<Droid> mDroids;
+	private List<Bomb> mBombs;
 
 	/** Used to choose new directions for the droids. */
 	private DroidAI droidAI;
@@ -54,16 +48,16 @@ public class Game {
 	 */
 
 	public Character getPlayerByNumber(int i) {
-		return players.get(i);
+		return mPlayers.get(i);
 	}
 
 	public List<Character> getPlayersByPos(float x, float y) {
 		float range = 0.01f;
 		List<Character> result = new ArrayList<Character>();
-		for(Character p : players) {
+		for (Character p : mPlayers) {
 			int intX = (int) Math.rint(p.getX());
 			int intY = (int) Math.rint(p.getY());
-			if(inRange(x, intX, range) && inRange(y, intY, range)) {
+			if (inRange(x, intX, range) && inRange(y, intY, range)) {
 				result.add(p);
 			}
 		}
@@ -90,47 +84,53 @@ public class Game {
 		this.gameDuration = 180000; // three minutes?
 		this.totalTime = 0;
 
-		this.level = new Level();
-		this.level.setLevelName("default");
-		this.level.setExplosionTimeout(4);
-		this.level.setExplosionDuration(2000);
-		this.level.setExplosionRange(2);
-		this.level.setRobotSpeed(1);
-		this.level.setPointsPerOpponentKilled(2);
-		this.level.setPointsPerRobotKilled(1);
-		this.level.setMaxNumberPlayers(3);
+		this.mLevel = new Level();
+		this.mLevel.setLevelName("default");
+		this.mLevel.setExplosionTimeout(4);
+		this.mLevel.setExplosionDuration(2000);
+		this.mLevel.setExplosionRange(2);
+		this.mLevel.setRobotSpeed(1);
+		this.mLevel.setPointsPerOpponentKilled(2);
+		this.mLevel.setPointsPerRobotKilled(1);
+		this.mLevel.setMaxNumberPlayers(3);
 
 		this.surfaceView = surfaceView;
-		
+
 		this.explosionSoundComponent = new SoundComponent(surfaceView);
 
 		decodeResources();
 
 		// Create Lists for filling
-		this.bombs = new ArrayList<Bomb>();
-		this.droids = new ArrayList<Droid>();
-		this.players = new ArrayList<Character>();
+		this.mBombs = new ArrayList<Bomb>();
+		this.mDroids = new ArrayList<Droid>();
+		this.mPlayers = new ArrayList<Character>();
 
 		// Create droidAI
-		droidAI = new DroidAI(droids);
+		droidAI = new DroidAI(mDroids);
 
 		// Creating Player and Robots on their starting position (maybe rework
 		// later)
 		for (int i = 0; i < 13; i++) {
 			for (int j = 0; j < 19; j++) {
 				// Check if a player is on this cell
-				if (this.level.getGrid().getGridCell(j, i) == '1' && this.players.size() < this.level.getMaxNumberPlayers()) {
-					players.add(new Character(playerBitmap[PLAYER_1], j, i,
+				if (this.mLevel.getGrid().getGridCell(j, i) == '1'
+						&& this.mPlayers.size() < this.mLevel
+								.getMaxNumberPlayers()) {
+					mPlayers.add(new Character(playerBitmap[PLAYER_1], j, i,
 							PLAYER_SPEED, getLevel().getGrid(), this));
-				} else if(this.level.getGrid().getGridCell(j, i) == '2' && this.players.size() < this.level.getMaxNumberPlayers()) {
-					players.add(new Character(playerBitmap[PLAYER_2], j, i,
+				} else if (this.mLevel.getGrid().getGridCell(j, i) == '2'
+						&& this.mPlayers.size() < this.mLevel
+								.getMaxNumberPlayers()) {
+					mPlayers.add(new Character(playerBitmap[PLAYER_2], j, i,
 							PLAYER_SPEED, getLevel().getGrid(), this));
-				} else if(this.level.getGrid().getGridCell(j, i) == '3' && this.players.size() < this.level.getMaxNumberPlayers()) {
-					players.add(new Character(playerBitmap[PLAYER_3], j, i,
+				} else if (this.mLevel.getGrid().getGridCell(j, i) == '3'
+						&& this.mPlayers.size() < this.mLevel
+								.getMaxNumberPlayers()) {
+					mPlayers.add(new Character(playerBitmap[PLAYER_3], j, i,
 							PLAYER_SPEED, getLevel().getGrid(), this));
 				}
-				if (this.level.getGrid().getGridCell(j, i) == 'R') {
-					this.droids.add(new Droid(droidBitmap, j, i, this.level
+				if (this.mLevel.getGrid().getGridCell(j, i) == 'R') {
+					this.mDroids.add(new Droid(droidBitmap, j, i, this.mLevel
 							.getRobotSpeed(), this));
 				}
 			}
@@ -187,7 +187,7 @@ public class Game {
 		decodePlayer2Bitmaps();
 		decodeAndRetPlayer3Bitmaps();
 	}
-	
+
 	private void decodePlayer1Bitmaps() {
 		playerBitmap[PLAYER_1][Character.FRONT] = BitmapFactory.decodeResource(
 				surfaceView.getResources(), R.drawable.eevee_front);
@@ -198,7 +198,7 @@ public class Game {
 		playerBitmap[PLAYER_1][Character.BACK] = BitmapFactory.decodeResource(
 				surfaceView.getResources(), R.drawable.eevee_back);
 	}
-	
+
 	private void decodePlayer2Bitmaps() {
 		playerBitmap[PLAYER_2][Character.FRONT] = BitmapFactory.decodeResource(
 				surfaceView.getResources(), R.drawable.espeon_front);
@@ -209,7 +209,7 @@ public class Game {
 		playerBitmap[PLAYER_2][Character.BACK] = BitmapFactory.decodeResource(
 				surfaceView.getResources(), R.drawable.espeon_back);
 	}
-	
+
 	private void decodeAndRetPlayer3Bitmaps() {
 		playerBitmap[PLAYER_3][Character.FRONT] = BitmapFactory.decodeResource(
 				surfaceView.getResources(), R.drawable.flareon_front);
@@ -235,7 +235,7 @@ public class Game {
 		droidBitmap[Character.BACK] = BitmapFactory.decodeResource(
 				surfaceView.getResources(), R.drawable.c0_3);
 	}
-	
+
 	/**
 	 * @see #decodeResources()
 	 */
@@ -243,9 +243,9 @@ public class Game {
 	}
 
 	public void draw(Canvas canvas) {
-		for (int rowNum = 0; rowNum < this.level.getGrid().getRowSize(); ++rowNum) {
-			for (int collNum = 0; collNum < this.level.getGrid().getColSize(); ++collNum) {
-				switch (this.level.getGrid().getGridCell(rowNum, collNum)) {
+		for (int rowNum = 0; rowNum < this.mLevel.getGrid().getRowSize(); ++rowNum) {
+			for (int collNum = 0; collNum < this.mLevel.getGrid().getColSize(); ++collNum) {
+				switch (this.mLevel.getGrid().getGridCell(rowNum, collNum)) {
 				case LevelGrid.WALL: {
 					canvas.drawBitmap(wallBitMap,
 							rowNum * wallBitMap.getWidth(), collNum
@@ -262,13 +262,13 @@ public class Game {
 			}
 		}
 
-		for (Character c : players) {
+		for (Character c : mPlayers) {
 			c.draw(canvas);
 		}
-		for (Bomb b : bombs) {
+		for (Bomb b : mBombs) {
 			b.draw(canvas);
 		}
-		for (Character c : droids) {
+		for (Character c : mDroids) {
 			c.draw(canvas);
 		}
 	}
@@ -278,9 +278,9 @@ public class Game {
 	 */
 	public void scaleResources() {
 		int newWidth = surfaceView.getWidth()
-				/ this.level.getGrid().getRowSize();
+				/ this.mLevel.getGrid().getRowSize();
 		int newHeight = surfaceView.getHeight()
-				/ this.level.getGrid().getColSize();
+				/ this.mLevel.getGrid().getColSize();
 		scaleWallBitmap(newWidth, newHeight);
 		scaleObstacleBitmap(newWidth, newHeight);
 		scaleBombBitmaps(newWidth, newHeight);
@@ -323,7 +323,7 @@ public class Game {
 	 * @see #scaleResources()
 	 */
 	private void scalePlayerBitmaps(int newWidth, int newHeight) {
-		for(Bitmap[] bitmaps : playerBitmap) {
+		for (Bitmap[] bitmaps : playerBitmap) {
 			scaleBitmapArray(newWidth, newHeight, bitmaps);
 		}
 	}
@@ -355,8 +355,9 @@ public class Game {
 	}
 
 	public void placeBomb(int x, int y) {
-		bombs.add(new Bomb(bombBitmap, x, y, this.level.getExplosionTimeout(),
-				this.level.getExplosionRange(), this.level.getGrid(), explosionSoundComponent));
+		mBombs.add(new Bomb(bombBitmap, x, y, this.mLevel.getExplosionTimeout(),
+				this.mLevel.getExplosionRange(), this.mLevel.getGrid(),
+				explosionSoundComponent));
 	}
 
 	public boolean nextRound() {
@@ -365,49 +366,56 @@ public class Game {
 		}
 		float t;
 		int[] expBlocks;
-		List<Bomb> toRemove = new ArrayList<Bomb>(); // STUPID HACK TO PREVENT
-														// MULTI-BOMB CRASH
-		for (Bomb b : bombs) {
+		List<Bomb> bombsToRemove = new ArrayList<Bomb>();
+		for (Bomb b : mBombs) {
 			t = b.tick();
 			if (t == 0) {
 				expBlocks = b.explode(surfaceView.getContext());
-				for (Character c : droids) {
-					if (((Math.rint(b.getY()) == Math.rint(c.getY()))
-							&& (expBlocks[2] <= Math.rint(c.getX())) && (expBlocks[3] >= Math
-							.rint(c.getX())))
-							|| ((Math.rint(b.getX()) == Math.rint(c.getX()))
-									&& (expBlocks[0] <= Math.rint(c.getY())) && (expBlocks[1] >= Math
-									.rint(c.getY())))) {
-
-						droids.remove(c);
-						// TODO which player? this is for single player:
-						players.get(0).setPoints(
-								players.get(0).getSpeed()
-										+ this.level.getPointsPerRobotKilled());
-					}
-				}
+				explosionCollision(b, expBlocks);
 			} else if (t == -1) {
-				toRemove.add(b);
+				bombsToRemove.add(b);
 			}
 		}
-
-		for (Bomb b : toRemove) {
-			bombs.remove(b);
-		}
-
-		// for (Droid d : droids) {
-		// d.moveRandomly();
-		// }
-
+		mBombs.removeAll(bombsToRemove);
 		return true;
 	}
 
+	/**
+	 * Remove all droids in act range.
+	 * 
+	 * @param bomb
+	 * @param actRange
+	 * @return the number of droids killed.
+	 */
+	public int explosionCollision(Bomb bomb, int[] actRange) {
+		List<Droid> droidsToRemove = new ArrayList<Droid>();
+		for (Droid d : mDroids) {
+			boolean collidedHorizontally = ((Math.rint(bomb.getY()) == Math
+					.rint(d.getY()))
+					&& (actRange[Bomb.RANGE_LEFT] <= Math.rint(d.getX())) && (actRange[Bomb.RANGE_RIGHT] >= Math
+					.rint(d.getX())));
+			boolean collidedVertically = ((Math.rint(bomb.getX()) == Math
+					.rint(d.getX()))
+					&& (actRange[Bomb.RANGE_UP] <= Math.rint(d.getY())) && (actRange[Bomb.RANGE_DOWN] >= Math
+					.rint(d.getY())));
+			if (collidedHorizontally || collidedVertically) {
+				droidsToRemove.add(d);
+			}
+		}
+		int droidsKilled = droidsToRemove.size();
+		mPlayers.get(0).setPoints(
+				mPlayers.get(0).getPoints() + droidsKilled
+						* mLevel.getPointsPerRobotKilled());
+		mDroids.removeAll(droidsToRemove);
+		return droidsKilled;
+	}
+
 	public void update(long timePassed) {
-		for (Character p : players) {
+		for (Character p : mPlayers) {
 			p.update(timePassed);
 		}
 		droidAI.update(timePassed);
-		for (Droid d : droids) {
+		for (Droid d : mDroids) {
 			d.update(timePassed);
 		}
 	}
@@ -416,18 +424,18 @@ public class Game {
 	 * GETTERS & SETTERS
 	 */
 	public Level getLevel() {
-		return level;
+		return mLevel;
 	}
 
 	public void setLevel(Level level) {
-		this.level = level;
+		this.mLevel = level;
 	}
 
 	public List<Character> getPlayers() {
-		return players;
+		return mPlayers;
 	}
 
 	public void setPlayers(List<Character> players) {
-		this.players = players;
+		this.mPlayers = players;
 	}
 }

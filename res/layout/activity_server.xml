@@ -9,7 +9,8 @@
         android:layout_height="wrap_content"
         android:hint="@string/et_player_name" />
     
-    <Button android:layout_width="wrap_content"
+    <Button android:id="@+id/btnAcceptClient" 
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="acceptClient"
         android:text="@string/btn_accept"/>

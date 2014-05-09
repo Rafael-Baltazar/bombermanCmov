@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocket;
-import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketServer;
 
 import com.example.bombermancmov.wifi.WifiConnection;
@@ -17,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 public class ServerActivity extends ActionBarActivity {
@@ -24,22 +24,21 @@ public class ServerActivity extends ActionBarActivity {
 
 	// WifiP2p
 	private static final int SERVER_PORT = 10001;
-	private SimWifiP2pSocketServer mSrvSocket;
+	private SimWifiP2pSocketServer mSrvSocket = null;
 	private WifiConnection mWifi = new WifiConnection(this);
 
 	// Layout
 	private EditText eRcvText;
+	private Button acceptButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_server);
 
-		// WifiP2p
-		SimWifiP2pSocketManager.Init(getApplicationContext());
-
 		// Layout
 		eRcvText = (EditText) findViewById(R.id.rcvText);
+		acceptButton = (Button) findViewById(R.id.btnAcceptClient);
 	}
 
 	@Override
@@ -63,11 +62,6 @@ public class ServerActivity extends ActionBarActivity {
 
 	@Override
 	protected void onResume() {
-		try {
-			mSrvSocket = new SimWifiP2pSocketServer(SERVER_PORT);
-		} catch (IOException e) {
-			Log.e(TAG, "IO new SocketServer: " + e.getMessage());
-		}
 		mWifi.bindWifiService();
 		super.onResume();
 	}
@@ -75,7 +69,10 @@ public class ServerActivity extends ActionBarActivity {
 	@Override
 	protected void onPause() {
 		try {
-			mSrvSocket.close();
+			if (mSrvSocket != null) {
+				mSrvSocket.close();
+				Log.d(TAG, "close SocketServer");
+			}
 		} catch (IOException e) {
 			Log.e(TAG, "IO close SocketServer: " + e.getMessage());
 		}
@@ -84,6 +81,14 @@ public class ServerActivity extends ActionBarActivity {
 	}
 
 	public void acceptClient(View v) {
+		try {
+			if (mSrvSocket == null) {
+				mSrvSocket = new SimWifiP2pSocketServer(SERVER_PORT);
+				Log.d(TAG, "New SocketServer");
+			}
+		} catch (IOException e) {
+			Log.e(TAG, "IO new SocketServer: " + e.getMessage());
+		}
 		new ReadFromTask().execute(mSrvSocket);
 	}
 
@@ -97,6 +102,7 @@ public class ServerActivity extends ActionBarActivity {
 		String prevTxt = eRcvText.getText().toString();
 		eRcvText.setText(message + prevTxt);
 	}
+
 	/**
 	 * Receive a message and store it in eRcvText.
 	 */

@@ -17,8 +17,9 @@ public class SingleGameActivity extends ActionBarActivity {
 
 	private static final String TAG = GameLoopThread.class.getSimpleName();
 	private FrameLayout frm;
-	private Button pauseButton, leftButton, rightButton, upButton, downButton, bombButton;
-	private TextView playerNameTextView, playerScoreTextView, timeLeftTextView,
+	private Button pauseButton, leftButton, rightButton, upButton, downButton,
+			bombButton;
+	private TextView nameTextView, scoreTextView, timeLeftTextView,
 			numPlayersTextView;
 	private MainGamePanel mGamePanel;
 
@@ -28,8 +29,8 @@ public class SingleGameActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_game);
 
 		// save for posterior use
-		playerNameTextView = (TextView) findViewById(R.id.playerName);
-		playerScoreTextView = (TextView) findViewById(R.id.playerScore);
+		nameTextView = (TextView) findViewById(R.id.playerName);
+		scoreTextView = (TextView) findViewById(R.id.playerScore);
 		timeLeftTextView = (TextView) findViewById(R.id.timeLeft);
 		numPlayersTextView = (TextView) findViewById(R.id.numberPlayers);
 
@@ -37,7 +38,9 @@ public class SingleGameActivity extends ActionBarActivity {
 		setOnClickListenersToButtons();
 
 		frm = (FrameLayout) findViewById(R.id.frameLayout);
-		mGamePanel = new MainGamePanel(this);
+		StatusScreenUpdater updater = new StatusScreenUpdater(nameTextView,
+				scoreTextView, timeLeftTextView, numPlayersTextView, this);
+		mGamePanel = new MainGamePanel(this, updater);
 		frm.addView(mGamePanel);
 
 		Log.d(TAG, "View added");
@@ -112,46 +115,11 @@ public class SingleGameActivity extends ActionBarActivity {
 		});
 	}
 
-	public void setPlayerName(String playerName) {
-		playerNameTextView.setText(playerName);
-	}
-
-	public void setPlayerScore(float playerScore) {
-		playerScoreTextView.setText(Float.toString(playerScore));
-	}
-
-	public void setTimeLeft(float timeLeft) {
-		timeLeftTextView.setText(Float.toString(timeLeft));
-	}
-
-	public void setNumPlayers(int numPlayers) {
-		numPlayersTextView.setText(Integer.toString(numPlayers));
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-	
 	public void pauseOrResumeGame(View b) {
 		String btnTxt = pauseButton.getText().toString();
 		String pause = getResources().getString(R.string.pause_button_text);
 		String resume = getResources().getString(R.string.resume_button_text);
-		if(btnTxt.equals(pause)) {
+		if (btnTxt.equals(pause)) {
 			mGamePanel.pauseThread();
 			pauseButton.setText(resume);
 		} else {
@@ -159,7 +127,7 @@ public class SingleGameActivity extends ActionBarActivity {
 			pauseButton.setText(pause);
 		}
 	}
-	
+
 	public void quitGame(View v) {
 		finish();
 	}
