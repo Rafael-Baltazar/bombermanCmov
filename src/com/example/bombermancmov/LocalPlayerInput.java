@@ -1,6 +1,7 @@
 package com.example.bombermancmov;
 
 public class LocalPlayerInput extends PlayerInput {
+	private int playerId;
 	private MainGamePanel mGamePanel;
 
 	/**
@@ -13,32 +14,32 @@ public class LocalPlayerInput extends PlayerInput {
 
 	@Override
 	public void tryMoveUp() {
-		mGamePanel.tryWalk(1);
+		mGamePanel.tryUp(playerId);
 	}
 
 	@Override
 	public void tryMoveDown() {
-		mGamePanel.tryWalk(2);
+		mGamePanel.tryDown(playerId);
 	}
 
 	@Override
 	public void tryMoveLeft() {
-		mGamePanel.tryWalk(0);
+		mGamePanel.tryLeft(playerId);
 	}
 
 	@Override
 	public void tryMoveRight() {
-		mGamePanel.tryWalk(3);
+		mGamePanel.tryRight(playerId);
 	}
 
 	@Override
 	public void tryStop() {
-		mGamePanel.tryStop();
+		mGamePanel.tryStop(playerId);
 	}
 
 	@Override
 	public void placeBomb() {
-		mGamePanel.doAction(4);
+		mGamePanel.placeBomb(playerId);
 	}
 
 }

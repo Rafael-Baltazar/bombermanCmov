@@ -6,7 +6,7 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
+import com.example.bombermancmov.model.Character;
 import com.example.bombermancmov.model.Game;
 
 /**
@@ -19,11 +19,9 @@ public class MainGamePanel extends SurfaceView implements
 		SurfaceHolder.Callback {
 
 	private static final String TAG = MainGamePanel.class.getSimpleName();
-	public static final int ROUND_TIME = 1000;// ms\
+	public static final int ROUND_TIME = 1000;// in milliseconds
 
-	/**
-	 * Update and render game model in a separate thread.
-	 */
+	/** Update and render game model in a separate thread. */
 	private GameLoopThread gameLoopThread;
 
 	// Run level.nextRound() every x milliseconds
@@ -36,7 +34,8 @@ public class MainGamePanel extends SurfaceView implements
 
 	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
 
-	public MainGamePanel(Context context, StatusScreenUpdater updater, boolean isSingleplayer) {
+	public MainGamePanel(Context context, StatusScreenUpdater updater,
+			boolean isSingleplayer) {
 		super(context);
 		surfaceHolder = getHolder();
 		mStatusScreenUpdater = updater;
@@ -83,7 +82,7 @@ public class MainGamePanel extends SurfaceView implements
 		gameLoopThread.setRunning(false);
 		shutDown(gameLoopThread);
 		Log.d(TAG, "Game loop thread was shut down cleanly");
-		
+
 		levelNextRound.setRunning(false);
 		shutDown(levelNextRound);
 		Log.d(TAG, "Level next round thread was shut down cleanly");
@@ -102,66 +101,56 @@ public class MainGamePanel extends SurfaceView implements
 		}
 	}
 
-	// TODO: multiplayer approach
-	public boolean doAction(int actionCode) {
-		switch (actionCode) {
-		case 0: {
-			game.getPlayerByNumber(0).tryMoveLeft();
-			break;
-		}
-		case 1: {
-			game.getPlayerByNumber(0).tryMoveUp();
-			break;
-		}
-		case 2: {
-			game.getPlayerByNumber(0).tryMoveDown();
-			break;
-		}
-		case 3: {
-			game.getPlayerByNumber(0).tryMoveRight();
-			break;
-		}
-		case 4: {
-			if(game.getPlayerByNumber(0).isAlive()) {
-				int x = (int) Math.rint(game.getPlayerByNumber(0).getX());
-				int y = (int) Math.rint(game.getPlayerByNumber(0).getY());
-				game.placeBomb(x,y);
-			}
-			break;
-		}
-		default:
-			return false;
-		}
-		return true;
-	}
-	
 	public void pauseThread() {
 		gameLoopThread.pause();
 	}
-	
+
 	public void resumeThread() {
 		gameLoopThread.unPause();
 	}
 
-	public void tryStop() {
-		game.getPlayerByNumber(0).stop();
+	public void tryLeft(int id) {
+		game.getPlayerByNumber(id).tryMoveLeft();
 	}
 
-	public void tryWalk(int dir) {
-		doAction(dir);
+	public void tryUp(int id) {
+		game.getPlayerByNumber(id).tryMoveUp();
+	}
+
+	public void tryDown(int id) {
+		game.getPlayerByNumber(id).tryMoveDown();
+	}
+
+	public void tryRight(int id) {
+		game.getPlayerByNumber(id).tryMoveRight();
+	}
+
+	public void tryStop(int id) {
+		game.getPlayerByNumber(id).stop();
+	}
+
+	public void placeBomb(int id) {
+		Character player = game.getPlayerByNumber(id); 
+		if (player.isAlive()) {
+			int x = (int) Math.rint(player.getX());
+			int y = (int) Math.rint(player.getY());
+			game.placeBomb(x, y);
+		}
 	}
 
 	public void update(long timePassed) {
 		game.update(timePassed);
 		mStatusScreenUpdater.runOnUiThread(new Runnable() {
 
-            @Override
-            public void run() {
-            	mStatusScreenUpdater.setPlayerScore(game.getPlayerByNumber(0).getPoints());
-        		mStatusScreenUpdater.setTimeLeft(game.getTimeLeft());
-        		mStatusScreenUpdater.setNumPlayers(game.getLevel().getMaxNumberPlayers());
-            }
-        });
+			@Override
+			public void run() {
+				mStatusScreenUpdater.setPlayerScore(game.getPlayerByNumber(0)
+						.getPoints());
+				mStatusScreenUpdater.setTimeLeft(game.getTimeLeft());
+				mStatusScreenUpdater.setNumPlayers(game.getLevel()
+						.getMaxNumberPlayers());
+			}
+		});
 	}
 
 	@Override
@@ -174,7 +163,7 @@ public class MainGamePanel extends SurfaceView implements
 		canvas.drawColor(Color.WHITE);
 		game.draw(canvas);
 	}
-	
+
 	public Game getGame() {
 		return game;
 	}

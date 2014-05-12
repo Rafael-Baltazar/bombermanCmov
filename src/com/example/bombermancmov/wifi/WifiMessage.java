@@ -24,4 +24,8 @@ public class WifiMessage {
 	public List<String> getArgs() {
 		return args;
 	}
+
+	public void setArgs(List<String> args) {
+		this.args = args;
+	}
 }

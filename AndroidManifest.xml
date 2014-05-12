@@ -24,7 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.bombermancmov.SingleGameActivity" />
+        <activity android:name="com.example.bombermancmov.GameActivity" />
 
         <service android:name="pt.utl.ist.cmov.wifidirect.service.SimWifiP2pService" />
 
