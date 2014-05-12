@@ -122,9 +122,11 @@ public class MainGamePanel extends SurfaceView implements
 			break;
 		}
 		case 4: {
-			int x = (int) Math.rint(game.getPlayerByNumber(0).getX());
-			int y = (int) Math.rint(game.getPlayerByNumber(0).getY());
-			game.placeBomb(x,y);
+			if(game.getPlayerByNumber(0).isAlive()) {
+				int x = (int) Math.rint(game.getPlayerByNumber(0).getX());
+				int y = (int) Math.rint(game.getPlayerByNumber(0).getY());
+				game.placeBomb(x,y);
+			}
 			break;
 		}
 		default:
@@ -171,5 +173,13 @@ public class MainGamePanel extends SurfaceView implements
 	public void drawGameModel(Canvas canvas) {
 		canvas.drawColor(Color.WHITE);
 		game.draw(canvas);
+	}
+	
+	public Game getGame() {
+		return game;
+	}
+
+	public void setGame(Game game) {
+		this.game = game;
 	}
 }

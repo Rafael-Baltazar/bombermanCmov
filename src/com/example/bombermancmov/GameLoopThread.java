@@ -49,7 +49,7 @@ public class GameLoopThread extends Thread {
 	@Override
 	public void run() {
 		long beginTime, timeDiff;
-		while (running) {
+		while (running && !gamePanel.getGame().isFinished()) {
 			// draw step
 			Canvas canvas = null;
 			try {

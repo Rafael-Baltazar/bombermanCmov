@@ -3,12 +3,12 @@ package com.example.bombermancmov;
 import com.example.bombermancmov.model.Game;
 
 public class LevelNextRoundThread extends Thread {
-	private Game level;
+	private Game game;
 	private int roundTime;
 	private boolean running = true;
 
-	public LevelNextRoundThread(Game level, int roundTime) {
-		this.level = level;
+	public LevelNextRoundThread(Game game, int roundTime) {
+		this.game = game;
 		this.roundTime = roundTime;
 	}
 
@@ -16,7 +16,7 @@ public class LevelNextRoundThread extends Thread {
 	
 	@Override
 	public void run() {
-		while (level.nextRound() && running) {
+		while (game.nextRound() && running && !game.isFinished()) {
 			try {
 				Thread.sleep(roundTime);
 			} catch (InterruptedException e) {
