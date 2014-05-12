@@ -14,8 +14,8 @@ import android.os.IBinder;
 import android.os.Messenger;
 import android.util.Log;
 
-public class WifiConnection {
-	private static final String TAG = WifiConnection.class.getSimpleName();
+public class WifiService {
+	private static final String TAG = WifiService.class.getSimpleName();
 	private Activity callerAct;
 	private Channel mChannel = null;
 	private Messenger mMessenger = null;
@@ -25,7 +25,7 @@ public class WifiConnection {
 	/** Connection to bind and unbind wifiP2p service. */
 	private ServiceConnection mConnection;
 
-	public WifiConnection(final Activity act) {
+	public WifiService(final Activity act) {
 		this.callerAct = act;
 		peerRequester = new PeerListListener() {
 			@Override
@@ -59,15 +59,17 @@ public class WifiConnection {
 		};
 	}
 
-	public void bindWifiService() {
+	public void bindService() {
 		Intent intent = new Intent(callerAct, SimWifiP2pService.class);
 		callerAct.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 		mBound = true;
 	}
 
-	public void unbindService() {
+	public void stopService() {
 		if (mBound) {
 			callerAct.unbindService(mConnection);
+			Intent intent = new Intent(callerAct, SimWifiP2pService.class);
+			callerAct.stopService(intent);
 			mBound = false;
 		}
 	}
@@ -96,8 +98,16 @@ public class WifiConnection {
 		return peerRequester;
 	}
 
+	public void setPeerRequester(PeerListListener peerRequester) {
+		this.peerRequester = peerRequester;
+	}
+
 	public SimWifiP2pManager getManager() {
 		return mManager;
+	}
+
+	public void requestPeers() {
+		mManager.requestPeers(mChannel, peerRequester);
 	}
 
 }

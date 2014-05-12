@@ -21,11 +21,13 @@
     <string name="display_num_players">Number of Players:</string>
     <string name="hint_player_name">Insert a nickname here</string>
     <string name="background_main_menu_description">Bomberman front view</string>
-    
     <string name="title_activity_server">ServerActivity</string>
     <string name="btn_req_peers">Request Peers</string>
     <string name="et_player_name">Player name will appear here</string>
     <string name="btn_accept">Accept new player</string>
     <string name="btn_server">Server</string>
+    <string name="title_activity_lobby">LobbyActivity</string>
+    <string name="display_available_games">Available Games</string>
+    <string name="btn_refresh_available_games">Refresh</string>
 
 </resources>

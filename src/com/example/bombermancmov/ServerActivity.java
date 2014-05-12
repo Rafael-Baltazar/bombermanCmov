@@ -1,20 +1,15 @@
 package com.example.bombermancmov;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocket;
-import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketServer;
-
-import com.example.bombermancmov.wifi.WifiConnection;
+import com.example.bombermancmov.wifi.SocketUtil;
+import com.example.bombermancmov.wifi.WifiService;
+import com.example.bombermancmov.wifi.commands.Command;
 
 import android.support.v7.app.ActionBarActivity;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,8 +19,9 @@ public class ServerActivity extends ActionBarActivity {
 
 	// WifiP2p
 	private static final int SERVER_PORT = 10001;
-	private SimWifiP2pSocketServer mSrvSocket = null;
-	private WifiConnection mWifi = new WifiConnection(this);
+	private boolean mSrvRegistered = false;
+	private WifiService mWifi = new WifiService(this);
+	private Map<String, Command> mCommands = new HashMap<String, Command>();
 
 	// Layout
 	private EditText eRcvText;
@@ -39,107 +35,43 @@ public class ServerActivity extends ActionBarActivity {
 		// Layout
 		eRcvText = (EditText) findViewById(R.id.rcvText);
 		acceptButton = (Button) findViewById(R.id.btnAcceptClient);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.server, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+		initSrvCommands();
 	}
 
 	@Override
 	protected void onResume() {
-		mWifi.bindWifiService();
+		mWifi.bindService();
 		super.onResume();
 	}
 
 	@Override
 	protected void onPause() {
-		try {
-			if (mSrvSocket != null) {
-				mSrvSocket.close();
-				Log.d(TAG, "close SocketServer");
-			}
-		} catch (IOException e) {
-			Log.e(TAG, "IO close SocketServer: " + e.getMessage());
-		}
-		mWifi.unbindService();
+		mWifi.stopService();
 		super.onPause();
 	}
 
 	public void acceptClient(View v) {
-		try {
-			if (mSrvSocket == null) {
-				mSrvSocket = new SimWifiP2pSocketServer(SERVER_PORT);
-				Log.d(TAG, "New SocketServer");
-			}
-		} catch (IOException e) {
-			Log.e(TAG, "IO new SocketServer: " + e.getMessage());
+		if (!mSrvRegistered) {
+			SocketUtil.registerServer(mCommands);
+			mSrvRegistered = true;
 		}
-		new ReadFromTask().execute(mSrvSocket);
+		acceptButton.setEnabled(false);
 	}
 
 	public void requestPeers(View v) {
-		mWifi.getManager().requestPeers(mWifi.getChannel(),
-				mWifi.getPeerRequester());
+		mWifi.requestPeers();
 	}
 
-	// WifiP2p
-	public void processWifiMessage(String message) {
-		String prevTxt = eRcvText.getText().toString();
-		eRcvText.setText(message + prevTxt);
-	}
+	private void initSrvCommands() {
+		Command cmd = new Command() {
 
-	/**
-	 * Receive a message and store it in eRcvText.
-	 */
-	private class ReadFromTask extends
-			AsyncTask<SimWifiP2pSocketServer, Void, String> {
-
-		@Override
-		protected String doInBackground(SimWifiP2pSocketServer... params) {
-			SimWifiP2pSocketServer srvSocket = params[0];
-			SimWifiP2pSocket client = null;
-			BufferedReader br;
-			try {
-				client = srvSocket.accept();
-			} catch (IOException e) {
-				Log.e(TAG, "IO: " + e.getMessage());
-				return null;
+			@Override
+			public void execute(List<String> args) {
+				String text = args.get(0);
+				eRcvText.setText(text);
 			}
-			try {
-				br = new BufferedReader(new InputStreamReader(
-						client.getInputStream()));
-				String message = br.readLine();
-				client.close();
-				return message;
-			} catch (IOException e) {
-				Log.e(TAG, "IO: " + e.getMessage());
-			}
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			if (result != null) {
-				Log.d(TAG, result);
-				processWifiMessage(result);
-			}
-			super.onPostExecute(result);
-		}
+		};
+		mCommands.put("rcv", cmd);
 	}
 
 }

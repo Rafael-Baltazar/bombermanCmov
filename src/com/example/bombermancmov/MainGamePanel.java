@@ -1,13 +1,13 @@
 package com.example.bombermancmov;
 
-import com.example.bombermancmov.model.Game;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import com.example.bombermancmov.model.Game;
 
 /**
  * This is the main surface that handles the on-touch events and draws the image

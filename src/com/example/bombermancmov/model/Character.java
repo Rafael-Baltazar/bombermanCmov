@@ -8,11 +8,11 @@ import android.util.Log;
 
 public class Character extends GameObject {
 	private static final String TAG = Character.class.getSimpleName();
-	private float speed = 0.3f;
+	private float speed;
 	private int speedx = 0;
 	private int speedy = 0;
 	private float points;
-	
+
 	private LevelGrid grid;
 
 	/**
@@ -32,9 +32,11 @@ public class Character extends GameObject {
 	 * @param y
 	 * @param speed
 	 * @param grid
-	 * @param game TODO
+	 * @param game
+	 *            TODO
 	 */
-	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid grid, Game game) {
+	public Character(Bitmap bitmap[], float x, float y, float speed,
+			LevelGrid grid, Game game) {
 		super(x, y);
 		this.speed = speed;
 		this.points = 0;
@@ -101,13 +103,13 @@ public class Character extends GameObject {
 	public void move(float x, float y) {
 		int intX = (int) Math.rint(x);
 		int intY = (int) Math.rint(y);
-		if (!isColliding(intX, intY)) {
+		if (!isCollidable(intX, intY)) {
 			setX(x);
 			setY(y);
 		}
 	}
 
-	private boolean isColliding(int x, int y) {
+	private boolean isCollidable(int x, int y) {
 		return grid.getGridCell(x, y) == LevelGrid.WALL
 				|| grid.getGridCell(x, y) == LevelGrid.OBSTACLE;
 	}
@@ -118,7 +120,7 @@ public class Character extends GameObject {
 		int y = (int) Math.rint(getY());
 		/* Search for collisions, one cell at a time. */
 		for (int i = 0; i < distance; i++) {
-			if (isColliding(x + i * speedx, y + i * speedy)) {
+			if (isCollidable(x + i * speedx, y + i * speedy)) {
 				distance = i - 1;
 				break;
 			}
@@ -126,6 +128,11 @@ public class Character extends GameObject {
 		move(getX() + distance * speedx, getY() + distance * speedy);
 	}
 
+	/**
+	 * Draws the character on the canvas.
+	 * 
+	 * @param canvas
+	 */
 	public void draw(Canvas canvas) {
 		drawableComponent.draw(canvas);
 	}

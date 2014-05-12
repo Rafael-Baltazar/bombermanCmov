@@ -20,8 +20,10 @@ public class GameLoopThread extends Thread {
 
 	/** Flag to hold game state */
 	private boolean running;
+	private boolean isMaster = true;
+	private boolean isPeer = true;
 
-	/** Frames per second, when game is running and resumed. */
+	/** Frames per second, when game is resumed. */
 	private static final int RESUME_FPS = 25;
 
 	/** Frames per second, when game is paused. */
@@ -60,8 +62,12 @@ public class GameLoopThread extends Thread {
 					// render state to the screen
 					// draws the canvas on the panel
 					if (canvas != null && frameDuration > 0) {
-						this.gamePanel.update(frameDuration);
-						this.gamePanel.drawGameModel(canvas);
+						if (isMaster) {
+							this.gamePanel.update(frameDuration);
+						}
+						if (isPeer) {
+							this.gamePanel.drawGameModel(canvas);
+						}
 					}
 				}
 			} finally {
@@ -100,8 +106,9 @@ public class GameLoopThread extends Thread {
 	}
 
 	private long calculateFrameDuration() {
-		if(maxFps == 0) return -1;
+		if (maxFps == 0)
+			return -1;
 		return 1000 / maxFps;
 	}
-	
+
 }

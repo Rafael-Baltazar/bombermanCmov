@@ -32,6 +32,10 @@
             android:name="com.example.bombermancmov.ServerActivity"
             android:label="@string/title_activity_server" >
         </activity>
+        <activity
+            android:name="com.example.bombermancmov.LobbyActivity"
+            android:label="@string/title_activity_lobby" >
+        </activity>
     </application>
 
 </manifest>

@@ -1,9 +1,15 @@
 package com.example.bombermancmov;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.example.bombermancmov.wifi.WifiConnection;
+import com.example.bombermancmov.wifi.WifiMessage;
+import com.example.bombermancmov.wifi.WifiMessageParser;
+import com.example.bombermancmov.wifi.WifiService;
 
 import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocket;
 import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketManager;
@@ -12,9 +18,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnKeyListener;
 import android.widget.EditText;
 
 public class MainMenuActivity extends Activity {
@@ -22,7 +26,7 @@ public class MainMenuActivity extends Activity {
 
 	// WifiP2p
 	private static final int REMOTE_PORT = 10001;
-	private WifiConnection mWifi = new WifiConnection(this);
+	private WifiService mWifi = new WifiService(this);
 
 	// Layout
 	private EditText ePlayerName;
@@ -38,54 +42,43 @@ public class MainMenuActivity extends Activity {
 
 		// Layout
 		ePlayerName = (EditText) findViewById(R.id.ePlayerName);
-		ePlayerName.setOnKeyListener(sendPlayerName);
 	}
 
 	@Override
 	protected void onResume() {
-		mWifi.bindWifiService();
+		mWifi.bindService();
 		super.onResume();
 	}
 
 	@Override
 	protected void onPause() {
-		mWifi.unbindService();
+		mWifi.stopService();
 		super.onPause();
 	}
-
-	// Layout
-	private OnKeyListener sendPlayerName = new OnKeyListener() {
-		public boolean onKey(View v, int keyCode, KeyEvent event) {
-			if (keyCode == KeyEvent.KEYCODE_ENTER) {
-				// Ignore Enter
-				return true;
-			}
-			return false;
-		}
-	};
 
 	public void newSingleGame(View v) {
 		String name = ePlayerName.getText().toString();
 		Intent intent = new Intent(this, SingleGameActivity.class);
 		intent.putExtra("PlayerName", name);
-		this.startActivity(intent);
+		startActivity(intent);
 	}
 	
 	public void newMultiPlayerGame(View v) {
 		String name = ePlayerName.getText().toString();
 		new WriteToTask().execute(new String[] { "192.168.0.2", name });
+//		Intent intent = new Intent(this, LobbyActivity.class);
+//		startActivity(intent);
 	}
 
 	public void newServer(View v) {
 		Intent intent = new Intent(this, ServerActivity.class);
-		this.startActivity(intent);
+		startActivity(intent);
 	}
 
 	public void exit(View v) {
 		finish();
 	}
 
-	// WifiP2p
 	/**
 	 * Send a message to a virtual address. Use: (new
 	 * WriteToTask).execute(virtualHost,message).
@@ -96,10 +89,10 @@ public class MainMenuActivity extends Activity {
 
 		@Override
 		protected String doInBackground(String... params) {
-			String clientHost = params[0];
+			String serverHost = params[0];
 			message = params[1];
 			try {
-				clientSocket = new SimWifiP2pSocket(clientHost, REMOTE_PORT);
+				clientSocket = new SimWifiP2pSocket(serverHost, REMOTE_PORT);
 			} catch (UnknownHostException e) {
 				return "Unknown Host:" + e.getMessage();
 			} catch (IOException e) {
@@ -113,13 +106,23 @@ public class MainMenuActivity extends Activity {
 			if (result != null) {
 				Log.e(TAG, result);
 			} else {
-				byte[] msg = (message + "\n").getBytes();
+				List<String> args = new ArrayList<String>();
+				String message = ePlayerName.getText().toString();
+				args.add(message);
+				WifiMessage wMsg = new WifiMessage("rcv", args);
+				List<WifiMessage> wMsgs = new ArrayList<WifiMessage>();
+				wMsgs.add(wMsg);
+				
+				String msg = WifiMessageParser.codeWifiMessages(wMsgs);
+				Log.d(TAG, msg);
 				try {
-					clientSocket.getOutputStream().write(msg);
+					ObjectOutputStream os = new ObjectOutputStream(clientSocket.getOutputStream());
+					os.flush();
+					os.writeObject(msg);
 					Log.d(TAG, "Sent message: " + message);
 					ePlayerName.setText("");
 				} catch (IOException e) {
-					Log.e(TAG, "IO error:" + e.getMessage());
+					Log.e(TAG, "IO error: " + e.getMessage());
 					ePlayerName.setText("");
 				}
 			}

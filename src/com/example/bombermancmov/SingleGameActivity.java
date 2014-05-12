@@ -22,6 +22,7 @@ public class SingleGameActivity extends ActionBarActivity {
 	private TextView nameTextView, scoreTextView, timeLeftTextView,
 			numPlayersTextView;
 	private MainGamePanel mGamePanel;
+	private PlayerInput playerInput;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,11 @@ public class SingleGameActivity extends ActionBarActivity {
 		mGamePanel = new MainGamePanel(this, updater);
 		frm.addView(mGamePanel);
 
+		boolean isLocal = getIntent().getBooleanExtra("isLocal", true);
+		if (isLocal) {
+			playerInput = new LocalPlayerInput(mGamePanel);
+		}
+
 		Log.d(TAG, "View added");
 	}
 
@@ -53,9 +59,9 @@ public class SingleGameActivity extends ActionBarActivity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					mGamePanel.tryWalk(0);
+					playerInput.tryMoveLeft();
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
-					mGamePanel.tryStop();
+					playerInput.tryStop();
 				}
 				return true;
 			}
@@ -67,9 +73,9 @@ public class SingleGameActivity extends ActionBarActivity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					mGamePanel.tryWalk(1);
+					playerInput.tryMoveUp();
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
-					mGamePanel.tryStop();
+					playerInput.tryStop();
 				}
 				return true;
 			}
@@ -82,9 +88,9 @@ public class SingleGameActivity extends ActionBarActivity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					mGamePanel.tryWalk(2);
+					playerInput.tryMoveDown();
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
-					mGamePanel.tryStop();
+					playerInput.tryStop();
 				}
 
 				return true;
@@ -97,9 +103,9 @@ public class SingleGameActivity extends ActionBarActivity {
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
-					mGamePanel.tryWalk(3);
+					playerInput.tryMoveRight();
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
-					mGamePanel.tryStop();
+					playerInput.tryStop();
 				}
 				return true;
 			}
@@ -110,7 +116,7 @@ public class SingleGameActivity extends ActionBarActivity {
 
 			@Override
 			public void onClick(View v) {
-				mGamePanel.doAction(4);
+				playerInput.placeBomb();
 			}
 		});
 	}

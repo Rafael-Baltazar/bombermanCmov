@@ -29,7 +29,6 @@ public class Bomb extends GameObject {
 	private boolean isExploding;
 	private int actRange[];
 	// Explosion sound
-	private SurfaceView surfaceView;
 	private SoundComponent mSoundComponent;
 
 	/** Handles draw method. */
