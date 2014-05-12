@@ -13,6 +13,8 @@ public class Character extends GameObject {
 	private int speedy = 0;
 	private float points;
 	
+	private boolean isAlive;
+
 	private LevelGrid grid;
 
 	/**
@@ -34,11 +36,12 @@ public class Character extends GameObject {
 	 * @param grid
 	 * @param game TODO
 	 */
-	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid grid, Game game) {
+	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid grid, Game game, boolean isAlive) {
 		super(x, y);
 		this.speed = speed;
 		this.points = 0;
 		this.grid = grid;
+		this.isAlive = isAlive;
 		drawableComponent = new DrawableComponent(this, bitmap, FRONT);
 	}
 
@@ -135,6 +138,15 @@ public class Character extends GameObject {
 
 	public void kill() {
 		Log.d(TAG, "Character died.");
+	}
+	
+	
+	public boolean isAlive() {
+		return isAlive;
+	}
+
+	public void setAlive(boolean isAlive) {
+		this.isAlive = isAlive;
 	}
 
 }

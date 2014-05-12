@@ -36,7 +36,7 @@ public class MainGamePanel extends SurfaceView implements
 
 	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
 
-	public MainGamePanel(Context context, StatusScreenUpdater updater) {
+	public MainGamePanel(Context context, StatusScreenUpdater updater, boolean isSingleplayer) {
 		super(context);
 		surfaceHolder = getHolder();
 		mStatusScreenUpdater = updater;
@@ -45,7 +45,7 @@ public class MainGamePanel extends SurfaceView implements
 		surfaceHolder.addCallback(this);
 
 		// create level
-		game = new Game(this);
+		game = new Game(this, isSingleplayer);
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);

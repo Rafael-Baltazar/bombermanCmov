@@ -23,6 +23,7 @@ public class Game {
 	private float totalTime;
 
 	private Level mLevel;
+	private boolean isSingleplayer;
 
 	// private Character player;
 	private List<Character> mPlayers;
@@ -42,7 +43,7 @@ public class Game {
 
 	private SurfaceView surfaceView;
 	private SoundComponent explosionSoundComponent;
-
+	
 	/*
 	 * public Character getPlayer() { return player; }
 	 */
@@ -79,10 +80,12 @@ public class Game {
 	/**
 	 * To test.
 	 */
-	public Game(SurfaceView surfaceView) {
+	public Game(SurfaceView surfaceView, boolean isSingleplayer) {
 		super();
 		this.gameDuration = 180000; // three minutes?
 		this.totalTime = 0;
+		
+		this.isSingleplayer = isSingleplayer;
 
 		this.mLevel = new Level();
 		this.mLevel.setLevelName("default");
@@ -117,21 +120,25 @@ public class Game {
 						&& this.mPlayers.size() < this.mLevel
 								.getMaxNumberPlayers()) {
 					mPlayers.add(new Character(playerBitmap[PLAYER_1], j, i,
-							PLAYER_SPEED, getLevel().getGrid(), this));
-				} else if (this.mLevel.getGrid().getGridCell(j, i) == '2'
-						&& this.mPlayers.size() < this.mLevel
-								.getMaxNumberPlayers()) {
-					mPlayers.add(new Character(playerBitmap[PLAYER_2], j, i,
-							PLAYER_SPEED, getLevel().getGrid(), this));
-				} else if (this.mLevel.getGrid().getGridCell(j, i) == '3'
-						&& this.mPlayers.size() < this.mLevel
-								.getMaxNumberPlayers()) {
-					mPlayers.add(new Character(playerBitmap[PLAYER_3], j, i,
-							PLAYER_SPEED, getLevel().getGrid(), this));
+							PLAYER_SPEED, getLevel().getGrid(), this, true));
+				} else 
+				{
+					if(this.isSingleplayer == false) 
+					{
+						if (this.mLevel.getGrid().getGridCell(j, i) == '2' && this.mPlayers.size() < this.mLevel.getMaxNumberPlayers()) {
+							mPlayers.add(new Character(playerBitmap[PLAYER_2], j, i, PLAYER_SPEED, getLevel().getGrid(), this, true));
+						} else if (this.mLevel.getGrid().getGridCell(j, i) == '3'
+							&& this.mPlayers.size() < this.mLevel
+									.getMaxNumberPlayers()) {
+						mPlayers.add(new Character(playerBitmap[PLAYER_3], j, i,
+								PLAYER_SPEED, getLevel().getGrid(), this, true));
+						}
+					}
 				}
+					
 				if (this.mLevel.getGrid().getGridCell(j, i) == 'R') {
 					this.mDroids.add(new Droid(droidBitmap, j, i, this.mLevel
-							.getRobotSpeed(), this));
+							.getRobotSpeed(), this, true));
 				}
 			}
 		}
@@ -256,7 +263,9 @@ public class Game {
 		}
 
 		for (Character c : mPlayers) {
-			c.draw(canvas);
+			if(c.isAlive()) {
+				c.draw(canvas);
+			}
 		}
 		for (Bomb b : mBombs) {
 			b.draw(canvas);
@@ -358,6 +367,20 @@ public class Game {
 		if (totalTime == gameDuration) {
 			return false;
 		}
+		
+		//if a player meets a droid on the same field, he gets killed
+		for (Character p : mPlayers) {
+			for (Character d : mDroids) {
+				//collision detection, maybe rework?
+				if((p.getX() <= d.getX() + 1 && p.getX() >= d.getX() -1) && (p.getY() <= d.getY() + 1 && p.getY() >= d.getY() -1)) {
+					p.setAlive(false);
+					if(this.isSingleplayer) {
+						return false;
+					}
+				}
+			}
+		}		
+		
 		float t;
 		int[] expBlocks;
 		List<Bomb> bombsToRemove = new ArrayList<Bomb>();

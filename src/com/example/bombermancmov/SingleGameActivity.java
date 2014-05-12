@@ -40,7 +40,7 @@ public class SingleGameActivity extends ActionBarActivity {
 		frm = (FrameLayout) findViewById(R.id.frameLayout);
 		StatusScreenUpdater updater = new StatusScreenUpdater(nameTextView,
 				scoreTextView, timeLeftTextView, numPlayersTextView, this);
-		mGamePanel = new MainGamePanel(this, updater);
+		mGamePanel = new MainGamePanel(this, updater, true); //true for isSinglePlayer
 		frm.addView(mGamePanel);
 
 		Log.d(TAG, "View added");
