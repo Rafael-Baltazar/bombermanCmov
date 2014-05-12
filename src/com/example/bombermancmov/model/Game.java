@@ -1,6 +1,7 @@
 package com.example.bombermancmov.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import android.graphics.Bitmap;
@@ -365,16 +366,13 @@ public class Game {
 	}
 
 	public boolean nextRound() {
-		if (totalTime == gameDuration) {
+		//RETURN false, if time is over || no droids more on the field (SinglePlayer) || player died
+		if (totalTime == gameDuration || this.mDroids.size() == 0 || (this.isSingleplayer && !mPlayers.get(0).isAlive())) {
 			return false;
 		} else {
 			this.gameDuration = this.gameDuration - MainGamePanel.ROUND_TIME;
 		}
-		
-		if(this.isSingleplayer && !mPlayers.get(0).isAlive()) {
-			return false;
-		}
-		
+				
 		float t;
 		int[] expBlocks;
 		List<Bomb> bombsToRemove = new ArrayList<Bomb>();
@@ -398,8 +396,12 @@ public class Game {
 	 * @param actRange
 	 */
 	public void explosionCollision(Bomb bomb, int[] actRange) {
-		List<Droid> droidsToRemove = new ArrayList<Droid>();
-		for (Droid d : mDroids) {
+		Iterator<Droid> it = mDroids.iterator();
+		Droid d = null;
+		
+		while(it.hasNext()) {
+			d = it.next();			
+			//check on collision
 			boolean collidedHorizontally = ((Math.rint(bomb.getY()) == Math
 					.rint(d.getY()))
 					&& (actRange[Bomb.RANGE_LEFT] <= Math.rint(d.getX())) && (actRange[Bomb.RANGE_RIGHT] >= Math
@@ -408,15 +410,14 @@ public class Game {
 					.rint(d.getX()))
 					&& (actRange[Bomb.RANGE_UP] <= Math.rint(d.getY())) && (actRange[Bomb.RANGE_DOWN] >= Math
 					.rint(d.getY())));
+			
 			if (collidedHorizontally || collidedVertically) {
-				droidsToRemove.add(d);
+				it.remove();
+				if(this.isSingleplayer) {
+					mPlayers.get(0).setPoints(mPlayers.get(0).getPoints() + mLevel.getPointsPerRobotKilled());
+				}
 			}
-		}
-		int droidsKilled = droidsToRemove.size();
-		mPlayers.get(0).setPoints(
-				mPlayers.get(0).getPoints() + droidsKilled
-						* mLevel.getPointsPerRobotKilled());
-		mDroids.removeAll(droidsToRemove);
+		}		
 	}
 
 	public void update(long timePassed) {
