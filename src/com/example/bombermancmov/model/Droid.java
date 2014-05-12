@@ -7,6 +7,9 @@ import android.util.Log;
 
 public class Droid extends Character {
 	private static final String TAG = Droid.class.getSimpleName();
+	/** Change the direction of the droids every TICK milliseconds. */
+	private static long TIME_TO_MOVE = 1500;
+	private long timeToProcess = 0;
 	
 	private Game mGame;
 
@@ -26,6 +29,14 @@ public class Droid extends Character {
 		List<Character> players = mGame.getPlayersByPos(intX, intY);
 		for (Character p : players) {
 			p.kill();
+		}
+	}
+	
+	public void updateDroid(long timePassed) {
+		timeToProcess += timePassed;
+		if (timeToProcess > TIME_TO_MOVE) {
+			this.tryMoveRandomly();
+			timeToProcess = 0;
 		}
 	}
 

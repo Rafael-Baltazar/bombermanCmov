@@ -142,6 +142,7 @@ public class Character extends GameObject {
 	}
 
 	public void kill() {
+		this.setAlive(false);
 		Log.d(TAG, "Character died.");
 	}
 	

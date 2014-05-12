@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.view.SurfaceView;
 
+import com.example.bombermancmov.MainGamePanel;
 import com.example.bombermancmov.R;
 import com.example.bombermancmov.model.component.SoundComponent;
 
@@ -31,7 +32,7 @@ public class Game {
 	private List<Bomb> mBombs;
 
 	/** Used to choose new directions for the droids. */
-	private DroidAI droidAI;
+	//private DroidAI droidAI;
 
 	/* Drawing */
 	/* Load bitmaps only once to increase performance */
@@ -109,7 +110,7 @@ public class Game {
 		this.mPlayers = new ArrayList<Character>();
 
 		// Create droidAI
-		droidAI = new DroidAI(mDroids);
+		//droidAI = new DroidAI(mDroids);
 
 		// Creating Player and Robots on their starting position (maybe rework
 		// later)
@@ -366,20 +367,13 @@ public class Game {
 	public boolean nextRound() {
 		if (totalTime == gameDuration) {
 			return false;
+		} else {
+			this.gameDuration = this.gameDuration - MainGamePanel.ROUND_TIME;
 		}
 		
-		//if a player meets a droid on the same field, he gets killed
-		for (Character p : mPlayers) {
-			for (Character d : mDroids) {
-				//collision detection, maybe rework?
-				if((p.getX() <= d.getX() + 1 && p.getX() >= d.getX() -1) && (p.getY() <= d.getY() + 1 && p.getY() >= d.getY() -1)) {
-					p.setAlive(false);
-					if(this.isSingleplayer) {
-						return false;
-					}
-				}
-			}
-		}		
+		if(this.isSingleplayer && !mPlayers.get(0).isAlive()) {
+			return false;
+		}
 		
 		float t;
 		int[] expBlocks;
@@ -429,8 +423,9 @@ public class Game {
 		for (Character p : mPlayers) {
 			p.update(timePassed);
 		}
-		droidAI.update(timePassed);
+
 		for (Droid d : mDroids) {
+			d.updateDroid(timePassed);
 			d.update(timePassed);
 		}
 	}

@@ -19,7 +19,7 @@ public class MainGamePanel extends SurfaceView implements
 		SurfaceHolder.Callback {
 
 	private static final String TAG = MainGamePanel.class.getSimpleName();
-	private static final int ROUND_TIME = 1000;// ms\
+	public static final int ROUND_TIME = 1000;// ms\
 
 	/**
 	 * Update and render game model in a separate thread.
