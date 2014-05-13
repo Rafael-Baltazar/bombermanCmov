@@ -118,6 +118,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="pauseOrResumeGame"
+                android:contentDescription="@string/pause_button_text"
                 android:src="@drawable/button_pause" />
 
             <ImageButton
@@ -125,6 +126,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="quitGame"
+                android:contentDescription="@string/quit_button_text"
                 android:src="@drawable/button_quit" />
         </LinearLayout>
 
@@ -133,6 +135,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:contentDescription="@string/left_button_text"
             android:src="@drawable/arrow_left" />
 
         <LinearLayout
@@ -145,6 +148,7 @@
 		        android:id="@+id/buttonUp"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
+		        android:contentDescription="@string/up_button_text"     
 		        android:src="@drawable/arrow_up" />
 
 
@@ -152,6 +156,7 @@
                 android:id="@+id/buttonDown"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:contentDescription="@string/down_button_text"
                 android:src="@drawable/arrow_down" />
         </LinearLayout>
 
@@ -159,6 +164,7 @@
             android:id="@+id/buttonRight"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/right_button_text"
             android:layout_weight="1"
             android:src="@drawable/arrow_right" />
 
@@ -167,6 +173,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:contentDescription="@string/bomb_button_text"
             android:src="@drawable/button_bomb" />
     </LinearLayout>
 
