@@ -5,19 +5,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.view.SurfaceView;
 
 import com.example.bombermancmov.MainGamePanel;
-import com.example.bombermancmov.R;
-import com.example.bombermancmov.model.component.SoundComponent;
 
 public class Game {
 	// Used for bitmap purposes
-	private static final int PLAYER_1 = 0;
-	private static final int PLAYER_2 = 1;
-	private static final int PLAYER_3 = 2;
+	public static final int PLAYER_1 = 0;
+	public static final int PLAYER_2 = 1;
+	public static final int PLAYER_3 = 2;
 	private static final float PLAYER_SPEED = 3.0f;
 
 	private float gameDuration;
@@ -33,21 +29,9 @@ public class Game {
 	private List<Droid> mDroids;
 	private List<Bomb> mBombs;
 
-	/** Used to choose new directions for the droids. */
-	//private DroidAI droidAI;
+	private Resource mResources;
 
-	/* Drawing */
-	/* Load bitmaps only once to increase performance */
-	private Bitmap wallBitMap;
-	private Bitmap obstacleBitmap;
-	private Bitmap[] bombBitmap;
-	private Bitmap[][] playerBitmap;
-	private Bitmap[] droidBitmap;
-
-	private SurfaceView surfaceView;
-	private SoundComponent explosionSoundComponent;	
-
-	public Game(SurfaceView surfaceView, boolean isSingleplayer) {
+	public Game(Resource resources, boolean isSingleplayer) {
 		super();
 		this.gameDuration = 180000; // three minutes?
 		this.totalTime = 0;
@@ -65,11 +49,8 @@ public class Game {
 		this.mLevel.setPointsPerRobotKilled(1);
 		this.mLevel.setMaxNumberPlayers(3);
 
-		this.surfaceView = surfaceView;
-
-		this.explosionSoundComponent = new SoundComponent(surfaceView);
-
-		decodeResources();
+		mResources = resources;
+		mResources.decodeResources();
 
 		// Create Lists for filling
 		this.mBombs = new ArrayList<Bomb>();
@@ -84,25 +65,25 @@ public class Game {
 				if (this.mLevel.getGrid().getGridCell(j, i) == '1'
 						&& this.mPlayers.size() < this.mLevel
 								.getMaxNumberPlayers()) {
-					mPlayers.add(new Character(playerBitmap[PLAYER_1], j, i,
+					mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_1], j, i,
 							PLAYER_SPEED, getLevel().getGrid(), this, true));
 				} else 
 				{
 					if(this.isSingleplayer == false) 
 					{
 						if (this.mLevel.getGrid().getGridCell(j, i) == '2' && this.mPlayers.size() < this.mLevel.getMaxNumberPlayers()) {
-							mPlayers.add(new Character(playerBitmap[PLAYER_2], j, i, PLAYER_SPEED, getLevel().getGrid(), this, true));
+							mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_2], j, i, PLAYER_SPEED, getLevel().getGrid(), this, true));
 						} else if (this.mLevel.getGrid().getGridCell(j, i) == '3'
 							&& this.mPlayers.size() < this.mLevel
 									.getMaxNumberPlayers()) {
-						mPlayers.add(new Character(playerBitmap[PLAYER_3], j, i,
+						mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_3], j, i,
 								PLAYER_SPEED, getLevel().getGrid(), this, true));
 						}
 					}
 				}
 					
 				if (this.mLevel.getGrid().getGridCell(j, i) == 'R') {
-					this.mDroids.add(new Droid(droidBitmap, j, i, this.mLevel
+					this.mDroids.add(new Droid(mResources.getDroidBitmap(), j, i, this.mLevel
 							.getRobotSpeed(), this, true));
 				}
 			}
@@ -127,10 +108,10 @@ public class Game {
 	}
 	
 	public void placeBomb(int x, int y) {
-		mBombs.add(new Bomb(bombBitmap, x, y,
+		mBombs.add(new Bomb(mResources.getBombBitmap(), x, y,
 				this.mLevel.getExplosionTimeout(), this.mLevel
 						.getExplosionRange(), this.mLevel.getGrid(),
-				explosionSoundComponent));
+				mResources.getExplosionSoundComponent()));
 	}
 
 	public boolean nextRound() {
@@ -148,7 +129,7 @@ public class Game {
 		for (Bomb b : mBombs) {
 			t = b.tick();
 			if (t == 0) {
-				expBlocks = b.explode(surfaceView.getContext());
+				expBlocks = b.explode(mResources.getSurfaceView().getContext());
 				explosionCollision(b, expBlocks);
 			} else if (t == -1) {
 				bombsToRemove.add(b);
@@ -210,15 +191,15 @@ public class Game {
 			for (int collNum = 0; collNum < this.mLevel.getGrid().getColSize(); ++collNum) {
 				switch (this.mLevel.getGrid().getGridCell(rowNum, collNum)) {
 				case LevelGrid.WALL: {
-					canvas.drawBitmap(wallBitMap,
-							rowNum * wallBitMap.getWidth(), collNum
-									* wallBitMap.getHeight(), null);
+					canvas.drawBitmap(mResources.getWallBitMap(),
+							rowNum * mResources.getWallBitMap().getWidth(), collNum
+									* mResources.getWallBitMap().getHeight(), null);
 					break;
 				}
 				case LevelGrid.OBSTACLE: {
-					canvas.drawBitmap(obstacleBitmap,
-							rowNum * obstacleBitmap.getWidth(), collNum
-									* obstacleBitmap.getHeight(), null);
+					canvas.drawBitmap(mResources.getObstacleBitmap(),
+							rowNum * mResources.getObstacleBitmap().getWidth(), collNum
+									* mResources.getObstacleBitmap().getHeight(), null);
 					break;
 				}
 				}
@@ -238,184 +219,6 @@ public class Game {
 		}
 	}
 	
-	/** Load resources only once to increase performance.
-	 */
-	private void decodeResources() {
-		decodeWallBitmap();
-		decodeObstacleBitmap();
-		decodeBombBitmaps();
-		decodePlayerBitmaps();
-		decodeDroidBitmaps();
-	}
-
-	/**
-	 * @see #decodeResources()
-	 */
-	private void decodeWallBitmap() {
-		wallBitMap = BitmapFactory.decodeResource(surfaceView.getResources(),
-				R.drawable.wall_1);
-	}
-
-	/**
-	 * @see #decodeResources()
-	 */
-	private void decodeObstacleBitmap() {
-		obstacleBitmap = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.obstacle_0);
-	}
-
-	/**
-	 * @see #decodeResources()
-	 */
-	private void decodeBombBitmaps() {
-		bombBitmap = new Bitmap[3];
-		bombBitmap[Bomb.NORMAL] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.bomb_0);
-		bombBitmap[Bomb.NEARLY] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.bomb_1);
-		bombBitmap[Bomb.EXPLODING] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.bomb_2);
-	}
-
-	/**
-	 * @see #decodeResources()
-	 */
-	private void decodePlayerBitmaps() {
-		playerBitmap = new Bitmap[3][4];
-		decodePlayer1Bitmaps();
-		decodePlayer2Bitmaps();
-		decodeAndRetPlayer3Bitmaps();
-	}
-
-	private void decodePlayer1Bitmaps() {
-		playerBitmap[PLAYER_1][Character.FRONT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.eevee_front);
-		playerBitmap[PLAYER_1][Character.LEFT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.eevee_left);
-		playerBitmap[PLAYER_1][Character.RIGHT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.eevee_right);
-		playerBitmap[PLAYER_1][Character.BACK] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.eevee_back);
-	}
-
-	private void decodePlayer2Bitmaps() {
-		playerBitmap[PLAYER_2][Character.FRONT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.espeon_front);
-		playerBitmap[PLAYER_2][Character.LEFT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.espeon_left);
-		playerBitmap[PLAYER_2][Character.RIGHT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.espeon_right);
-		playerBitmap[PLAYER_2][Character.BACK] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.espeon_back);
-	}
-
-	private void decodeAndRetPlayer3Bitmaps() {
-		playerBitmap[PLAYER_3][Character.FRONT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.flareon_front);
-		playerBitmap[PLAYER_3][Character.LEFT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.flareon_left);
-		playerBitmap[PLAYER_3][Character.RIGHT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.flareon_right);
-		playerBitmap[PLAYER_3][Character.BACK] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.flareon_back);
-	}
-
-	/**
-	 * @see #decodeResources()
-	 */
-	private void decodeDroidBitmaps() {
-		droidBitmap = new Bitmap[4];
-		droidBitmap[Character.FRONT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.c0_0);
-		droidBitmap[Character.LEFT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.c0_1);
-		droidBitmap[Character.RIGHT] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.c0_2);
-		droidBitmap[Character.BACK] = BitmapFactory.decodeResource(
-				surfaceView.getResources(), R.drawable.c0_3);
-	}
-
-	/**
-	 * Scale bitmaps only once to increase performance.
-	 */
-	public void scaleResources() {
-		int newWidth = surfaceView.getWidth()
-				/ this.mLevel.getGrid().getRowSize();
-		int newHeight = surfaceView.getHeight()
-				/ this.mLevel.getGrid().getColSize();
-		scaleWallBitmap(newWidth, newHeight);
-		scaleObstacleBitmap(newWidth, newHeight);
-		scaleBombBitmaps(newWidth, newHeight);
-		scalePlayerBitmaps(newWidth, newHeight);
-		scaleDroidBitmaps(newWidth, newHeight);
-	}
-
-	/**
-	 * @param newWidth
-	 * @param newHeight
-	 * @see #scaleResources()
-	 */
-	private void scaleWallBitmap(int newWidth, int newHeight) {
-		wallBitMap = Bitmap.createScaledBitmap(wallBitMap, newWidth, newHeight,
-				false);
-	}
-
-	/**
-	 * @param newWidth
-	 * @param newHeight
-	 * @see #scaleResources()
-	 */
-	private void scaleObstacleBitmap(int newWidth, int newHeight) {
-		obstacleBitmap = Bitmap.createScaledBitmap(obstacleBitmap, newWidth,
-				newHeight, false);
-	}
-
-	/**
-	 * @param newWidth
-	 * @param newHeight
-	 * @see #scaleResources()
-	 */
-	private void scaleBombBitmaps(int newWidth, int newHeight) {
-		scaleBitmapArray(newWidth, newHeight, bombBitmap);
-	}
-
-	/**
-	 * @param newWidth
-	 * @param newHeight
-	 * @see #scaleResources()
-	 */
-	private void scalePlayerBitmaps(int newWidth, int newHeight) {
-		for (Bitmap[] bitmaps : playerBitmap) {
-			scaleBitmapArray(newWidth, newHeight, bitmaps);
-		}
-	}
-
-	/**
-	 * @param newWidth
-	 * @param newHeight
-	 * @see #scaleResources()
-	 */
-	private void scaleDroidBitmaps(int newWidth, int newHeight) {
-		scaleBitmapArray(newWidth, newHeight, droidBitmap);
-	}
-
-	/**
-	 * Scales all given bitmaps to the new width and height.
-	 * 
-	 * @param newWidth
-	 *            The new desired width.
-	 * @param newHeight
-	 *            The new desired height.
-	 * @param bitmaps
-	 *            The bitmap array to be scaled.
-	 */
-	private void scaleBitmapArray(int newWidth, int newHeight, Bitmap[] bitmaps) {
-		for (int i = 0; i < bitmaps.length; ++i) {
-			bitmaps[i] = Bitmap.createScaledBitmap(bitmaps[i], newWidth,
-					newHeight, false);
-		}
-	}
-
 	/**
 	 * GETTERS & SETTERS
 	 */
@@ -424,7 +227,7 @@ public class Game {
 	}
 
 	public Bitmap getWallBitMap() {
-		return wallBitMap;
+		return mResources.getWallBitMap();
 	}
 	
 	public Character getPlayerByNumber(int i) {

@@ -8,6 +8,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import com.example.bombermancmov.model.Character;
 import com.example.bombermancmov.model.Game;
+import com.example.bombermancmov.model.Resource;
+import com.example.bombermancmov.model.component.SoundComponent;
 
 /**
  * This is the main surface that handles the on-touch events and draws the image
@@ -31,6 +33,7 @@ public class MainGamePanel extends SurfaceView implements
 
 	/* Game model */
 	private Game game;
+	private Resource mResource;
 
 	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
 
@@ -44,7 +47,9 @@ public class MainGamePanel extends SurfaceView implements
 		surfaceHolder.addCallback(this);
 
 		// create level
-		game = new Game(this, isSingleplayer);
+		mResource = new Resource(this);
+		mResource.setExplosionSoundComponent(new SoundComponent(this));
+		game = new Game(mResource, isSingleplayer);
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
@@ -56,7 +61,9 @@ public class MainGamePanel extends SurfaceView implements
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		Log.d(TAG, "Surface changed");
-		game.scaleResources();
+		int newWidth = getWidth() / game.getLevel().getGrid().getRowSize();
+		int newHeight = getHeight() / game.getLevel().getGrid().getColSize();
+		mResource.scaleResources(newWidth, newHeight);
 	}
 
 	@Override
