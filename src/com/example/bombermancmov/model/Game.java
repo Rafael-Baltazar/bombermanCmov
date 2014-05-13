@@ -23,6 +23,7 @@ public class Game {
 	
 	private boolean isSingleplayer;
 	private boolean finished;
+	private int endStatus; //Singleplayer: 0 = not ended, 1 = win, 2 = lost/killed, 3 = lost/timeover
 
 	// private Character player;
 	private List<Character> mPlayers;
@@ -38,6 +39,7 @@ public class Game {
 		
 		this.isSingleplayer = isSingleplayer;
 		this.finished = false;
+		this.endStatus = 0;
 
 		this.mLevel = new Level();
 		this.mLevel.setLevelName("default");
@@ -115,13 +117,7 @@ public class Game {
 	}
 
 	public boolean nextRound() {
-		this.gameDuration = this.gameDuration - MainGamePanel.ROUND_TIME;
-
-		//RETURN false, if time is over || singleplayer: player died or no more droids 
-		if (totalTime == gameDuration || (this.isSingleplayer && (!mPlayers.get(0).isAlive()) || this.mDroids.size() == 0)) {
-			this.finished = true;
-			return false;
-		} 
+		this.gameDuration = this.gameDuration - MainGamePanel.ROUND_TIME; 
 		
 		float t;
 		int[] expBlocks;
@@ -136,7 +132,27 @@ public class Game {
 			}
 		}
 		mBombs.removeAll(bombsToRemove);
-		return true;
+		
+		//RETURN false, if time is over || singleplayer: player died or no more droids 
+		if (totalTime == gameDuration || (this.isSingleplayer && (!mPlayers.get(0).isAlive()) || this.mDroids.size() == 0)) {
+			this.finished = true;
+			
+			if(this.mDroids.size() == 0 && this.mPlayers.get(0).isAlive()) {
+				this.endStatus = 1;
+			}		
+			
+			if(!this.mPlayers.get(0).isAlive()) {
+				this.endStatus = 2;
+			}
+			
+			if(this.totalTime == gameDuration) {
+				this.endStatus = 3;
+			}
+			
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**
@@ -256,5 +272,13 @@ public class Game {
 
 	public void setFinished(boolean finished) {
 		this.finished = finished;
+	}	
+
+	public int getEndStatus() {
+		return endStatus;
+	}
+
+	public void setEndStatus(int endStatus) {
+		this.endStatus = endStatus;
 	}
 }

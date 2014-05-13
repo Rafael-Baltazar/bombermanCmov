@@ -1,11 +1,18 @@
 package com.example.bombermancmov;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.TextView;
+
 import com.example.bombermancmov.model.Character;
 import com.example.bombermancmov.model.Game;
 import com.example.bombermancmov.model.Resource;
@@ -30,6 +37,8 @@ public class MainGamePanel extends SurfaceView implements
 	private LevelNextRoundThread levelNextRound;
 
 	private SurfaceHolder surfaceHolder;
+	
+	private GameActivity context;
 
 	/* Game model */
 	private Game game;
@@ -37,9 +46,10 @@ public class MainGamePanel extends SurfaceView implements
 
 	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
 
-	public MainGamePanel(Context context, StatusScreenUpdater updater,
+	public MainGamePanel(GameActivity context, StatusScreenUpdater updater,
 			boolean isSingleplayer) {
 		super(context);
+		this.context = context;
 		surfaceHolder = getHolder();
 		mStatusScreenUpdater = updater;
 
@@ -53,7 +63,7 @@ public class MainGamePanel extends SurfaceView implements
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
-
+		
 		Log.d(TAG, "constructor");
 	}
 
@@ -108,6 +118,10 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void pauseThread() {
 		gameLoopThread.pause();
+		
+		if(this.game.isFinished()) {
+			this.buildEnddialog();
+		}
 	}
 
 	public void resumeThread() {
@@ -132,6 +146,10 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void tryStop(int id) {
 		game.getPlayerByNumber(id).stop();
+		
+		if(this.game.isFinished()) {
+			this.buildEnddialog();
+		}
 	}
 
 	public void placeBomb(int id) {
@@ -162,6 +180,45 @@ public class MainGamePanel extends SurfaceView implements
 	protected void onDraw(Canvas canvas) {
 		Log.d("onDraw", "Using onDraw.");
 		drawGameModel(canvas);
+	}
+		
+	//Enddialog for finishing a game
+	public void buildEnddialog() {
+    	invalidate();
+        //game completed
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(false);        
+        
+		switch(this.game.getEndStatus()) {
+			case 1: 
+				builder.setTitle(context.getText(R.string.finished_title_win));
+				break;
+			case 2: 
+				builder.setTitle(context.getText(R.string.finished_title_lost_killed));
+				break;
+			case 3: 
+				builder.setTitle(context.getText(R.string.finished_title_lost_time));
+				break;
+			default:
+				builder.setTitle(context.getText(R.string.finished_title_lost_unkown));
+				break;	        	
+		} 
+        
+        LayoutInflater inflater = context.getLayoutInflater();
+        View view = inflater.inflate(R.layout.finish, null);
+        builder.setView(view);
+        View closeButton = view.findViewById(R.id.closeGame);
+        
+        closeButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View clicked) {
+                if(clicked.getId() == R.id.closeGame) {
+                    context.finish();
+                }
+            }
+        });
+        AlertDialog finishDialog = builder.create();                
+        finishDialog.show();
 	}
 
 	public void drawGameModel(Canvas canvas) {

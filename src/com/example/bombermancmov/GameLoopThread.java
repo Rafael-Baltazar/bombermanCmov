@@ -88,7 +88,7 @@ public class GameLoopThread extends Thread {
 			} catch (InterruptedException e) {
 				Log.d(TAG, "Interrupted sleep");
 			}
-		}
+		}		
 	}
 
 	public void setRunning(boolean running) {
