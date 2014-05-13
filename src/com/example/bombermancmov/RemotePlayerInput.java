@@ -4,74 +4,82 @@ import java.util.ArrayList;
 import java.util.List;
 import com.example.bombermancmov.model.Character;
 import com.example.bombermancmov.model.Game;
-import com.example.bombermancmov.wifi.WifiMessage;
-import com.example.bombermancmov.wifi.commands.MovePlayerCommand;
+import com.example.bombermancmov.wifi.CommandRequest;
+import com.example.bombermancmov.wifi.commands.PlaceBombCommand;
+import com.example.bombermancmov.wifi.commands.TryMoveCommand;
+import com.example.bombermancmov.wifi.commands.TryStopCommand;
 
 public class RemotePlayerInput extends PlayerInput {
-	private int playerId;
+	private int mPlayerId;
 	private Game mGame;
-	private WifiMessage bombPlacement;
-	private WifiMessage movement;
+	private CommandRequest bombPlacement = null;
+	private CommandRequest movement = null;
 
 	/**
 	 * @param mGame
+	 * @param playerId
 	 */
-	public RemotePlayerInput(Game mGame) {
+	public RemotePlayerInput(Game game, int playerId) {
 		super();
-		this.mGame = mGame;
+		mGame = game;
+		mPlayerId = playerId;
 	}
 
 	@Override
 	public void tryMoveUp() {
-		List<String> args = new ArrayList<String>();
-		float x = mGame.getPlayerByNumber(playerId).getX();
-		float y = mGame.getPlayerByNumber(playerId).getY();
-		args.add(String.valueOf(playerId));
-		args.add(String.valueOf(x));
-		args.add(String.valueOf(y));
-		args.add(String.valueOf(Character.BACK));
-		if (movement == null) {
-			movement = new WifiMessage(MovePlayerCommand.CODE, args);
-		} else {
-			movement.setArgs(args);
-		}
+		tryMove(Character.BACK);
 	}
 
 	@Override
 	public void tryMoveDown() {
-		// TODO Auto-generated method stub
-
+		tryMove(Character.FRONT);
 	}
 
 	@Override
 	public void tryMoveLeft() {
-		// TODO Auto-generated method stub
-
+		tryMove(Character.LEFT);
 	}
 
 	@Override
 	public void tryMoveRight() {
-		// TODO Auto-generated method stub
-
+		tryMove(Character.RIGHT);
 	}
-
+	
+	private void tryMove(int direction) {
+		List<String> args = new ArrayList<String>();
+		args.add(String.valueOf(mPlayerId));
+		args.add(String.valueOf(direction));
+		if (movement == null) {
+			movement = new CommandRequest(TryMoveCommand.CODE, args);
+		} else {
+			movement.setArgs(args);
+		}
+	}
+	
 	@Override
 	public void tryStop() {
-		// TODO Auto-generated method stub
-
+		List<String> args = new ArrayList<String>();
+		args.add(String.valueOf(mPlayerId));
+		movement = new CommandRequest(TryStopCommand.CODE, args);
 	}
 
 	@Override
 	public void placeBomb() {
-		// TODO Auto-generated method stub
-
+		List<String> args = new ArrayList<String>();
+		Character player = mGame.getPlayerByNumber(mPlayerId);
+		int x = (int) Math.rint(player.getX());
+		int y = (int) Math.rint(player.getY());
+		args.add(String.valueOf(mPlayerId));
+		args.add(String.valueOf(x));
+		args.add(String.valueOf(y));
+		bombPlacement = new CommandRequest(PlaceBombCommand.CODE, args);
 	}
 
-	public WifiMessage getBombPlacement() {
+	public CommandRequest getBombPlacement() {
 		return bombPlacement;
 	}
 
-	public WifiMessage getMovement() {
+	public CommandRequest getMovement() {
 		return movement;
 	}
 

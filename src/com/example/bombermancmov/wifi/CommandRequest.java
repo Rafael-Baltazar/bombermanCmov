@@ -2,7 +2,7 @@ package com.example.bombermancmov.wifi;
 
 import java.util.List;
 
-public class WifiMessage {
+public class CommandRequest {
 	
 	private String command;
 	private List<String> args;
@@ -11,7 +11,7 @@ public class WifiMessage {
 	 * @param command
 	 * @param args
 	 */
-	public WifiMessage(String command, List<String> args) {
+	public CommandRequest(String command, List<String> args) {
 		super();
 		this.command = command;
 		this.args = args;

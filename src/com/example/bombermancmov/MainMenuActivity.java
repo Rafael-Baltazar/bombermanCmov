@@ -26,7 +26,6 @@ public class MainMenuActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.menu);
 
-		SimWifiP2pSocketManager.Init(getApplicationContext());
 		ePlayerName = (EditText) findViewById(R.id.ePlayerName);
 	}
 

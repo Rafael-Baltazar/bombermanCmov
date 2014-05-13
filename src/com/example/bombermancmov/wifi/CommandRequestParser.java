@@ -3,23 +3,17 @@ package com.example.bombermancmov.wifi;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.util.Log;
-
-/**
- * Use json.
- */
-public class WifiMessageParser {
-	private static final String TAG = WifiMessageParser.class.getSimpleName();
+public class CommandRequestParser {
 
 	private static final String cmdDelim = "@";
 	private static final String argDelim = ":";
 
 	/**
 	 * @param commands
-	 * @return the list of wifiMessages
+	 * @return the list of command requests
 	 */
-	public static List<WifiMessage> decodeWifiMessages(String commands) {
-		List<WifiMessage> result = new ArrayList<WifiMessage>();
+	public static List<CommandRequest> translateCommandRequestString(String commands) {
+		List<CommandRequest> result = new ArrayList<CommandRequest>();
 		String[] splitMsgs = commands.split(cmdDelim);
 
 		for (String s : splitMsgs) {
@@ -32,7 +26,7 @@ public class WifiMessageParser {
 				for (int i = 1; i < msg.length; i++) {
 					args.add(msg[i]);
 				}
-				result.add(new WifiMessage(cmd, args));
+				result.add(new CommandRequest(cmd, args));
 			}
 		}
 		return result;
@@ -42,11 +36,11 @@ public class WifiMessageParser {
 	 * @param msgs
 	 * @return string to send through wifiP2p
 	 */
-	public static String codeWifiMessages(List<WifiMessage> msgs) {
+	public static String codeCommandRequests(List<CommandRequest> msgs) {
 		StringBuilder result = new StringBuilder();
 
 		String delCmd = "";
-		for (WifiMessage wM : msgs) {
+		for (CommandRequest wM : msgs) {
 			String cmd = wM.getCommand();
 			List<String> args = wM.getArgs();
 

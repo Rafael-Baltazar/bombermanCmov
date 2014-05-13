@@ -94,9 +94,7 @@ public class MainGamePanel extends SurfaceView implements
 				thread.join();
 				break;
 			} catch (InterruptedException e) {
-				Log.d(TAG,
-						"Interrupted exception at surface destroyed: "
-								+ e.getMessage());
+				Log.d(TAG, "Surface destroyed: " + e.getMessage());
 			}
 		}
 	}
@@ -130,7 +128,7 @@ public class MainGamePanel extends SurfaceView implements
 	}
 
 	public void placeBomb(int id) {
-		Character player = game.getPlayerByNumber(id); 
+		Character player = game.getPlayerByNumber(id);
 		if (player.isAlive()) {
 			int x = (int) Math.rint(player.getX());
 			int y = (int) Math.rint(player.getY());

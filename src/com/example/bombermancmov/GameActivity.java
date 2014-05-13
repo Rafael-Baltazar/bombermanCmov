@@ -17,8 +17,6 @@ public class GameActivity extends ActionBarActivity {
 	private FrameLayout frm;
 	private Button pauseButton, leftButton, rightButton, upButton, downButton,
 			bombButton;
-	private TextView nameTextView, scoreTextView, timeLeftTextView,
-			numPlayersTextView;
 	private MainGamePanel mGamePanel;
 	private PlayerInput playerInput;
 
@@ -28,10 +26,10 @@ public class GameActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_game);
 
 		// save for posterior use
-		nameTextView = (TextView) findViewById(R.id.playerName);
-		scoreTextView = (TextView) findViewById(R.id.playerScore);
-		timeLeftTextView = (TextView) findViewById(R.id.timeLeft);
-		numPlayersTextView = (TextView) findViewById(R.id.numberPlayers);
+		TextView nameTextView = (TextView) findViewById(R.id.playerName);
+		TextView scoreTextView = (TextView) findViewById(R.id.playerScore);
+		TextView timeLeftTextView = (TextView) findViewById(R.id.timeLeft);
+		TextView numPlayersTextView = (TextView) findViewById(R.id.numberPlayers);
 		StatusScreenUpdater updater = new StatusScreenUpdater(nameTextView,
 				scoreTextView, timeLeftTextView, numPlayersTextView, this);
 		
@@ -41,12 +39,13 @@ public class GameActivity extends ActionBarActivity {
 		setOnClickListenersToButtons();
 		
 		boolean isLocal = getIntent().getBooleanExtra("isLocal", true);
+		int playerId = getIntent().getIntExtra("playerId", 0);
 		if (isLocal) {
 			mGamePanel = new MainGamePanel(this, updater, true); //true for isSinglePlayer
 			playerInput = new LocalPlayerInput(mGamePanel);
 		} else {
 			mGamePanel = new MainGamePanel(this, updater, false);
-			playerInput = new RemotePlayerInput(mGamePanel.getGame());
+			playerInput = new RemotePlayerInput(mGamePanel.getGame(), playerId);
 		}
 		frm.addView(mGamePanel);
 		

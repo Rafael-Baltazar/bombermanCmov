@@ -5,6 +5,7 @@ import pt.utl.ist.cmov.wifidirect.SimWifiP2pManager;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pManager.Channel;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pManager.PeerListListener;
 import pt.utl.ist.cmov.wifidirect.service.SimWifiP2pService;
+import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketManager;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,7 +17,7 @@ import android.util.Log;
 
 public class WifiService {
 	private static final String TAG = WifiService.class.getSimpleName();
-	private Activity callerAct;
+	private Activity mCallerAct;
 	private Channel mChannel = null;
 	private Messenger mMessenger = null;
 	private SimWifiP2pManager mManager = null;
@@ -26,12 +27,13 @@ public class WifiService {
 	private ServiceConnection mConnection;
 
 	public WifiService(final Activity act) {
-		this.callerAct = act;
+		mCallerAct = act;
+		SimWifiP2pSocketManager.Init(mCallerAct.getApplicationContext());
 		peerRequester = new PeerListListener() {
 			@Override
 			public void onPeersAvailable(SimWifiP2pDeviceList peers) {
 				int size = peers.getDeviceList().size();
-				Log.d(TAG + ":" + callerAct.getLocalClassName(),
+				Log.d(TAG + ":" + mCallerAct.getLocalClassName(),
 						"Peer list size: " + size);
 			}
 		};
@@ -60,50 +62,18 @@ public class WifiService {
 	}
 
 	public void bindService() {
-		Intent intent = new Intent(callerAct, SimWifiP2pService.class);
-		callerAct.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+		Intent intent = new Intent(mCallerAct, SimWifiP2pService.class);
+		mCallerAct.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 		mBound = true;
 	}
 
 	public void stopService() {
 		if (mBound) {
-			callerAct.unbindService(mConnection);
-			Intent intent = new Intent(callerAct, SimWifiP2pService.class);
-			callerAct.stopService(intent);
+			mCallerAct.unbindService(mConnection);
+			Intent intent = new Intent(mCallerAct, SimWifiP2pService.class);
+			mCallerAct.stopService(intent);
 			mBound = false;
 		}
-	}
-
-	public void setCallerAct(Activity callerAct) {
-		this.callerAct = callerAct;
-	}
-
-	public boolean isBound() {
-		return mBound;
-	}
-
-	public void setBound(boolean b) {
-		mBound = b;
-	}
-
-	public ServiceConnection getConnection() {
-		return mConnection;
-	}
-
-	public Channel getChannel() {
-		return mChannel;
-	}
-
-	public PeerListListener getPeerRequester() {
-		return peerRequester;
-	}
-
-	public void setPeerRequester(PeerListListener peerRequester) {
-		this.peerRequester = peerRequester;
-	}
-
-	public SimWifiP2pManager getManager() {
-		return mManager;
 	}
 
 	public void requestPeers() {

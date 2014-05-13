@@ -12,7 +12,7 @@ import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketServer;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class RegisterServer extends AsyncTask<Void, List<WifiMessage>, Void> {
+public class RegisterServer extends AsyncTask<Void, List<CommandRequest>, Void> {
 	private static final String TAG = RegisterServer.class.getSimpleName();
 
 	private SimWifiP2pSocketServer mSrv;
@@ -45,8 +45,8 @@ public class RegisterServer extends AsyncTask<Void, List<WifiMessage>, Void> {
 				client.close();
 				// Execute.
 				Log.d(TAG, message);
-				List<WifiMessage> wifiCmds = WifiMessageParser
-						.decodeWifiMessages(message);
+				List<CommandRequest> wifiCmds = CommandRequestParser
+						.translateCommandRequestString(message);
 				publishProgress(wifiCmds);
 			} catch (IOException e) {
 				Log.e(TAG, "Commands read " + e.getMessage());
@@ -58,9 +58,9 @@ public class RegisterServer extends AsyncTask<Void, List<WifiMessage>, Void> {
 	}
 
 	@Override
-	protected void onProgressUpdate(List<WifiMessage>... values) {
-		List<WifiMessage> wifiCmds = values[0];
-		for (WifiMessage m : wifiCmds) {
+	protected void onProgressUpdate(List<CommandRequest>... values) {
+		List<CommandRequest> wifiCmds = values[0];
+		for (CommandRequest m : wifiCmds) {
 			mCmds.get(m.getCommand()).execute(m.getArgs());
 		}
 		super.onProgressUpdate(values);

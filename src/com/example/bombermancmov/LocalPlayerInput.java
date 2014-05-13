@@ -1,7 +1,7 @@
 package com.example.bombermancmov;
 
 public class LocalPlayerInput extends PlayerInput {
-	private int playerId;
+	private int playerId = 0; // single-player
 	private MainGamePanel mGamePanel;
 
 	/**
