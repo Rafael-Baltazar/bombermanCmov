@@ -7,19 +7,20 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class GameActivity extends ActionBarActivity {
 
 	private static final String TAG = GameLoopThread.class.getSimpleName();
 	private FrameLayout frm;
-	private Button pauseButton, leftButton, rightButton, upButton, downButton,
-			bombButton;
+	private ImageButton upButton, leftButton, rightButton, downButton, pauseButton, bombButton;
+	private boolean btnPaused; //true if button has pause-symbol, false if button has resume-symbol
+
 	private MainGamePanel mGamePanel;
 	private PlayerInput playerInput;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -31,7 +32,9 @@ public class GameActivity extends ActionBarActivity {
 		TextView timeLeftTextView = (TextView) findViewById(R.id.timeLeft);
 		TextView numPlayersTextView = (TextView) findViewById(R.id.numberPlayers);
 		
-		pauseButton = (Button) findViewById(R.id.buttonPause);
+		pauseButton = (ImageButton) findViewById(R.id.buttonPause);
+		this.btnPaused = true;
+		
 		frm = (FrameLayout) findViewById(R.id.frameLayout);
 		
 		setOnClickListenersToButtons();
@@ -57,7 +60,7 @@ public class GameActivity extends ActionBarActivity {
 	}
 
 	private void setOnClickListenersToButtons() {
-		leftButton = (Button) findViewById(R.id.buttonLeft);
+		leftButton = (ImageButton) findViewById(R.id.buttonLeft);
 		leftButton.setOnTouchListener(new OnTouchListener() {
 
 			@Override
@@ -71,7 +74,7 @@ public class GameActivity extends ActionBarActivity {
 			}
 		});
 
-		upButton = (Button) findViewById(R.id.buttonUp);
+		upButton = (ImageButton) findViewById(R.id.buttonUp);
 		upButton.setOnTouchListener(new OnTouchListener() {
 
 			@Override
@@ -86,7 +89,7 @@ public class GameActivity extends ActionBarActivity {
 
 		});
 
-		downButton = (Button) findViewById(R.id.buttonDown);
+		downButton = (ImageButton) findViewById(R.id.buttonDown);
 		downButton.setOnTouchListener(new OnTouchListener() {
 
 			@Override
@@ -101,7 +104,7 @@ public class GameActivity extends ActionBarActivity {
 			}
 		});
 
-		rightButton = (Button) findViewById(R.id.buttonRight);
+		rightButton = (ImageButton) findViewById(R.id.buttonRight);
 		rightButton.setOnTouchListener(new OnTouchListener() {
 
 			@Override
@@ -115,7 +118,7 @@ public class GameActivity extends ActionBarActivity {
 			}
 		});
 
-		bombButton = (Button) findViewById(R.id.buttonBomb);
+		bombButton = (ImageButton) findViewById(R.id.buttonBomb);
 		bombButton.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -126,15 +129,14 @@ public class GameActivity extends ActionBarActivity {
 	}
 
 	public void pauseOrResumeGame(View b) {
-		String btnTxt = pauseButton.getText().toString();
-		String pause = getResources().getString(R.string.pause_button_text);
-		String resume = getResources().getString(R.string.resume_button_text);
-		if (btnTxt.equals(pause)) {
+		if(this.btnPaused) {
 			mGamePanel.pauseThread();
-			pauseButton.setText(resume);
+			pauseButton.setImageResource(R.drawable.button_resume);
+			btnPaused = false;
 		} else {
 			mGamePanel.resumeThread();
-			pauseButton.setText(pause);
+			pauseButton.setImageResource(R.drawable.button_pause);
+			btnPaused = true;
 		}
 	}
 
