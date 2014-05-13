@@ -28,7 +28,6 @@ public class WifiService {
 
 	public WifiService(final Activity act) {
 		mCallerAct = act;
-		SimWifiP2pSocketManager.Init(mCallerAct.getApplicationContext());
 		peerRequester = new PeerListListener() {
 			@Override
 			public void onPeersAvailable(SimWifiP2pDeviceList peers) {
