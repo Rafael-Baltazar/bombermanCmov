@@ -17,10 +17,8 @@ public class MainMenuActivity extends Activity {
 	private static final int REMOTE_PORT = 10001;
 	private WifiService mWifi = new WifiService(this);
 
-	// Layout
 	private EditText ePlayerName;
 
-	// Activity life-cycle
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,14 +42,14 @@ public class MainMenuActivity extends Activity {
 	public void newSingleGame(View v) {
 		String name = ePlayerName.getText().toString();
 		Intent intent = new Intent(this, GameActivity.class);
-		intent.putExtra("PlayerName", name);
+		intent.putExtra("playerName", name);
 		startActivity(intent);
 	}
 	
 	public void newMultiPlayerGame(View v) {
 		String name = ePlayerName.getText().toString();
 		Intent intent = new Intent(this, GameActivity.class);
-		intent.putExtra("PlayerName", name);
+		intent.putExtra("playerName", name);
 		intent.putExtra("isLocal", false);
 		startActivity(intent);
 	}

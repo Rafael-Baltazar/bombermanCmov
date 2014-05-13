@@ -30,21 +30,25 @@ public class GameActivity extends ActionBarActivity {
 		TextView scoreTextView = (TextView) findViewById(R.id.playerScore);
 		TextView timeLeftTextView = (TextView) findViewById(R.id.timeLeft);
 		TextView numPlayersTextView = (TextView) findViewById(R.id.numberPlayers);
-		StatusScreenUpdater updater = new StatusScreenUpdater(nameTextView,
-				scoreTextView, timeLeftTextView, numPlayersTextView, this);
 		
 		pauseButton = (Button) findViewById(R.id.buttonPause);
 		frm = (FrameLayout) findViewById(R.id.frameLayout);
 		
 		setOnClickListenersToButtons();
 		
+		StatusScreenUpdater statusScreen = new StatusScreenUpdater(nameTextView,
+				scoreTextView, timeLeftTextView, numPlayersTextView, this);
+		
+		String playerName = getIntent().getStringExtra("playerName");
 		boolean isLocal = getIntent().getBooleanExtra("isLocal", true);
 		int playerId = getIntent().getIntExtra("playerId", 0);
+		
+		statusScreen.setPlayerName(playerName);
 		if (isLocal) {
-			mGamePanel = new MainGamePanel(this, updater, true); //true for isSinglePlayer
+			mGamePanel = new MainGamePanel(this, statusScreen, true); //true for isSinglePlayer
 			playerInput = new LocalPlayerInput(mGamePanel);
 		} else {
-			mGamePanel = new MainGamePanel(this, updater, false);
+			mGamePanel = new MainGamePanel(this, statusScreen, false);
 			playerInput = new RemotePlayerInput(mGamePanel.getGame(), playerId);
 		}
 		frm.addView(mGamePanel);
