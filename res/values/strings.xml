@@ -27,12 +27,12 @@
     <string name="btn_accept">Accept new player</string>
     <string name="btn_server">Server</string>
     <string name="title_activity_lobby">LobbyActivity</string>
-    <string name="display_available_games">Available Games</string>
-    <string name="btn_refresh_available_games">Refresh</string>
+    <string name="hint_ip">Master Ip</string>
+    <string name="btn_connect">Connect</string>
     <string name="finished_title_win">You won! All droids killed</string>
     <string name="finished_title_lost_killed">You lost! R.I.P</string>
     <string name="finished_title_lost_time">You lost! Time is over</string>
-    <string name="finished_title_lost_unkown">You lost! Unkown?</string>
+    <string name="finished_title_lost_unkown">You lost! Unknown?</string>
     <string name="finished_button">Exit</string>
     
 </resources>

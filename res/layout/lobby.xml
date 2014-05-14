@@ -6,18 +6,19 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="refreshAvailableGames"
-        android:text="@string/btn_refresh_available_games" />
+        android:onClick="newMultiPlayerGame"
+        android:text="@string/btn_multi" />
 
-    <TextView
+    <EditText
+        android:id="@+id/edit_ip_connect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/display_available_games" />
+        android:hint="@string/hint_ip" />
 
-    <ListView
-        android:id="@+id/availableGames"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="connect"
+        android:text="@string/btn_connect" />
 
 </LinearLayout>

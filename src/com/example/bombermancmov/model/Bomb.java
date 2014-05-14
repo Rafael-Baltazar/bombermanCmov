@@ -24,6 +24,7 @@ public class Bomb extends GameObject {
 	public static final int EXPLODING = 2;
 
 	private LevelGrid level;
+	private Character owner;
 	private int timeToExplode;
 	private float range;
 	private boolean isExploding;
@@ -38,8 +39,8 @@ public class Bomb extends GameObject {
 		return range;
 	}
 
-	public Bomb(Bitmap[] bitmaps, float x, float y, int time, float range,
-			LevelGrid level, SoundComponent soundComponent) {
+	public Bomb(Bitmap[] bitmaps, Character owner, float x, float y, int time, float range,
+			LevelGrid grid, SoundComponent soundComponent) {
 		super(x, y);
 		int intx = (int) Math.rint(x);
 		int inty = (int) Math.rint(y);
@@ -49,12 +50,12 @@ public class Bomb extends GameObject {
 		actRange[RANGE_LEFT] = intx;
 		actRange[RANGE_RIGHT] = intx;
 		this.timeToExplode = time;
-		this.level = level;
+		this.level = grid;
 		this.range = range;
 		this.isExploding = false;
+		this.owner = owner;
 		// Explosion Sound load
 		mSoundComponent = soundComponent;
-
 		drawableComponent = new DrawableExplosionComponent(this, bitmaps,
 				NORMAL);
 	}
@@ -164,5 +165,9 @@ public class Bomb extends GameObject {
 				"Bomb exploded in X: " + this.getX() + " Y: " + this.getY());
 		isExploding = true;
 		return actRange;
+	}
+	
+	public Character getOwner() {
+		return owner;
 	}
 }

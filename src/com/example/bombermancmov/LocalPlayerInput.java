@@ -1,45 +1,70 @@
 package com.example.bombermancmov;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.example.bombermancmov.model.Character;
+import com.example.bombermancmov.model.Game;
+import com.example.bombermancmov.wifi.CommandRequest;
+
 public class LocalPlayerInput extends PlayerInput {
-	private int playerId = 0; // single-player
-	private MainGamePanel mGamePanel;
+	private int mPlayerId = 0; // single-player
+	private Game mGame;
 
 	/**
-	 * @param mGamePanel
+	 * @param game
 	 */
-	public LocalPlayerInput(MainGamePanel mGamePanel) {
+	public LocalPlayerInput(Game game) {
 		super();
-		this.mGamePanel = mGamePanel;
+		this.mGame = game;
 	}
 
 	@Override
 	public void tryMoveUp() {
-		mGamePanel.tryUp(playerId);
+		mGame.getPlayerByNumber(mPlayerId).tryMoveUp();
 	}
 
 	@Override
 	public void tryMoveDown() {
-		mGamePanel.tryDown(playerId);
+		mGame.getPlayerByNumber(mPlayerId).tryMoveDown();
 	}
 
 	@Override
 	public void tryMoveLeft() {
-		mGamePanel.tryLeft(playerId);
+		mGame.getPlayerByNumber(mPlayerId).tryMoveLeft();
 	}
 
 	@Override
 	public void tryMoveRight() {
-		mGamePanel.tryRight(playerId);
+		mGame.getPlayerByNumber(mPlayerId).tryMoveRight();
 	}
 
 	@Override
 	public void tryStop() {
-		mGamePanel.tryStop(playerId);
+		mGame.getPlayerByNumber(mPlayerId).stop();
 	}
 
 	@Override
 	public void placeBomb() {
-		mGamePanel.placeBomb(playerId);
+		Character player = mGame.getPlayerByNumber(mPlayerId);
+		int x = (int) Math.rint(player.getX());
+		int y = (int) Math.rint(player.getY());
+		mGame.placeBomb(mPlayerId, x, y);
+	}
+
+	@Override
+	public int getPlayerId() {
+		return mPlayerId;
+	}
+
+	@Override
+	public void setPlayerId(int id) {
+		mPlayerId = id;
+	}
+
+	@Override
+	public List<CommandRequest> consumeCommandRequests() {
+		return new ArrayList<CommandRequest>();
 	}
 
 }

@@ -2,8 +2,11 @@ package com.example.bombermancmov.wifi;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class CommandRequestParser {
+import com.example.bombermancmov.wifi.commands.Command;
+
+public class CommandRequestUtil {
 
 	private static final String cmdDelim = "@";
 	private static final String argDelim = ":";
@@ -12,8 +15,12 @@ public class CommandRequestParser {
 	 * @param commands
 	 * @return the list of command requests
 	 */
-	public static List<CommandRequest> translateCommandRequestString(String commands) {
+	public static List<CommandRequest> translateCommandRequestString(
+			String commands) {
 		List<CommandRequest> result = new ArrayList<CommandRequest>();
+		if (commands.equals("")) {
+			return result;
+		}
 		String[] splitMsgs = commands.split(cmdDelim);
 
 		for (String s : splitMsgs) {
@@ -56,4 +63,11 @@ public class CommandRequestParser {
 		return result.toString();
 	}
 
+	public static void executeCommandRequests(List<CommandRequest> cmdRequests,
+			Map<String, Command> commands) {
+		for (CommandRequest c : cmdRequests) {
+			Command cmd = commands.get(c.getCommand());
+			cmd.execute(c.getArgs());
+		}
+	}
 }

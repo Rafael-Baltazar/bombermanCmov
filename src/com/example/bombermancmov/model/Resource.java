@@ -18,6 +18,7 @@ public class Resource {
 
 	public Resource(SurfaceView surfaceView) {
 		this.surfaceView = surfaceView;
+		decodeResources();
 	}
 
 	public Bitmap getWallBitMap() {
@@ -175,8 +176,8 @@ public class Resource {
 
 	/**
 	 * Scale bitmaps only once to increase performance.
-	 * @param newWidth TODO
-	 * @param newHeight TODO
+	 * @param newWidth the desired new width
+	 * @param newHeight the desired new height
 	 */
 	public void scaleResources(int newWidth, int newHeight) {
 		scaleWallBitmap(newWidth, newHeight);

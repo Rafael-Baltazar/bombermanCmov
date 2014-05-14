@@ -20,8 +20,6 @@ public class GameLoopThread extends Thread {
 
 	/** Flag to hold game state */
 	private boolean running;
-	private boolean isMaster = true;
-	private boolean isPeer = true;
 
 	/** Frames per second, when game is resumed. */
 	private static final int RESUME_FPS = 25;
@@ -62,12 +60,8 @@ public class GameLoopThread extends Thread {
 					// render state to the screen
 					// draws the canvas on the panel
 					if (canvas != null && frameDuration > 0) {
-						if (isMaster) {
-							this.gamePanel.update(frameDuration);
-						}
-						if (isPeer) {
-							this.gamePanel.drawGameModel(canvas);
-						}
+						this.gamePanel.update(frameDuration);
+						this.gamePanel.drawGameModel(canvas);
 					}
 				}
 			} finally {
@@ -88,7 +82,7 @@ public class GameLoopThread extends Thread {
 			} catch (InterruptedException e) {
 				Log.d(TAG, "Interrupted sleep");
 			}
-		}		
+		}
 	}
 
 	public void setRunning(boolean running) {

@@ -34,18 +34,11 @@
             android:id="@+id/bMulti"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="5dp"
             android:onClick="newMultiPlayerGame"
+            android:padding="5dp"
             android:text="@string/btn_multi" />
 
         <Button
-            android:id="@+id/bServer"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="@string/btn_server"
-            android:onClick="newServer" />
-        <Button
             android:id="@+id/bOptions"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"

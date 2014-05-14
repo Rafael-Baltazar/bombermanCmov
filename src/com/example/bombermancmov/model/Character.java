@@ -23,10 +23,10 @@ public class Character extends GameObject {
 
 	private String name;
 
-	public static int FRONT = 0;
-	public static int LEFT = 1;
-	public static int RIGHT = 2;
-	public static int BACK = 3;
+	public static final int FRONT = 0;
+	public static final int LEFT = 1;
+	public static final int RIGHT = 2;
+	public static final int BACK = 3;
 
 	/**
 	 * @param x

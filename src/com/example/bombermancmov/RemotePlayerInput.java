@@ -10,6 +10,7 @@ import com.example.bombermancmov.wifi.commands.TryMoveCommand;
 import com.example.bombermancmov.wifi.commands.TryStopCommand;
 
 public class RemotePlayerInput extends PlayerInput {
+	private static final int UNINITIALIZED_ID = -1;
 	private int mPlayerId;
 	private Game mGame;
 	private CommandRequest bombPlacement = null;
@@ -23,6 +24,13 @@ public class RemotePlayerInput extends PlayerInput {
 		super();
 		mGame = game;
 		mPlayerId = playerId;
+	}
+
+	/**
+	 * @param mGame
+	 */
+	public RemotePlayerInput(Game mGame) {
+		this(mGame, UNINITIALIZED_ID);
 	}
 
 	@Override
@@ -44,20 +52,22 @@ public class RemotePlayerInput extends PlayerInput {
 	public void tryMoveRight() {
 		tryMove(Character.RIGHT);
 	}
-	
+
 	private void tryMove(int direction) {
+		if (mPlayerId == UNINITIALIZED_ID) {
+			return;
+		}
 		List<String> args = new ArrayList<String>();
 		args.add(String.valueOf(mPlayerId));
 		args.add(String.valueOf(direction));
-		if (movement == null) {
-			movement = new CommandRequest(TryMoveCommand.CODE, args);
-		} else {
-			movement.setArgs(args);
-		}
+		movement = new CommandRequest(TryMoveCommand.CODE, args);
 	}
-	
+
 	@Override
 	public void tryStop() {
+		if (mPlayerId == UNINITIALIZED_ID) {
+			return;
+		}
 		List<String> args = new ArrayList<String>();
 		args.add(String.valueOf(mPlayerId));
 		movement = new CommandRequest(TryStopCommand.CODE, args);
@@ -65,6 +75,9 @@ public class RemotePlayerInput extends PlayerInput {
 
 	@Override
 	public void placeBomb() {
+		if (mPlayerId == UNINITIALIZED_ID) {
+			return;
+		}
 		List<String> args = new ArrayList<String>();
 		Character player = mGame.getPlayerByNumber(mPlayerId);
 		int x = (int) Math.rint(player.getX());
@@ -81,6 +94,33 @@ public class RemotePlayerInput extends PlayerInput {
 
 	public CommandRequest getMovement() {
 		return movement;
+	}
+
+	@Override
+	public int getPlayerId() {
+		return mPlayerId;
+	}
+
+	public void setGame(Game mGame) {
+		this.mGame = mGame;
+	}
+
+	@Override
+	public void setPlayerId(int id) {
+		mPlayerId = id;
+	}
+
+	@Override
+	public List<CommandRequest> consumeCommandRequests() {
+		List<CommandRequest> commandRequests = new ArrayList<CommandRequest>();
+		if (movement != null) {
+			commandRequests.add(movement);
+		}
+		if (bombPlacement != null) {
+			commandRequests.add(bombPlacement);
+			bombPlacement = null;
+		}
+		return commandRequests;
 	}
 
 }

@@ -7,7 +7,12 @@ import java.util.List;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
+import com.example.bombermancmov.LocalPlayerInput;
 import com.example.bombermancmov.MainGamePanel;
+import com.example.bombermancmov.PlayerInput;
+import com.example.bombermancmov.RemotePlayerInput;
+import com.example.bombermancmov.model.component.MasterNetworkComponent;
+import com.example.bombermancmov.model.component.PeerNetworkComponent;
 
 public class Game {
 	// Used for bitmap purposes
@@ -20,10 +25,15 @@ public class Game {
 	private float totalTime;
 
 	private Level mLevel;
-	
-	private boolean isSingleplayer;
+
+	private PlayerInput mPlayerInput;
+
 	private boolean finished;
-	private int endStatus; //Singleplayer: 0 = not ended, 1 = win, 2 = lost/killed, 3 = lost/timeover
+	private int endStatus;
+	private static final int NOT_ENDED = 0;
+	private static final int WIN = 1;
+	private static final int LOST_KILLED = 2;
+	private static final int LOST_TIMEOVER = 3;
 
 	// private Character player;
 	private List<Character> mPlayers;
@@ -36,10 +46,9 @@ public class Game {
 		super();
 		this.gameDuration = 180000; // three minutes?
 		this.totalTime = 0;
-		
-		this.isSingleplayer = isSingleplayer;
+
 		this.finished = false;
-		this.endStatus = 0;
+		this.endStatus = NOT_ENDED;
 
 		this.mLevel = new Level();
 		this.mLevel.setLevelName("default");
@@ -52,12 +61,17 @@ public class Game {
 		this.mLevel.setMaxNumberPlayers(3);
 
 		mResources = resources;
-		mResources.decodeResources();
 
 		// Create Lists for filling
 		this.mBombs = new ArrayList<Bomb>();
 		this.mDroids = new ArrayList<Droid>();
 		this.mPlayers = new ArrayList<Character>();
+
+		if (isSingleplayer) {
+			this.mPlayerInput = new LocalPlayerInput(this);
+		} else {
+			this.mPlayerInput = new RemotePlayerInput(this);
+		}
 
 		// Creating Player and Robots on their starting position (maybe rework
 		// later)
@@ -67,31 +81,37 @@ public class Game {
 				if (this.mLevel.getGrid().getGridCell(j, i) == '1'
 						&& this.mPlayers.size() < this.mLevel
 								.getMaxNumberPlayers()) {
-					mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_1], j, i,
+					mPlayers.add(new Character(
+							mResources.getPlayerBitmap()[PLAYER_1], j, i,
 							PLAYER_SPEED, getLevel().getGrid(), this, true));
-				} else 
-				{
-					if(this.isSingleplayer == false) 
-					{
-						if (this.mLevel.getGrid().getGridCell(j, i) == '2' && this.mPlayers.size() < this.mLevel.getMaxNumberPlayers()) {
-							mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_2], j, i, PLAYER_SPEED, getLevel().getGrid(), this, true));
+				} else {
+					if (!isSingleplayer) {
+						if (this.mLevel.getGrid().getGridCell(j, i) == '2'
+								&& this.mPlayers.size() < this.mLevel
+										.getMaxNumberPlayers()) {
+							mPlayers.add(new Character(mResources
+									.getPlayerBitmap()[PLAYER_2], j, i,
+									PLAYER_SPEED, getLevel().getGrid(), this,
+									true));
 						} else if (this.mLevel.getGrid().getGridCell(j, i) == '3'
-							&& this.mPlayers.size() < this.mLevel
-									.getMaxNumberPlayers()) {
-						mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_3], j, i,
-								PLAYER_SPEED, getLevel().getGrid(), this, true));
+								&& this.mPlayers.size() < this.mLevel
+										.getMaxNumberPlayers()) {
+							mPlayers.add(new Character(mResources
+									.getPlayerBitmap()[PLAYER_3], j, i,
+									PLAYER_SPEED, getLevel().getGrid(), this,
+									true));
 						}
 					}
 				}
-					
+
 				if (this.mLevel.getGrid().getGridCell(j, i) == 'R') {
-					this.mDroids.add(new Droid(mResources.getDroidBitmap(), j, i, this.mLevel
-							.getRobotSpeed(), this, true));
+					this.mDroids.add(new Droid(mResources.getDroidBitmap(), j,
+							i, this.mLevel.getRobotSpeed(), this, true));
 				}
 			}
 		}
 	}
-	
+
 	public List<Character> getPlayersByPos(float x, float y) {
 		float range = 0.01f;
 		List<Character> result = new ArrayList<Character>();
@@ -108,17 +128,18 @@ public class Game {
 	private boolean inRange(float a, float b, float range) {
 		return (a - range <= b && b <= a) || (a <= b && b <= a + range);
 	}
-	
-	public void placeBomb(int x, int y) {
-		mBombs.add(new Bomb(mResources.getBombBitmap(), x, y,
-				this.mLevel.getExplosionTimeout(), this.mLevel
-						.getExplosionRange(), this.mLevel.getGrid(),
-				mResources.getExplosionSoundComponent()));
+
+	public void placeBomb(int id, int x, int y) {
+		Bomb b = new Bomb(mResources.getBombBitmap(), getPlayerByNumber(id), x,
+				y, this.mLevel.getExplosionTimeout(),
+				this.mLevel.getExplosionRange(), this.mLevel.getGrid(),
+				mResources.getExplosionSoundComponent());
+		mBombs.add(b);
 	}
 
 	public boolean nextRound() {
-		this.gameDuration = this.gameDuration - MainGamePanel.ROUND_TIME; 
-		
+		this.gameDuration = this.gameDuration - MainGamePanel.ROUND_TIME;
+
 		float t;
 		int[] expBlocks;
 		List<Bomb> bombsToRemove = new ArrayList<Bomb>();
@@ -132,23 +153,33 @@ public class Game {
 			}
 		}
 		mBombs.removeAll(bombsToRemove);
-		
-		//RETURN false, if time is over || singleplayer: player died or no more droids 
-		if (totalTime == gameDuration || (this.isSingleplayer && (!mPlayers.get(0).isAlive()) || this.mDroids.size() == 0)) {
+
+		// RETURN false, if time is over || singleplayer: player died or no more
+		// droids
+		int playersAlive = 0;
+		for (Character c : mPlayers) {
+			if (c.isAlive()) {
+				playersAlive++;
+			}
+		}
+		if (totalTime == gameDuration || playersAlive < 1
+				|| (playersAlive == 1 && this.mDroids.size() == 0)) {
 			this.finished = true;
-			
-			if(this.mDroids.size() == 0 && this.mPlayers.get(0).isAlive()) {
-				this.endStatus = 1;
-			}		
-			
-			if(!this.mPlayers.get(0).isAlive()) {
-				this.endStatus = 2;
+			int playerId = mPlayerInput.getPlayerId();
+
+			if (this.mDroids.size() == 0
+					&& this.mPlayers.get(playerId).isAlive()) {
+				this.endStatus = WIN;
 			}
-			
-			if(this.totalTime == gameDuration) {
-				this.endStatus = 3;
+
+			if (!this.mPlayers.get(playerId).isAlive()) {
+				this.endStatus = LOST_KILLED;
 			}
-			
+
+			if (this.totalTime == gameDuration) {
+				this.endStatus = LOST_TIMEOVER;
+			}
+
 			return false;
 		} else {
 			return true;
@@ -162,12 +193,46 @@ public class Game {
 	 * @param actRange
 	 */
 	public void explosionCollision(Bomb bomb, int[] actRange) {
-		Iterator<Droid> it = mDroids.iterator();
-		Droid d = null;
-		
-		while(it.hasNext()) {
-			d = it.next();			
-			//check on collision
+		Iterator<Droid> droidIt = mDroids.iterator();
+		Iterator<Character> playerIt = mPlayers.iterator();
+		float droidPoints = mLevel.getPointsPerRobotKilled();
+		float playerPoints = mLevel.getPointsPerOpponentKilled();
+		explodeDroids(bomb, actRange, droidIt, droidPoints);
+		explodePlayers(bomb, actRange, playerIt, playerPoints);
+	}
+
+	private void explodePlayers(Bomb bomb, int[] actRange,
+			Iterator<Character> it, float points) {
+		while (it.hasNext()) {
+			Character p = it.next();
+			if (p.equals(bomb.getOwner())) {
+				continue;
+			}
+			// check on collision
+			boolean collidedHorizontally = ((Math.rint(bomb.getY()) == Math
+					.rint(p.getY()))
+					&& (actRange[Bomb.RANGE_LEFT] <= Math.rint(p.getX())) && (actRange[Bomb.RANGE_RIGHT] >= Math
+					.rint(p.getX())));
+			boolean collidedVertically = ((Math.rint(bomb.getX()) == Math
+					.rint(p.getX()))
+					&& (actRange[Bomb.RANGE_UP] <= Math.rint(p.getY())) && (actRange[Bomb.RANGE_DOWN] >= Math
+					.rint(p.getY())));
+
+			if (collidedHorizontally || collidedVertically) {
+				p.kill();
+				Character owner = bomb.getOwner();
+				if (mPlayers.contains(owner)) {
+					owner.setPoints(owner.getPoints() + points);
+				}
+			}
+		}
+	}
+
+	private void explodeDroids(Bomb bomb, int[] actRange, Iterator<Droid> it,
+			float points) {
+		while (it.hasNext()) {
+			Droid d = it.next();
+			// check on collision
 			boolean collidedHorizontally = ((Math.rint(bomb.getY()) == Math
 					.rint(d.getY()))
 					&& (actRange[Bomb.RANGE_LEFT] <= Math.rint(d.getX())) && (actRange[Bomb.RANGE_RIGHT] >= Math
@@ -176,19 +241,20 @@ public class Game {
 					.rint(d.getX()))
 					&& (actRange[Bomb.RANGE_UP] <= Math.rint(d.getY())) && (actRange[Bomb.RANGE_DOWN] >= Math
 					.rint(d.getY())));
-			
+
 			if (collidedHorizontally || collidedVertically) {
 				it.remove();
-				if(this.isSingleplayer) {
-					mPlayers.get(0).setPoints(mPlayers.get(0).getPoints() + mLevel.getPointsPerRobotKilled());
+				Character owner = bomb.getOwner();
+				if (mPlayers.contains(owner)) {
+					owner.setPoints(owner.getPoints() + points);
 				}
 			}
-		}		
+		}
 	}
 
 	public void update(long timePassed) {
 		for (Character p : mPlayers) {
-			if(p.isAlive()) {
+			if (p.isAlive()) {
 				p.update(timePassed);
 			}
 		}
@@ -207,15 +273,17 @@ public class Game {
 			for (int collNum = 0; collNum < this.mLevel.getGrid().getColSize(); ++collNum) {
 				switch (this.mLevel.getGrid().getGridCell(rowNum, collNum)) {
 				case LevelGrid.WALL: {
-					canvas.drawBitmap(mResources.getWallBitMap(),
-							rowNum * mResources.getWallBitMap().getWidth(), collNum
-									* mResources.getWallBitMap().getHeight(), null);
+					canvas.drawBitmap(mResources.getWallBitMap(), rowNum
+							* mResources.getWallBitMap().getWidth(), collNum
+							* mResources.getWallBitMap().getHeight(), null);
 					break;
 				}
 				case LevelGrid.OBSTACLE: {
-					canvas.drawBitmap(mResources.getObstacleBitmap(),
-							rowNum * mResources.getObstacleBitmap().getWidth(), collNum
-									* mResources.getObstacleBitmap().getHeight(), null);
+					canvas.drawBitmap(mResources.getObstacleBitmap(), rowNum
+							* mResources.getObstacleBitmap().getWidth(),
+							collNum
+									* mResources.getObstacleBitmap()
+											.getHeight(), null);
 					break;
 				}
 				}
@@ -223,7 +291,7 @@ public class Game {
 		}
 
 		for (Character c : mPlayers) {
-			if(c.isAlive()) {
+			if (c.isAlive()) {
 				c.draw(canvas);
 			}
 		}
@@ -234,7 +302,7 @@ public class Game {
 			c.draw(canvas);
 		}
 	}
-	
+
 	/**
 	 * GETTERS & SETTERS
 	 */
@@ -245,11 +313,11 @@ public class Game {
 	public Bitmap getWallBitMap() {
 		return mResources.getWallBitMap();
 	}
-	
+
 	public Character getPlayerByNumber(int i) {
 		return mPlayers.get(i);
 	}
-	
+
 	public Level getLevel() {
 		return mLevel;
 	}
@@ -264,7 +332,7 @@ public class Game {
 
 	public void setPlayers(List<Character> players) {
 		this.mPlayers = players;
-	}	
+	}
 
 	public boolean isFinished() {
 		return finished;
@@ -272,7 +340,7 @@ public class Game {
 
 	public void setFinished(boolean finished) {
 		this.finished = finished;
-	}	
+	}
 
 	public int getEndStatus() {
 		return endStatus;
@@ -281,4 +349,9 @@ public class Game {
 	public void setEndStatus(int endStatus) {
 		this.endStatus = endStatus;
 	}
+
+	public PlayerInput getPlayerInput() {
+		return mPlayerInput;
+	}
+
 }

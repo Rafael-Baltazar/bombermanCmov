@@ -13,49 +13,45 @@ import android.widget.TextView;
 
 public class GameActivity extends ActionBarActivity {
 
-	private static final String TAG = GameLoopThread.class.getSimpleName();
+	private static final String TAG = GameActivity.class.getSimpleName();
 	private FrameLayout frm;
-	private ImageButton upButton, leftButton, rightButton, downButton, pauseButton, bombButton;
-	private boolean btnPaused; //true if button has pause-symbol, false if button has resume-symbol
-
+	private ImageButton upButton, leftButton, rightButton, downButton,
+			pauseButton, bombButton;
+	private boolean btnPaused; // true if button has pause-symbol, false if
+								// button has resume-symbol
 	private MainGamePanel mGamePanel;
 	private PlayerInput playerInput;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
 
-		// save for posterior use
+		// updater
 		TextView nameTextView = (TextView) findViewById(R.id.playerName);
 		TextView scoreTextView = (TextView) findViewById(R.id.playerScore);
 		TextView timeLeftTextView = (TextView) findViewById(R.id.timeLeft);
 		TextView numPlayersTextView = (TextView) findViewById(R.id.numberPlayers);
-		
+		StatusScreenUpdater statusScreen = new StatusScreenUpdater(
+				nameTextView, scoreTextView, timeLeftTextView,
+				numPlayersTextView, this);
+
+		frm = (FrameLayout) findViewById(R.id.frameLayout);
 		pauseButton = (ImageButton) findViewById(R.id.buttonPause);
 		this.btnPaused = true;
-		
-		frm = (FrameLayout) findViewById(R.id.frameLayout);
-		
 		setOnClickListenersToButtons();
-		
-		StatusScreenUpdater statusScreen = new StatusScreenUpdater(nameTextView,
-				scoreTextView, timeLeftTextView, numPlayersTextView, this);
-		
+
+		// TODO flags bleh dX
 		String playerName = getIntent().getStringExtra("playerName");
-		boolean isLocal = getIntent().getBooleanExtra("isLocal", true);
-		int playerId = getIntent().getIntExtra("playerId", 0);
-		
 		statusScreen.setPlayerName(playerName);
-		if (isLocal) {
-			mGamePanel = new MainGamePanel(this, statusScreen, true); //true for isSinglePlayer
-			playerInput = new LocalPlayerInput(mGamePanel);
-		} else {
-			mGamePanel = new MainGamePanel(this, statusScreen, false);
-			playerInput = new RemotePlayerInput(mGamePanel.getGame(), playerId);
-		}
+		boolean isSinglePlayer = getIntent().getBooleanExtra("isLocal", true);
+		boolean isMaster = getIntent().getBooleanExtra("isMaster", true);
+		String masterIp = getIntent().getStringExtra("masterIp");
+		mGamePanel = new MainGamePanel(this, statusScreen, isSinglePlayer, isMaster,
+				masterIp);
+		playerInput = mGamePanel.getGame().getPlayerInput();
 		frm.addView(mGamePanel);
-		
+
 		Log.d(TAG, "View added");
 	}
 
@@ -129,7 +125,7 @@ public class GameActivity extends ActionBarActivity {
 	}
 
 	public void pauseOrResumeGame(View b) {
-		if(this.btnPaused) {
+		if (this.btnPaused) {
 			mGamePanel.pauseThread();
 			pauseButton.setImageResource(R.drawable.button_resume);
 			btnPaused = false;
@@ -141,8 +137,12 @@ public class GameActivity extends ActionBarActivity {
 	}
 
 	public void quitGame(View v) {
-		//game finished, go back to main menu
+		// game finished, go back to main menu
 		finish();
+	}
+
+	public void setPlayerInput(PlayerInput playerInput) {
+		this.playerInput = playerInput;
 	}
 
 }
