@@ -16,9 +16,9 @@
     <string name="down_button_text">Down</string>
     <string name="bomb_button_text">Bomb</string>
     <string name="display_time_left">Time left:</string>
-    <string name="display_player_name">Player Name:</string>
-    <string name="display_player_score">Player Score:</string>
-    <string name="display_num_players">Number of Players:</string>
+    <string name="display_player_name">Name:</string>
+    <string name="display_player_score">Score:</string>
+    <string name="display_num_players">Players left:</string>
     <string name="hint_player_name">Insert a nickname here</string>
     <string name="background_main_menu_description">Bomberman front view</string>
     <string name="title_activity_server">ServerActivity</string>
@@ -34,5 +34,11 @@
     <string name="finished_title_lost_time">You lost! Time is over</string>
     <string name="finished_title_lost_unkown">You lost! Unknown?</string>
     <string name="finished_button">Exit</string>
+    
+    <string-array name="level_strings">
+        <item>Level 1</item>
+        <item>Level 2</item>
+        <item>Level 3</item>
+    </string-array>  
     
 </resources>

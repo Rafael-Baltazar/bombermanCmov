@@ -1,5 +1,7 @@
 package com.example.bombermancmov;
 
+import com.example.bombermancmov.model.Game;
+
 import android.graphics.Canvas;
 import android.os.SystemClock;
 import android.util.Log;
@@ -17,6 +19,10 @@ public class GameLoopThread extends Thread {
 
 	/** The actual view that handles inputs and draws to the surface. */
 	private MainGamePanel gamePanel;
+	
+	/** the game & round time */
+	private Game game;
+	private int roundTime;
 
 	/** Flag to hold game state */
 	private boolean running;
@@ -37,6 +43,9 @@ public class GameLoopThread extends Thread {
 		super();
 		this.surfaceHolder = surfaceHolder;
 		this.gamePanel = gamePanel;
+		this.game = gamePanel.getGame();
+		this.roundTime = MainGamePanel.ROUND_TIME;
+		this.running = true; //for shutdowns
 	}
 
 	/**
@@ -46,8 +55,17 @@ public class GameLoopThread extends Thread {
 	 */
 	@Override
 	public void run() {
-		long beginTime, timeDiff;
-		while (running && !gamePanel.getGame().isFinished()) {
+		long beginTime, timeDiff, oldTime;		
+		oldTime = SystemClock.uptimeMillis();
+		
+		while (!gamePanel.getGame().isFinished() && running) {
+			if((SystemClock.uptimeMillis() - oldTime) > this.roundTime) {
+				if(!this.game.nextRound()) {
+					break;
+				}
+				oldTime = SystemClock.uptimeMillis();
+			}	
+			
 			// draw step
 			Canvas canvas = null;
 			try {
@@ -80,13 +98,10 @@ public class GameLoopThread extends Thread {
 					sleep(sleepTime);
 				}
 			} catch (InterruptedException e) {
+				this.running = false;
 				Log.d(TAG, "Interrupted sleep");
 			}
 		}
-	}
-
-	public void setRunning(boolean running) {
-		this.running = running;
 	}
 
 	public void unPause() {
@@ -103,6 +118,14 @@ public class GameLoopThread extends Thread {
 		if (maxFps == 0)
 			return -1;
 		return 1000 / maxFps;
+	}	
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
 	}
 
 }

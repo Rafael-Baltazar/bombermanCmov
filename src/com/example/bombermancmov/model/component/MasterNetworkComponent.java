@@ -78,6 +78,7 @@ public class MasterNetworkComponent extends NetworkComponent {
 		ObjectInputStream is = new ObjectInputStream(
 				newPeerSocket.getInputStream());
 		Peer newPeer = new Peer(newPeerSocket, os, is);
+		
 		Integer request = (Integer) is.readObject();
 		if (request == PeerNetworkComponent.UNINITIALIZED) {
 			if (mPeers.size() < MAX_NUM_PEERS) {

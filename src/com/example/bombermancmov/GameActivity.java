@@ -1,5 +1,8 @@
 package com.example.bombermancmov;
 
+import com.example.bombermancmov.model.Level;
+import com.example.bombermancmov.model.LevelLoader;
+
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -15,12 +18,13 @@ public class GameActivity extends ActionBarActivity {
 
 	private static final String TAG = GameActivity.class.getSimpleName();
 	private FrameLayout frm;
+	private MainGamePanel mGamePanel;
+	private PlayerInput playerInput;
 	private ImageButton upButton, leftButton, rightButton, downButton,
 			pauseButton, bombButton;
 	private boolean btnPaused; // true if button has pause-symbol, false if
 								// button has resume-symbol
-	private MainGamePanel mGamePanel;
-	private PlayerInput playerInput;
+	private Level level;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,18 +51,19 @@ public class GameActivity extends ActionBarActivity {
 		boolean isSinglePlayer = getIntent().getBooleanExtra("isLocal", true);
 		boolean isMaster = getIntent().getBooleanExtra("isMaster", true);
 		String masterIp = getIntent().getStringExtra("masterIp");
-		mGamePanel = new MainGamePanel(this, statusScreen, isSinglePlayer, isMaster,
-				masterIp);
+		this.level = LevelLoader.loadLevel(
+				getIntent().getStringExtra("levelName"), getResources()
+						.openRawResource(R.raw.level1));
+		mGamePanel = new MainGamePanel(this, statusScreen, level,
+				isSinglePlayer, isMaster, masterIp);
 		playerInput = mGamePanel.getGame().getPlayerInput();
 		frm.addView(mGamePanel);
-
 		Log.d(TAG, "View added");
 	}
 
 	private void setOnClickListenersToButtons() {
 		leftButton = (ImageButton) findViewById(R.id.buttonLeft);
 		leftButton.setOnTouchListener(new OnTouchListener() {
-
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -72,7 +77,6 @@ public class GameActivity extends ActionBarActivity {
 
 		upButton = (ImageButton) findViewById(R.id.buttonUp);
 		upButton.setOnTouchListener(new OnTouchListener() {
-
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -87,7 +91,6 @@ public class GameActivity extends ActionBarActivity {
 
 		downButton = (ImageButton) findViewById(R.id.buttonDown);
 		downButton.setOnTouchListener(new OnTouchListener() {
-
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -102,7 +105,6 @@ public class GameActivity extends ActionBarActivity {
 
 		rightButton = (ImageButton) findViewById(R.id.buttonRight);
 		rightButton.setOnTouchListener(new OnTouchListener() {
-
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -116,7 +118,6 @@ public class GameActivity extends ActionBarActivity {
 
 		bombButton = (ImageButton) findViewById(R.id.buttonBomb);
 		bombButton.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				playerInput.placeBomb();
@@ -125,7 +126,7 @@ public class GameActivity extends ActionBarActivity {
 	}
 
 	public void pauseOrResumeGame(View b) {
-		if (this.btnPaused) {
+		if (btnPaused) {
 			mGamePanel.pauseThread();
 			pauseButton.setImageResource(R.drawable.button_resume);
 			btnPaused = false;
@@ -137,12 +138,10 @@ public class GameActivity extends ActionBarActivity {
 	}
 
 	public void quitGame(View v) {
-		// game finished, go back to main menu
 		finish();
 	}
 
 	public void setPlayerInput(PlayerInput playerInput) {
 		this.playerInput = playerInput;
 	}
-
 }

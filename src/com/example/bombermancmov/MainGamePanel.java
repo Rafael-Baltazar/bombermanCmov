@@ -19,6 +19,7 @@ import android.view.View;
 
 import com.example.bombermancmov.model.Character;
 import com.example.bombermancmov.model.Game;
+import com.example.bombermancmov.model.Level;
 import com.example.bombermancmov.model.Resource;
 import com.example.bombermancmov.model.component.MasterNetworkComponent;
 import com.example.bombermancmov.model.component.NullMasterNetworkComponent;
@@ -53,9 +54,6 @@ public class MainGamePanel extends SurfaceView implements
 	private PeerNetworkComponent peerNetComp;
 	private Map<String, Command> mCommands;
 
-	// Run level.nextRound() every x milliseconds
-	private LevelNextRoundThread levelNextRound;
-
 	private SurfaceHolder surfaceHolder;
 
 	private Activity context;
@@ -68,7 +66,7 @@ public class MainGamePanel extends SurfaceView implements
 	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
 
 	public MainGamePanel(GameActivity gameActivity,
-			StatusScreenUpdater updater, boolean isSingleplayer,
+			StatusScreenUpdater updater, Level level,boolean isSingleplayer,
 			boolean isMaster, String masterIp) {
 		super(gameActivity);
 		this.context = gameActivity;
@@ -88,11 +86,11 @@ public class MainGamePanel extends SurfaceView implements
 		if (isSingleplayer) {
 			masterNetComp = new NullMasterNetworkComponent();
 			peerNetComp = new NullPeerNetworkComponent();
-			game = new Game(mResource, isSingleplayer);
+			game = new Game(mResource, level, isSingleplayer);
 		} else {
 			masterNetComp = new MasterNetworkComponent();
 			peerNetComp = new PeerNetworkComponent();
-			game = new Game(mResource, isSingleplayer);
+			game = new Game(mResource, level, isSingleplayer);
 		}
 		// make the GamePanel focusable so it can handle events
 		mCommands = initCommands();
@@ -119,18 +117,10 @@ public class MainGamePanel extends SurfaceView implements
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		Log.d(TAG, "Surface is being created");
-		startThreads();
-	}
-
-	private void startThreads() {
-		// create the game loop thread
+		Log.d(TAG, "Surface is being created");		
+		// create & start the game loop thread
 		gameLoopThread = new GameLoopThread(surfaceHolder, this);
-		gameLoopThread.setRunning(true);
 		gameLoopThread.start();
-		// create env thread
-		levelNextRound = new LevelNextRoundThread(game, ROUND_TIME);
-		levelNextRound.start();
 		// create master thread
 		if (isMaster) {
 			try {
@@ -141,6 +131,10 @@ public class MainGamePanel extends SurfaceView implements
 			acceptPeersThread = new AcceptNewPeersThread(masterNetComp);
 			acceptPeersThread.start();
 		}
+	}
+	
+	public void quitThread() {
+		this.gameLoopThread.setRunning(false);
 	}
 
 	@Override
@@ -153,10 +147,6 @@ public class MainGamePanel extends SurfaceView implements
 		gameLoopThread.setRunning(false);
 		shutDown(gameLoopThread);
 		Log.d(TAG, "Game loop thread was shut down cleanly");
-
-		levelNextRound.setRunning(false);
-		shutDown(levelNextRound);
-		Log.d(TAG, "Level next round thread was shut down cleanly");
 
 		if (isMaster) {
 			acceptPeersThread.interrupt();
@@ -195,18 +185,34 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void tryLeft(int id) {
 		game.getPlayerByNumber(id).tryMoveLeft();
+		
+		if(this.game.isFinished()) {
+			this.buildEnddialog();
+		}
 	}
 
 	public void tryUp(int id) {
 		game.getPlayerByNumber(id).tryMoveUp();
+		
+		if(this.game.isFinished()) {
+			this.buildEnddialog();
+		}
 	}
 
 	public void tryDown(int id) {
 		game.getPlayerByNumber(id).tryMoveDown();
+		
+		if(this.game.isFinished()) {
+			this.buildEnddialog();
+		}
 	}
 
 	public void tryRight(int id) {
 		game.getPlayerByNumber(id).tryMoveRight();
+		
+		if(this.game.isFinished()) {
+			this.buildEnddialog();
+		}
 	}
 
 	public void tryStop(int id) {
@@ -300,43 +306,41 @@ public class MainGamePanel extends SurfaceView implements
 
 	// Enddialog for finishing a game
 	public void buildEnddialog() {
-		invalidate();
-		// game completed
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setCancelable(false);
-
-		switch (this.game.getEndStatus()) {
-		case 1:
-			builder.setTitle(context.getText(R.string.finished_title_win));
-			break;
-		case 2:
-			builder.setTitle(context
-					.getText(R.string.finished_title_lost_killed));
-			break;
-		case 3:
-			builder.setTitle(context.getText(R.string.finished_title_lost_time));
-			break;
-		default:
-			builder.setTitle(context
-					.getText(R.string.finished_title_lost_unkown));
-			break;
+    	invalidate();
+        //game complete
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(false);        
+        
+		switch(this.game.getEndStatus()) {
+			case 1: 
+				builder.setTitle(context.getText(R.string.finished_title_win) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
+				break;
+			case 2: 
+				builder.setTitle(context.getText(R.string.finished_title_lost_killed) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
+				break;
+			case 3: 
+				builder.setTitle(context.getText(R.string.finished_title_lost_time) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
+				break;
+			default:
+				builder.setTitle(context.getText(R.string.finished_title_lost_unkown) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
+				break;	        	
 		}
-
-		LayoutInflater inflater = context.getLayoutInflater();
-		View view = inflater.inflate(R.layout.finish, null);
-		builder.setView(view);
-		View closeButton = view.findViewById(R.id.closeGame);
-
-		closeButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View clicked) {
-				if (clicked.getId() == R.id.closeGame) {
-					context.finish();
-				}
-			}
-		});
-		AlertDialog finishDialog = builder.create();
-		finishDialog.show();
+		        
+        LayoutInflater inflater = context.getLayoutInflater();
+        View view = inflater.inflate(R.layout.finish, null);
+        builder.setView(view);
+        View closeButton = view.findViewById(R.id.closeGame);
+        
+        closeButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View clicked) {
+                if(clicked.getId() == R.id.closeGame) {
+                    context.finish();
+                }
+            }
+        });
+        AlertDialog finishDialog = builder.create();  
+        finishDialog.show();
 	}
 
 	public void drawGameModel(Canvas canvas) {

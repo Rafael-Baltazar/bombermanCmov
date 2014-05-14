@@ -22,6 +22,11 @@
             android:hint="@string/hint_player_name"
             android:padding="5dp" />
 
+        <Spinner
+            android:id="@+id/level_spinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
+
         <Button
             android:id="@+id/bSingle"
             android:layout_width="fill_parent"
