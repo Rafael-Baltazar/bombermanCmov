@@ -1,17 +1,13 @@
 package com.example.bombermancmov;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.TextView;
 
 import com.example.bombermancmov.model.Character;
 import com.example.bombermancmov.model.Game;
@@ -75,12 +71,8 @@ public class MainGamePanel extends SurfaceView implements
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		Log.d(TAG, "Surface is being created");
-		startThreads();
-	}
-
-	private void startThreads() {
-		// create the game loop thread
+		Log.d(TAG, "Surface is being created");		
+		// create & start the game loop thread
 		gameLoopThread = new GameLoopThread(surfaceHolder, this);
 		gameLoopThread.setRunning(true);
 		gameLoopThread.start();
@@ -180,20 +172,21 @@ public class MainGamePanel extends SurfaceView implements
         builder.setCancelable(false);        
         
 		switch(this.game.getEndStatus()) {
+			//Singleplayer
 			case 1: 
-				builder.setTitle(context.getText(R.string.finished_title_win));
+				builder.setTitle(context.getText(R.string.finished_title_win) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
 				break;
 			case 2: 
-				builder.setTitle(context.getText(R.string.finished_title_lost_killed));
+				builder.setTitle(context.getText(R.string.finished_title_lost_killed) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
 				break;
 			case 3: 
-				builder.setTitle(context.getText(R.string.finished_title_lost_time));
+				builder.setTitle(context.getText(R.string.finished_title_lost_time) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
 				break;
 			default:
-				builder.setTitle(context.getText(R.string.finished_title_lost_unkown));
+				builder.setTitle(context.getText(R.string.finished_title_lost_unkown) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
 				break;	        	
-		} 
-        
+		}
+		        
         LayoutInflater inflater = context.getLayoutInflater();
         View view = inflater.inflate(R.layout.finish, null);
         builder.setView(view);
@@ -207,7 +200,8 @@ public class MainGamePanel extends SurfaceView implements
                 }
             }
         });
-        AlertDialog finishDialog = builder.create();                
+        AlertDialog finishDialog = builder.create();  
+        
         finishDialog.show();
 	}
 
