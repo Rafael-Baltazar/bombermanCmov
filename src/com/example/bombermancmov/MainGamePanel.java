@@ -11,6 +11,7 @@ import android.view.View;
 
 import com.example.bombermancmov.model.Character;
 import com.example.bombermancmov.model.Game;
+import com.example.bombermancmov.model.Level;
 import com.example.bombermancmov.model.Resource;
 import com.example.bombermancmov.model.component.SoundComponent;
 
@@ -39,7 +40,7 @@ public class MainGamePanel extends SurfaceView implements
 
 	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
 
-	public MainGamePanel(GameActivity context, StatusScreenUpdater updater,
+	public MainGamePanel(GameActivity context, StatusScreenUpdater updater, Level level,
 			boolean isSingleplayer) {
 		super(context);
 		this.context = context;
@@ -52,7 +53,7 @@ public class MainGamePanel extends SurfaceView implements
 		// create level
 		mResource = new Resource(this);
 		mResource.setExplosionSoundComponent(new SoundComponent(this));
-		game = new Game(mResource, isSingleplayer);
+		game = new Game(mResource, level, isSingleplayer);
 
 		// make the GamePanel focusable so it can handle events
 		setFocusable(true);
@@ -76,24 +77,17 @@ public class MainGamePanel extends SurfaceView implements
 		gameLoopThread = new GameLoopThread(surfaceHolder, this);
 		gameLoopThread.start();
 	}
+	
+	public void quitThread() {
+		this.gameLoopThread.setRunning(false);
+	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		Log.d(TAG, "Surface is being destroyed");
-		// shut down all the threads
-		shutDown(gameLoopThread);
+		this.gameLoopThread.setRunning(false);
 		Log.d(TAG, "Game loop thread was shut down cleanly");
-	}
 
-	private void shutDown(Thread thread) {
-		while (true) {
-			try {
-				thread.join();
-				break;
-			} catch (InterruptedException e) {
-				Log.d(TAG, "Surface destroyed: " + e.getMessage());
-			}
-		}
+		Log.d(TAG, "Surface is being destroyed");
 	}
 
 	public void pauseThread() {

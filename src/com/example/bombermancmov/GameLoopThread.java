@@ -23,6 +23,7 @@ public class GameLoopThread extends Thread {
 	/** the game & round time */
 	private Game game;
 	private int roundTime;
+	private boolean running;
 
 	/** Flag to hold game state */
 	private boolean isMaster = true;
@@ -46,6 +47,7 @@ public class GameLoopThread extends Thread {
 		this.gamePanel = gamePanel;
 		this.game = gamePanel.getGame();
 		this.roundTime = MainGamePanel.ROUND_TIME;
+		this.running = true; //for shutdowns
 	}
 
 	/**
@@ -55,11 +57,10 @@ public class GameLoopThread extends Thread {
 	 */
 	@Override
 	public void run() {
-		long beginTime, timeDiff, oldTime;
-		
+		long beginTime, timeDiff, oldTime;		
 		oldTime = SystemClock.uptimeMillis();
 		
-		while (!gamePanel.getGame().isFinished()) {
+		while (!gamePanel.getGame().isFinished() && running) {
 			if((SystemClock.uptimeMillis() - oldTime) > this.roundTime) {
 				if(!this.game.nextRound()) {
 					break;
@@ -103,6 +104,7 @@ public class GameLoopThread extends Thread {
 					sleep(sleepTime);
 				}
 			} catch (InterruptedException e) {
+				this.running = false;
 				Log.d(TAG, "Interrupted sleep");
 			}
 		}		
@@ -122,6 +124,14 @@ public class GameLoopThread extends Thread {
 		if (maxFps == 0)
 			return -1;
 		return 1000 / maxFps;
+	}	
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
 	}
 
 }

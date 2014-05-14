@@ -30,25 +30,15 @@ public class Game {
 
 	private Resource mResources;
 
-	public Game(Resource resources, boolean isSingleplayer) {
+	public Game(Resource resources, Level level, boolean isSingleplayer) {
 		super();
+		this.mLevel = level;
 		this.gameDuration = 60000; // 1 minute
 		
 		this.isSingleplayer = isSingleplayer;
 		this.finished = false;
 		this.endStatus = 0;
-
-		//default settings of the level, should be done by file
-		this.mLevel = new Level();
-		this.mLevel.setLevelName("default");
-		this.mLevel.setExplosionTimeout(4);
-		this.mLevel.setExplosionDuration(2000);
-		this.mLevel.setExplosionRange(2);
-		this.mLevel.setRobotSpeed(1);
-		this.mLevel.setPointsPerOpponentKilled(2);
-		this.mLevel.setPointsPerRobotKilled(1);
-		this.mLevel.setMaxNumberPlayers(3);
-
+		
 		mResources = resources;
 		mResources.decodeResources();
 
