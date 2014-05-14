@@ -33,9 +33,6 @@ public class MainGamePanel extends SurfaceView implements
 	/** Update and render game model in a separate thread. */
 	private GameLoopThread gameLoopThread;
 
-	// Run level.nextRound() every x milliseconds
-	private LevelNextRoundThread levelNextRound;
-
 	private SurfaceHolder surfaceHolder;
 	
 	private GameActivity context;
@@ -87,9 +84,6 @@ public class MainGamePanel extends SurfaceView implements
 		gameLoopThread = new GameLoopThread(surfaceHolder, this);
 		gameLoopThread.setRunning(true);
 		gameLoopThread.start();
-		// create env thread
-		levelNextRound = new LevelNextRoundThread(game, ROUND_TIME);
-		levelNextRound.start();
 	}
 
 	@Override
@@ -99,10 +93,6 @@ public class MainGamePanel extends SurfaceView implements
 		gameLoopThread.setRunning(false);
 		shutDown(gameLoopThread);
 		Log.d(TAG, "Game loop thread was shut down cleanly");
-
-		levelNextRound.setRunning(false);
-		shutDown(levelNextRound);
-		Log.d(TAG, "Level next round thread was shut down cleanly");
 	}
 
 	private void shutDown(Thread thread) {

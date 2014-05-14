@@ -1,5 +1,7 @@
 package com.example.bombermancmov;
 
+import com.example.bombermancmov.model.Game;
+
 import android.graphics.Canvas;
 import android.os.SystemClock;
 import android.util.Log;
@@ -17,6 +19,10 @@ public class GameLoopThread extends Thread {
 
 	/** The actual view that handles inputs and draws to the surface. */
 	private MainGamePanel gamePanel;
+	
+	/** the game & round time */
+	private Game game;
+	private int roundTime;
 
 	/** Flag to hold game state */
 	private boolean running;
@@ -39,6 +45,8 @@ public class GameLoopThread extends Thread {
 		super();
 		this.surfaceHolder = surfaceHolder;
 		this.gamePanel = gamePanel;
+		this.game = gamePanel.getGame();
+		this.roundTime = MainGamePanel.ROUND_TIME;
 	}
 
 	/**
@@ -48,8 +56,18 @@ public class GameLoopThread extends Thread {
 	 */
 	@Override
 	public void run() {
-		long beginTime, timeDiff;
+		long beginTime, timeDiff, oldTime;
+		
+		oldTime = SystemClock.uptimeMillis();
+		
 		while (running && !gamePanel.getGame().isFinished()) {
+			if((SystemClock.uptimeMillis() - oldTime) > this.roundTime) {
+				if(!this.game.nextRound()) {
+					this.setRunning(false);
+				}
+				oldTime = SystemClock.uptimeMillis();
+			}	
+			
 			// draw step
 			Canvas canvas = null;
 			try {

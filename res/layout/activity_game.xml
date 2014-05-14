@@ -174,7 +174,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:contentDescription="@string/bomb_button_text"
-            android:src="@drawable/button_bomb" />
+            android:src="@drawable/button_bomb_l" />
     </LinearLayout>
 
 </LinearLayout>
