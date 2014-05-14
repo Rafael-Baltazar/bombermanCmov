@@ -25,7 +25,6 @@ public class GameLoopThread extends Thread {
 	private int roundTime;
 
 	/** Flag to hold game state */
-	private boolean running;
 	private boolean isMaster = true;
 	private boolean isPeer = true;
 
@@ -60,10 +59,10 @@ public class GameLoopThread extends Thread {
 		
 		oldTime = SystemClock.uptimeMillis();
 		
-		while (running && !gamePanel.getGame().isFinished()) {
+		while (!gamePanel.getGame().isFinished()) {
 			if((SystemClock.uptimeMillis() - oldTime) > this.roundTime) {
 				if(!this.game.nextRound()) {
-					this.setRunning(false);
+					break;
 				}
 				oldTime = SystemClock.uptimeMillis();
 			}	
@@ -107,10 +106,6 @@ public class GameLoopThread extends Thread {
 				Log.d(TAG, "Interrupted sleep");
 			}
 		}		
-	}
-
-	public void setRunning(boolean running) {
-		this.running = running;
 	}
 
 	public void unPause() {

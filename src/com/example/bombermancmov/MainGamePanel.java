@@ -74,7 +74,6 @@ public class MainGamePanel extends SurfaceView implements
 		Log.d(TAG, "Surface is being created");		
 		// create & start the game loop thread
 		gameLoopThread = new GameLoopThread(surfaceHolder, this);
-		gameLoopThread.setRunning(true);
 		gameLoopThread.start();
 	}
 
@@ -82,7 +81,6 @@ public class MainGamePanel extends SurfaceView implements
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		Log.d(TAG, "Surface is being destroyed");
 		// shut down all the threads
-		gameLoopThread.setRunning(false);
 		shutDown(gameLoopThread);
 		Log.d(TAG, "Game loop thread was shut down cleanly");
 	}
@@ -100,10 +98,6 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void pauseThread() {
 		gameLoopThread.pause();
-		
-		if(this.game.isFinished()) {
-			this.buildEnddialog();
-		}
 	}
 
 	public void resumeThread() {
@@ -112,18 +106,34 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void tryLeft(int id) {
 		game.getPlayerByNumber(id).tryMoveLeft();
+		
+		if(this.game.isFinished()) {
+			this.buildEnddialog();
+		}
 	}
 
 	public void tryUp(int id) {
 		game.getPlayerByNumber(id).tryMoveUp();
+		
+		if(this.game.isFinished()) {
+			this.buildEnddialog();
+		}
 	}
 
 	public void tryDown(int id) {
 		game.getPlayerByNumber(id).tryMoveDown();
+		
+		if(this.game.isFinished()) {
+			this.buildEnddialog();
+		}
 	}
 
 	public void tryRight(int id) {
 		game.getPlayerByNumber(id).tryMoveRight();
+		
+		if(this.game.isFinished()) {
+			this.buildEnddialog();
+		}
 	}
 
 	public void tryStop(int id) {

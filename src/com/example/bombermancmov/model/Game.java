@@ -17,7 +17,6 @@ public class Game {
 	private static final float PLAYER_SPEED = 3.0f;
 
 	private float gameDuration;
-	private float totalTime;
 
 	private Level mLevel;
 	
@@ -25,7 +24,6 @@ public class Game {
 	private boolean finished;
 	private int endStatus; //Singleplayer: 0 = not ended, 1 = win, 2 = lost/killed, 3 = lost/timeover
 
-	// private Character player;
 	private List<Character> mPlayers;
 	private List<Droid> mDroids;
 	private List<Bomb> mBombs;
@@ -34,13 +32,13 @@ public class Game {
 
 	public Game(Resource resources, boolean isSingleplayer) {
 		super();
-		this.gameDuration = 180000; // three minutes?
-		this.totalTime = 0;
+		this.gameDuration = 60000; // 1 minute
 		
 		this.isSingleplayer = isSingleplayer;
 		this.finished = false;
 		this.endStatus = 0;
 
+		//default settings of the level, should be done by file
 		this.mLevel = new Level();
 		this.mLevel.setLevelName("default");
 		this.mLevel.setExplosionTimeout(4);
@@ -56,40 +54,43 @@ public class Game {
 
 		// Create Lists for filling
 		this.mBombs = new ArrayList<Bomb>();
+		//set characters
+		this.setCharactersOnField();
+	}
+	
+	//Get the Position for the Droids & Players from the current level(grid)
+	private void setCharactersOnField() {
+		//Create Lists
 		this.mDroids = new ArrayList<Droid>();
 		this.mPlayers = new ArrayList<Character>();
-
-		// Creating Player and Robots on their starting position (maybe rework
-		// later)
-		for (int i = 0; i < 13; i++) {
-			for (int j = 0; j < 19; j++) {
-				// Check if a player is on this cell
-				if (this.mLevel.getGrid().getGridCell(j, i) == '1'
-						&& this.mPlayers.size() < this.mLevel
-								.getMaxNumberPlayers()) {
-					mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_1], j, i,
-							PLAYER_SPEED, getLevel().getGrid(), this, true));
-				} else 
-				{
-					if(this.isSingleplayer == false) 
-					{
-						if (this.mLevel.getGrid().getGridCell(j, i) == '2' && this.mPlayers.size() < this.mLevel.getMaxNumberPlayers()) {
-							mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_2], j, i, PLAYER_SPEED, getLevel().getGrid(), this, true));
-						} else if (this.mLevel.getGrid().getGridCell(j, i) == '3'
-							&& this.mPlayers.size() < this.mLevel
-									.getMaxNumberPlayers()) {
+		
+		// Creating Player and Robots on their starting position 
+		for (int i = 0; i < this.mLevel.getGrid().getColSize(); i++) { 
+			for (int j = 0; j < this.mLevel.getGrid().getRowSize(); j++) {
+				switch(this.mLevel.getGrid().getGridCell(j, i)) {
+				case '1':
+					if(this.mPlayers.size() < this.mLevel.getMaxNumberPlayers()) {
+						mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_1], j, i,
+								PLAYER_SPEED, getLevel().getGrid(), this, true));	
+					} break;
+				case '2':
+					if(this.mPlayers.size() < this.mLevel.getMaxNumberPlayers() && !this.isSingleplayer) {
+						mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_2], j, i,
+								PLAYER_SPEED, getLevel().getGrid(), this, true));	
+					} break;
+				case '3':
+					if(this.mPlayers.size() < this.mLevel.getMaxNumberPlayers() && !this.isSingleplayer) {
 						mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_3], j, i,
-								PLAYER_SPEED, getLevel().getGrid(), this, true));
-						}
-					}
-				}
-					
-				if (this.mLevel.getGrid().getGridCell(j, i) == 'R') {
-					this.mDroids.add(new Droid(mResources.getDroidBitmap(), j, i, this.mLevel
-							.getRobotSpeed(), this, true));
+								PLAYER_SPEED, getLevel().getGrid(), this, true));	
+					} break;
+				case 'R':
+					this.mDroids.add(new Droid(mResources.getDroidBitmap(), j, i, this.mLevel.getRobotSpeed(), this, true));
+					break;
+				default: 
+					break;									
 				}
 			}
-		}
+		}				
 	}
 	
 	public List<Character> getPlayersByPos(float x, float y) {
@@ -134,7 +135,7 @@ public class Game {
 		mBombs.removeAll(bombsToRemove);
 		
 		//RETURN false, if time is over || singleplayer: player died or no more droids 
-		if (totalTime == gameDuration || (this.isSingleplayer && (!mPlayers.get(0).isAlive()) || this.mDroids.size() == 0)) {
+		if (gameDuration <= 0 || (this.isSingleplayer && (!mPlayers.get(0).isAlive()) || this.mDroids.size() == 0)) {
 			this.finished = true;
 			
 			if(this.mDroids.size() == 0 && this.mPlayers.get(0).isAlive()) {
@@ -145,7 +146,7 @@ public class Game {
 				this.endStatus = 2;
 			}
 			
-			if(this.totalTime == gameDuration) {
+			if(gameDuration <= 0) {
 				this.endStatus = 3;
 			}
 			
@@ -239,7 +240,7 @@ public class Game {
 	 * GETTERS & SETTERS
 	 */
 	public float getTimeLeft() {
-		return gameDuration - totalTime;
+		return gameDuration;
 	}
 
 	public Bitmap getWallBitMap() {
