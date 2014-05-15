@@ -3,7 +3,6 @@ package com.example.bombermancmov.model;
 import java.util.List;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 public class Droid extends Character {
 	private static final String TAG = Droid.class.getSimpleName();

@@ -3,9 +3,6 @@ package com.example.bombermancmov;
 import java.io.IOException;
 import java.util.Locale;
 
-import com.example.bombermancmov.model.Level;
-import com.example.bombermancmov.model.LevelLoader;
-
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -17,6 +14,9 @@ import android.view.View.OnTouchListener;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.example.bombermancmov.model.Level;
+import com.example.bombermancmov.model.LevelLoader;
 
 public class GameActivity extends ActionBarActivity {
 

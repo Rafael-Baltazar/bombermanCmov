@@ -2,6 +2,7 @@ package com.example.bombermancmov;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.example.bombermancmov.model.Character;
 import com.example.bombermancmov.model.Game;
 import com.example.bombermancmov.wifi.CommandRequest;

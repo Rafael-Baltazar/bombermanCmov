@@ -63,6 +63,7 @@ public class MainGamePanel extends SurfaceView implements
 	private Game game;
 	private Resource mResource;
 	private boolean isMaster;
+	private Level level;
 
 	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
 
@@ -83,6 +84,7 @@ public class MainGamePanel extends SurfaceView implements
 		this.context = context;
 		surfaceHolder = getHolder();
 		mStatusScreenUpdater = updater;
+		this.level = level;
 
 		// adding the callback(this) to the surface holder to intercept events
 		surfaceHolder.addCallback(this);
@@ -113,7 +115,7 @@ public class MainGamePanel extends SurfaceView implements
 		commands.put(NopCommand.CODE, new NopCommand());
 		commands.put(TryMoveCommand.CODE, new TryMoveCommand(game));
 		commands.put(TryStopCommand.CODE, new TryStopCommand(game));
-		commands.put(PlaceBombCommand.CODE, new PlaceBombCommand());
+		commands.put(PlaceBombCommand.CODE, new PlaceBombCommand(game));
 		commands.put(DroidMovementCommand.CODE, new DroidMovementCommand(game));
 		return commands;
 	}

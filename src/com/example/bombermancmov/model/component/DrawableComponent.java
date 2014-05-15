@@ -1,9 +1,9 @@
 package com.example.bombermancmov.model.component;
 
-import com.example.bombermancmov.model.GameObject;
-
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+
+import com.example.bombermancmov.model.GameObject;
 
 public class DrawableComponent implements Drawable {
 	private static final String TAG = DrawableComponent.class.getSimpleName();

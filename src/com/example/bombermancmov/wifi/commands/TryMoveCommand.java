@@ -2,8 +2,8 @@ package com.example.bombermancmov.wifi.commands;
 
 import java.util.List;
 
-import com.example.bombermancmov.model.Game;
 import com.example.bombermancmov.model.Character;
+import com.example.bombermancmov.model.Game;
 
 public class TryMoveCommand extends Command {
 

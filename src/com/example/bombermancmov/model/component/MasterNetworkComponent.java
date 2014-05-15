@@ -7,12 +7,12 @@ import java.io.OptionalDataException;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocket;
+import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketServer;
+
 import com.example.bombermancmov.wifi.CommandRequest;
 import com.example.bombermancmov.wifi.CommandRequestUtil;
 import com.example.bombermancmov.wifi.Peer;
-
-import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocket;
-import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketServer;
 
 /**
  * Component to create server, accept peers, and send or receive command
@@ -61,7 +61,7 @@ public class MasterNetworkComponent extends NetworkComponent {
 			mSrvSocket = null;
 		}
 	}
-
+	
 	/**
 	 * Blocks until a new peer joins. Then, initiates a protocol to give it an
 	 * id and stores its socket in the component.
