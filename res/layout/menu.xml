@@ -44,13 +44,6 @@
             android:text="@string/btn_multi" />
 
         <Button
-            android:id="@+id/bOptions"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:text="@string/btn_options" />
-
-        <Button
             android:id="@+id/bExit"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
