@@ -44,16 +44,15 @@ public class GameActivity extends ActionBarActivity {
 		pauseButton = (ImageButton) findViewById(R.id.buttonPause);
 		this.btnPaused = true;
 		setOnClickListenersToButtons();
-
+		this.level = LevelLoader.loadLevel(
+				getIntent().getStringExtra("levelName"), getResources()
+						.openRawResource(R.raw.level1));
 		// TODO flags bleh dX
 		String playerName = getIntent().getStringExtra("playerName");
 		statusScreen.setPlayerName(playerName);
 		boolean isSinglePlayer = getIntent().getBooleanExtra("isLocal", true);
 		boolean isMaster = getIntent().getBooleanExtra("isMaster", true);
 		String masterIp = getIntent().getStringExtra("masterIp");
-		this.level = LevelLoader.loadLevel(
-				getIntent().getStringExtra("levelName"), getResources()
-						.openRawResource(R.raw.level1));
 		mGamePanel = new MainGamePanel(this, statusScreen, level,
 				isSinglePlayer, isMaster, masterIp);
 		playerInput = mGamePanel.getGame().getPlayerInput();
@@ -141,7 +140,4 @@ public class GameActivity extends ActionBarActivity {
 		finish();
 	}
 
-	public void setPlayerInput(PlayerInput playerInput) {
-		this.playerInput = playerInput;
-	}
 }

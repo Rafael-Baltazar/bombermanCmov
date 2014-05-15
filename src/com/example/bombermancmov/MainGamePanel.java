@@ -30,6 +30,7 @@ import com.example.bombermancmov.wifi.AcceptNewPeersThread;
 import com.example.bombermancmov.wifi.CommandRequest;
 import com.example.bombermancmov.wifi.CommandRequestUtil;
 import com.example.bombermancmov.wifi.commands.Command;
+import com.example.bombermancmov.wifi.commands.NopCommand;
 import com.example.bombermancmov.wifi.commands.PlaceBombCommand;
 import com.example.bombermancmov.wifi.commands.TryMoveCommand;
 import com.example.bombermancmov.wifi.commands.TryStopCommand;
@@ -49,7 +50,7 @@ public class MainGamePanel extends SurfaceView implements
 
 	/** Update and render game model in a separate thread. */
 	private GameLoopThread gameLoopThread;
-	private AcceptNewPeersThread acceptPeersThread;
+	private AcceptNewPeersThread acceptPeersThread = null;
 	private MasterNetworkComponent masterNetComp;
 	private PeerNetworkComponent peerNetComp;
 	private Map<String, Command> mCommands;
@@ -65,11 +66,21 @@ public class MainGamePanel extends SurfaceView implements
 
 	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
 
-	public MainGamePanel(GameActivity gameActivity,
-			StatusScreenUpdater updater, Level level,boolean isSingleplayer,
-			boolean isMaster, String masterIp) {
-		super(gameActivity);
-		this.context = gameActivity;
+	/**
+	 * Constructor.
+	 * 
+	 * @param context
+	 * @param updater
+	 * @param level
+	 * @param isSingleplayer
+	 * @param isMaster
+	 * @param masterIp
+	 */
+	public MainGamePanel(Activity context, StatusScreenUpdater updater,
+			Level level, boolean isSingleplayer, boolean isMaster,
+			String masterIp) {
+		super(context);
+		this.context = context;
 		surfaceHolder = getHolder();
 		mStatusScreenUpdater = updater;
 
@@ -86,12 +97,11 @@ public class MainGamePanel extends SurfaceView implements
 		if (isSingleplayer) {
 			masterNetComp = new NullMasterNetworkComponent();
 			peerNetComp = new NullPeerNetworkComponent();
-			game = new Game(mResource, level, isSingleplayer);
 		} else {
 			masterNetComp = new MasterNetworkComponent();
 			peerNetComp = new PeerNetworkComponent();
-			game = new Game(mResource, level, isSingleplayer);
 		}
+		game = new Game(mResource, level, isSingleplayer);
 		// make the GamePanel focusable so it can handle events
 		mCommands = initCommands();
 		setFocusable(true);
@@ -100,6 +110,7 @@ public class MainGamePanel extends SurfaceView implements
 
 	private Map<String, Command> initCommands() {
 		Map<String, Command> commands = new HashMap<String, Command>();
+		commands.put(NopCommand.CODE, new NopCommand());
 		commands.put(TryMoveCommand.CODE, new TryMoveCommand(game));
 		commands.put(TryStopCommand.CODE, new TryStopCommand(game));
 		commands.put(PlaceBombCommand.CODE, new PlaceBombCommand());
@@ -117,7 +128,7 @@ public class MainGamePanel extends SurfaceView implements
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		Log.d(TAG, "Surface is being created");		
+		Log.d(TAG, "Surface is being created");
 		// create & start the game loop thread
 		gameLoopThread = new GameLoopThread(surfaceHolder, this);
 		gameLoopThread.start();
@@ -125,16 +136,12 @@ public class MainGamePanel extends SurfaceView implements
 		if (isMaster) {
 			try {
 				masterNetComp.createServerSocket(MASTER_PORT);
+				acceptPeersThread = new AcceptNewPeersThread(masterNetComp);
+				acceptPeersThread.start();
 			} catch (IOException e) {
 				Log.e(TAG, "IO new server socket: " + e.getMessage());
 			}
-			acceptPeersThread = new AcceptNewPeersThread(masterNetComp);
-			acceptPeersThread.start();
 		}
-	}
-	
-	public void quitThread() {
-		this.gameLoopThread.setRunning(false);
 	}
 
 	@Override
@@ -148,15 +155,15 @@ public class MainGamePanel extends SurfaceView implements
 		shutDown(gameLoopThread);
 		Log.d(TAG, "Game loop thread was shut down cleanly");
 
-		if (isMaster) {
+		if (isMaster && acceptPeersThread != null) {
 			acceptPeersThread.interrupt();
 			try {
 				masterNetComp.closeServerSocket();
+				shutDown(acceptPeersThread);
+				Log.d(TAG, "Accept peers thread was shut down cleanly");
 			} catch (IOException e) {
 				Log.e(TAG, "IO closing sockets: " + e.getMessage());
 			}
-			shutDown(acceptPeersThread);
-			Log.d(TAG, "Accept peers thread was shut down cleanly");
 		}
 	}
 
@@ -185,32 +192,32 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void tryLeft(int id) {
 		game.getPlayerByNumber(id).tryMoveLeft();
-		
-		if(this.game.isFinished()) {
+
+		if (this.game.isFinished()) {
 			this.buildEnddialog();
 		}
 	}
 
 	public void tryUp(int id) {
 		game.getPlayerByNumber(id).tryMoveUp();
-		
-		if(this.game.isFinished()) {
+
+		if (this.game.isFinished()) {
 			this.buildEnddialog();
 		}
 	}
 
 	public void tryDown(int id) {
 		game.getPlayerByNumber(id).tryMoveDown();
-		
-		if(this.game.isFinished()) {
+
+		if (this.game.isFinished()) {
 			this.buildEnddialog();
 		}
 	}
 
 	public void tryRight(int id) {
 		game.getPlayerByNumber(id).tryMoveRight();
-		
-		if(this.game.isFinished()) {
+
+		if (this.game.isFinished()) {
 			this.buildEnddialog();
 		}
 	}
@@ -247,18 +254,11 @@ public class MainGamePanel extends SurfaceView implements
 			CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
 
 			game.update(timePassed);
-			updateStatusScreen();
 		} else {
 			try {
-				// Get player id from master and update
-				peerNetComp.createClientSocket(masterHost, MASTER_PORT);
-				int playerId = peerNetComp.getPlayerId();
-				PlayerInput playerInput = game.getPlayerInput();
-				playerInput.setPlayerId(playerId);
+				requestPlayerIdFromMaster();
 				// Send command requests
 				cmdRequests = game.getPlayerInput().consumeCommandRequests();
-				CommandRequestUtil.executeCommandRequests(cmdRequests,
-						mCommands);
 				sendCommandRequests(cmdRequests);
 			} catch (ClassNotFoundException e) {
 				Log.e(TAG, "ClassNotFound new client socket: " + e.getMessage());
@@ -266,19 +266,53 @@ public class MainGamePanel extends SurfaceView implements
 				Log.e(TAG, "IO new client socket: " + e.getMessage());
 			}
 		}
+		updateStatusScreen();
 	}
 
+	private void requestPlayerIdFromMaster() throws ClassNotFoundException,
+			IOException {
+		peerNetComp.createClientSocket(masterHost, MASTER_PORT);
+		int playerId = peerNetComp.getPlayerId();
+		PlayerInput playerInput = game.getPlayerInput();
+		playerInput.setPlayerId(playerId);
+	}
+
+	/**
+	 * If you are master, send command requests to peers. Otherwise, send
+	 * command requests to master.
+	 * 
+	 * @param cmdRequests
+	 * @see #MainGamePanel(Activity, StatusScreenUpdater, Level, boolean,
+	 *      boolean, String)
+	 */
 	private void sendCommandRequests(List<CommandRequest> cmdRequests) {
 		try {
-			peerNetComp.sendCommandRequests(cmdRequests);
+			if (isMaster) {
+				masterNetComp.sendCommandRequests(cmdRequests);
+			} else {
+				peerNetComp.sendCommandRequests(cmdRequests);
+			}
 		} catch (IOException e) {
 			Log.e(TAG, "IO sending command requests: " + e.getMessage());
 		}
 	}
 
+	/**
+	 * Receive command requests and executes the corresponding commands.
+	 * Receives from peers, if you are master. Otherwise, receive from master.
+	 * 
+	 * @param cmdRequests
+	 * @see #MainGamePanel(Activity, StatusScreenUpdater, Level, boolean,
+	 *      boolean, String)
+	 */
 	private void receiveCommandRequests(List<CommandRequest> cmdRequests) {
 		try {
-			cmdRequests = masterNetComp.receiveCommandRequests();
+			if (isMaster) {
+				cmdRequests = masterNetComp.receiveCommandRequests();
+			} else {
+				cmdRequests = peerNetComp.receiveCommandRequests();
+			}
+			CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
 		} catch (OptionalDataException e) {
 			Log.e(TAG,
 					"OptionalData receive command requests: " + e.getMessage());
@@ -288,7 +322,7 @@ public class MainGamePanel extends SurfaceView implements
 		} catch (IOException e) {
 			Log.e(TAG, "IO receive command requests: " + e.getMessage());
 		}
-		CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
+
 	}
 
 	private void updateStatusScreen() {
@@ -306,41 +340,49 @@ public class MainGamePanel extends SurfaceView implements
 
 	// Enddialog for finishing a game
 	public void buildEnddialog() {
-    	invalidate();
-        //game complete
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setCancelable(false);        
-        
-		switch(this.game.getEndStatus()) {
-			case 1: 
-				builder.setTitle(context.getText(R.string.finished_title_win) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
-				break;
-			case 2: 
-				builder.setTitle(context.getText(R.string.finished_title_lost_killed) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
-				break;
-			case 3: 
-				builder.setTitle(context.getText(R.string.finished_title_lost_time) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
-				break;
-			default:
-				builder.setTitle(context.getText(R.string.finished_title_lost_unkown) + " Points: " + this.game.getPlayerByNumber(0).getPoints());
-				break;	        	
+		invalidate();
+		// game complete
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setCancelable(false);
+
+		switch (this.game.getEndStatus()) {
+		case 1:
+			builder.setTitle(context.getText(R.string.finished_title_win)
+					+ " Points: " + this.game.getPlayerByNumber(0).getPoints());
+			break;
+		case 2:
+			builder.setTitle(context
+					.getText(R.string.finished_title_lost_killed)
+					+ " Points: "
+					+ this.game.getPlayerByNumber(0).getPoints());
+			break;
+		case 3:
+			builder.setTitle(context.getText(R.string.finished_title_lost_time)
+					+ " Points: " + this.game.getPlayerByNumber(0).getPoints());
+			break;
+		default:
+			builder.setTitle(context
+					.getText(R.string.finished_title_lost_unkown)
+					+ " Points: "
+					+ this.game.getPlayerByNumber(0).getPoints());
+			break;
 		}
-		        
-        LayoutInflater inflater = context.getLayoutInflater();
-        View view = inflater.inflate(R.layout.finish, null);
-        builder.setView(view);
-        View closeButton = view.findViewById(R.id.closeGame);
-        
-        closeButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View clicked) {
-                if(clicked.getId() == R.id.closeGame) {
-                    context.finish();
-                }
-            }
-        });
-        AlertDialog finishDialog = builder.create();  
-        finishDialog.show();
+
+		LayoutInflater inflater = context.getLayoutInflater();
+		View view = inflater.inflate(R.layout.finish, null);
+		builder.setView(view);
+		View closeButton = view.findViewById(R.id.closeGame);
+
+		closeButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View clicked) {
+				if (clicked.getId() == R.id.closeGame) {
+					context.finish();
+				}
+			}
+		});
+		AlertDialog finishDialog = builder.create();
+		finishDialog.show();
 	}
 
 	public void drawGameModel(Canvas canvas) {

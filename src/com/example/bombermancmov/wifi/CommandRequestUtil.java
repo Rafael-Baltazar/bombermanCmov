@@ -6,6 +6,10 @@ import java.util.Map;
 
 import com.example.bombermancmov.wifi.commands.Command;
 
+/**
+ * Util methods to translate command requests from a string, code command
+ * requests into a string and execute command requests given a command list.
+ */
 public class CommandRequestUtil {
 
 	private static final String cmdDelim = "@";
