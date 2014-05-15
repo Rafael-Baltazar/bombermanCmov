@@ -77,7 +77,7 @@ public class GameActivity extends ActionBarActivity {
 		leftButton = (ImageButton) findViewById(R.id.buttonLeft);
 		leftButton.setOnTouchListener(new OnTouchListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
+			public boolean onTouch(View v, MotionEvent event) {				
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					playerInput.tryMoveLeft();
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -90,7 +90,7 @@ public class GameActivity extends ActionBarActivity {
 		upButton = (ImageButton) findViewById(R.id.buttonUp);
 		upButton.setOnTouchListener(new OnTouchListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
+			public boolean onTouch(View v, MotionEvent event) {				
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					playerInput.tryMoveUp();
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -118,7 +118,7 @@ public class GameActivity extends ActionBarActivity {
 		rightButton = (ImageButton) findViewById(R.id.buttonRight);
 		rightButton.setOnTouchListener(new OnTouchListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
+			public boolean onTouch(View v, MotionEvent event) {				
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					playerInput.tryMoveRight();
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -132,6 +132,10 @@ public class GameActivity extends ActionBarActivity {
 		bombButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				if(mGamePanel.getGame().isFinished()) {
+					mGamePanel.buildEnddialog();
+				}
+				
 				playerInput.placeBomb();
 			}
 		});
@@ -139,7 +143,7 @@ public class GameActivity extends ActionBarActivity {
 		quitButton = (ImageButton) findViewById(R.id.buttonQuit);
 		quitButton.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View v) {
+			public void onClick(View v) {				
 				finish();
 			}
 		});

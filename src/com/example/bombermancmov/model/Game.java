@@ -288,6 +288,16 @@ public class Game {
 			c.draw(canvas);
 		}
 	}
+	
+	public int getLeftOpponents() {
+		int counter = 0;
+		for(int i = 0; i < this.mPlayers.size(); i++) {
+			if(this.mPlayers.get(i).isAlive()) {
+				counter++;
+			}
+		}
+		return (counter - 1 + this.mDroids.size());
+	}
 
 	/**
 	 * GETTERS & SETTERS
@@ -343,5 +353,4 @@ public class Game {
 	public PlayerInput getPlayerInput() {
 		return mPlayerInput;
 	}
-
 }

@@ -33,12 +33,12 @@ public class StatusScreenUpdater {
 		playerNameTextView.setText(playerName);
 	}
 
-	public void setPlayerScore(float points) {
-		playerScoreTextView.setText(Float.toString(points));
+	public void setPlayerScore(int points) {
+		playerScoreTextView.setText(Integer.toString(points));
 	}
 
-	public void setTimeLeft(float timeLeft) {
-		timeLeftTextView.setText(Float.toString(timeLeft));
+	public void setTimeLeft(int timeLeft) {
+		timeLeftTextView.setText(Integer.toString(timeLeft) + "s");
 	}
 
 	public void setNumPlayers(int numPlayers) {
