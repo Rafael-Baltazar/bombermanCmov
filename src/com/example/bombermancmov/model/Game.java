@@ -11,8 +11,6 @@ import com.example.bombermancmov.LocalPlayerInput;
 import com.example.bombermancmov.MainGamePanel;
 import com.example.bombermancmov.PlayerInput;
 import com.example.bombermancmov.RemotePlayerInput;
-import com.example.bombermancmov.model.component.MasterNetworkComponent;
-import com.example.bombermancmov.model.component.PeerNetworkComponent;
 
 public class Game {
 	// Used for bitmap purposes
@@ -33,6 +31,8 @@ public class Game {
 	private static final int WIN = 1;
 	private static final int LOST_KILLED = 2;
 	private static final int LOST_TIMEOVER = 3;
+	
+	private boolean isSingleplayer;
 
 	private List<Character> mPlayers;
 	private List<Droid> mDroids;
@@ -44,35 +44,27 @@ public class Game {
 		super();
 		this.finished = false;
 		this.endStatus = NOT_ENDED;
-
-		this.mLevel = new Level(resources, 1);
-		this.mLevel.setLevelName("default");
-		this.mLevel.setExplosionTimeout(4);
-		this.mLevel.setExplosionDuration(2000);
-		this.mLevel.setExplosionRange(2);
-		this.mLevel.setRobotSpeed(1);
-		this.mLevel.setPointsPerOpponentKilled(2);
-		this.mLevel.setPointsPerRobotKilled(1);
-		this.mLevel.setMaxNumberPlayers(3);
+		
+		this.isSingleplayer = isSingleplayer;
 
 		this.mLevel = level;
 		this.gameDuration = 60000; // 1 minute
 		
+		this.mBombs = new ArrayList<Bomb>();
+		
 		mResources = resources;
-		if (isSingleplayer) {
+		if (this.isSingleplayer) {
 			this.mPlayerInput = new LocalPlayerInput(this);
 		} else {
 			this.mPlayerInput = new RemotePlayerInput(this);
 		}
 
-		// Create Lists for filling
-		this.mBombs = new ArrayList<Bomb>();
-		//set characters
-		this.setCharactersOnField(isSingleplayer);
+		//set characters on their positions of the level
+		this.setCharactersOnField();
 	}
 	
 	//Get the Position for the Droids & Players from the current level(grid)
-	private void setCharactersOnField(boolean isSingleplayer) {
+	private void setCharactersOnField() {
 		//Create Lists
 		this.mDroids = new ArrayList<Droid>();
 		this.mPlayers = new ArrayList<Character>();
@@ -87,12 +79,12 @@ public class Game {
 								PLAYER_SPEED, getLevel().getGrid(), this, true));	
 					} break;
 				case '2':
-					if(this.mPlayers.size() < this.mLevel.getMaxNumberPlayers() && !isSingleplayer) {
+					if(this.mPlayers.size() < this.mLevel.getMaxNumberPlayers() && !this.isSingleplayer) {
 						mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_2], j, i,
 								PLAYER_SPEED, getLevel().getGrid(), this, true));	
 					} break;
 				case '3':
-					if(this.mPlayers.size() < this.mLevel.getMaxNumberPlayers() && !isSingleplayer) {
+					if(this.mPlayers.size() < this.mLevel.getMaxNumberPlayers() && !this.isSingleplayer) {
 						mPlayers.add(new Character(mResources.getPlayerBitmap()[PLAYER_3], j, i,
 								PLAYER_SPEED, getLevel().getGrid(), this, true));	
 					} break;
@@ -156,7 +148,7 @@ public class Game {
 				playersAlive++;
 			}
 		}
-		if (gameDuration < 0 || playersAlive < 1
+		if (gameDuration <= 0 || playersAlive < 1
 				|| (playersAlive == 1 && this.mDroids.size() == 0)) {
 			this.finished = true;
 			int playerId = mPlayerInput.getPlayerId();

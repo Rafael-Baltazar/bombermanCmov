@@ -7,7 +7,8 @@ import java.util.Map;
 
 public class Level {
 	private String levelName;
-	
+	private long gameDuration;
+
 	private float explosionDuration;
 	private float explosionRange;
 	private int explosionTimeout;
@@ -22,7 +23,6 @@ public class Level {
 	
 	public Level() {
 		super();
-		this.grid = new LevelGrid(null); //DEFAULT 19x13 field (see levelgrid constructor)
 	}
 	
 	public Level(Resource res, int level_number){
@@ -178,5 +178,13 @@ public class Level {
 
 	public void setGrid(LevelGrid grid) {
 		this.grid = grid;
+	}
+	
+	public long getGameDuration() {
+		return gameDuration;
+	}
+
+	public void setGameDuration(long gameDuration) {
+		this.gameDuration = gameDuration;
 	}
 }
