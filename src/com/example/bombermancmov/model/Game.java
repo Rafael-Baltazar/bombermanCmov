@@ -45,7 +45,7 @@ public class Game {
 		this.finished = false;
 		this.endStatus = NOT_ENDED;
 
-		this.mLevel = new Level();
+		this.mLevel = new Level(resources, 1);
 		this.mLevel.setLevelName("default");
 		this.mLevel.setExplosionTimeout(4);
 		this.mLevel.setExplosionDuration(2000);
