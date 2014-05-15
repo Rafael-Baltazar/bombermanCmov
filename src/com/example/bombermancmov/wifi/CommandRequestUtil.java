@@ -93,23 +93,10 @@ public class CommandRequestUtil {
 	 */
 	public static List<CommandRequest> extractCommandRequests(Game game) {
 		List<CommandRequest> commandRequests = new ArrayList<CommandRequest>();
-		CommandRequest droidMovCmdReq = extractDroidMovement(commandRequests, game);
+		CommandRequest droidMovCmdReq = DroidMovementCommand
+				.extractCommandRequest(game);
 		commandRequests.add(droidMovCmdReq);
 		return commandRequests;
 	}
 
-	private static CommandRequest extractDroidMovement(
-			List<CommandRequest> commandRequests, Game game) {
-		List<String> args = new ArrayList<String>();
-		List<Droid> droids = game.getDroids();
-		for (Droid d : droids) {
-			float x = d.getX();
-			float y = d.getY();
-			args.add(String.valueOf(x));
-			args.add(String.valueOf(y));
-		}
-		CommandRequest cmdRequest = new CommandRequest(
-				DroidMovementCommand.CODE, args);
-		return cmdRequest;
-	}
 }

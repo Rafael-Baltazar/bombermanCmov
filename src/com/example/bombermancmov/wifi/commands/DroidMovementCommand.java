@@ -1,9 +1,11 @@
 package com.example.bombermancmov.wifi.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.bombermancmov.model.Droid;
 import com.example.bombermancmov.model.Game;
+import com.example.bombermancmov.wifi.CommandRequest;
 
 public class DroidMovementCommand extends Command {
 
@@ -28,6 +30,20 @@ public class DroidMovementCommand extends Command {
 			d.setX(x);
 			d.setY(y);
 		}
+	}
+	
+	public static CommandRequest extractCommandRequest(Game game) {
+		List<String> args = new ArrayList<String>();
+		List<Droid> droids = game.getDroids();
+		for (Droid d : droids) {
+			float x = d.getX();
+			float y = d.getY();
+			args.add(String.valueOf(x));
+			args.add(String.valueOf(y));
+		}
+		CommandRequest cmdRequest = new CommandRequest(
+				DroidMovementCommand.CODE, args);
+		return cmdRequest;
 	}
 
 }

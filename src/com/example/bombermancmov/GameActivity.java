@@ -58,7 +58,8 @@ public class GameActivity extends ActionBarActivity {
 		String masterIp = getIntent().getStringExtra("masterIp");
 		
 		//Load level from extra
-		String fileName = getIntent().getStringExtra("levelName").replace(" ","").toLowerCase(Locale.ENGLISH) + ".dat";
+//		String fileName = getIntent().getStringExtra("levelName").replace(" ","").toLowerCase(Locale.ENGLISH) + ".dat";
+		String fileName = "level1";
 		AssetManager am = getAssets();
 		try {
 			this.level = LevelLoader.loadLevel(am.open(fileName));
