@@ -2,13 +2,14 @@ package com.example.bombermancmov.model;
 
 public class Level {
 	private String levelName;
-	
+
 	private float explosionDuration;
 	private float explosionRange;
 	private int explosionTimeout;
 	private float robotSpeed;
 	private float pointsPerRobotKilled;
 	private float pointsPerOpponentKilled;
+	private long gameDuration;
 
 	private int maxNumberPlayers;
 	
@@ -16,7 +17,10 @@ public class Level {
 	
 	public Level() {
 		super();
-		this.grid = new LevelGrid(null); //DEFAULT 19x13 field (see levelgrid constructor)
+	}
+	
+	public Level(Resource res, int level_number){
+		
 	}
 
 	public Level(String levelName, float explosionDuration, float explosionRange, float robotSpeed,
@@ -108,5 +112,13 @@ public class Level {
 
 	public void setGrid(LevelGrid grid) {
 		this.grid = grid;
+	}
+	
+	public long getGameDuration() {
+		return gameDuration;
+	}
+
+	public void setGameDuration(long gameDuration) {
+		this.gameDuration = gameDuration;
 	}
 }

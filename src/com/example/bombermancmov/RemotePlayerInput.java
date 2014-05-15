@@ -115,6 +115,7 @@ public class RemotePlayerInput extends PlayerInput {
 		List<CommandRequest> commandRequests = new ArrayList<CommandRequest>();
 		if (movement != null) {
 			commandRequests.add(movement);
+			movement = null;
 		}
 		if (bombPlacement != null) {
 			commandRequests.add(bombPlacement);

@@ -1,27 +1,85 @@
 package com.example.bombermancmov.model;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class LevelLoader {
 		
-	public static Level loadLevel(String levelName, InputStream file) {
+	public static Level loadLevel(InputStream file) {
 		Level level = new Level();
+		LevelGrid levelgrid = new LevelGrid();
 		
-		level.setLevelName("default");
-		level.setExplosionTimeout(4);
-		level.setExplosionDuration(2000);
-		level.setExplosionRange(2);
-		level.setRobotSpeed(1);
-		level.setPointsPerOpponentKilled(2);
-		level.setPointsPerRobotKilled(1);
-		level.setMaxNumberPlayers(3);
-		
-		/*if(levelName == null || file == null) {
+		if(file != null) {
+			try {		
+				BufferedReader reader = new BufferedReader(new InputStreamReader(file));
+				String nextLine = "";
+				
+				//Set values
+				for(int valLine = 0; valLine < 9; valLine++) {
+					nextLine = reader.readLine();
+					
+					switch(nextLine.split(":")[0]) {						
+						case "LN":{
+							level.setLevelName(nextLine.split(":")[1]);
+							break;
+						}
+						case "GD":{
+							level.setGameDuration(Long.parseLong(nextLine.split(":")[1]));
+							break;
+						}
+						case "MP":{
+							level.setMaxNumberPlayers(Integer.parseInt(nextLine.split(":")[1]));
+							break;
+						}
+						case "ET":{
+							level.setExplosionTimeout(Integer.parseInt(nextLine.split(":")[1]));
+							break;
+						}
+						case "ED":{
+							level.setExplosionDuration(Float.parseFloat(nextLine.split(":")[1]));
+							break;
+						}
+						case "ER":{
+							level.setExplosionRange(Float.parseFloat(nextLine.split(":")[1]));
+							break;
+						}
+						case "RS":{
+							level.setRobotSpeed(Float.parseFloat(nextLine.split(":")[1]));
+							break;
+						}
+						case "PR":{
+							level.setPointsPerRobotKilled(Float.parseFloat(nextLine.split(":")[1]));
+							break;
+						}
+						case "PO":{
+							level.setPointsPerOpponentKilled(Float.parseFloat(nextLine.split(":")[1]));
+							break;
+						}
+					}		
+				}
+				
+				//get height & width
+				nextLine = reader.readLine();
+				int rows = Integer.parseInt(nextLine.split(":")[1]);
+				int cols = Integer.parseInt(nextLine.split(":")[2]);			
+				
+				//Reading LevelGrid
+				char[][] grid = new char[cols][rows];
+				int rowCnt = 0;
+				
+				while((nextLine = reader.readLine()) != null) {
+					grid[rowCnt++] = nextLine.toCharArray();
+				}				
+				
+				levelgrid.setGridLayout(grid);
+				level.setGrid(levelgrid);				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			//default level
 			level.setLevelName("default");
 			level.setExplosionTimeout(4);
 			level.setExplosionDuration(2000);
@@ -30,90 +88,10 @@ public class LevelLoader {
 			level.setPointsPerOpponentKilled(2);
 			level.setPointsPerRobotKilled(1);
 			level.setMaxNumberPlayers(3);
-		} else {
-			BufferedReader in = null;
-			float ln, gd, et, ed, er, rs, pr, po;			
 			
-			try {
-				in = new BufferedReader(new FileReader(new File("levels/level1.dat")));
-			} catch (FileNotFoundException e) {
-				System.out.println(e.getMessage());
-			}
-			String line = "";
-			
-			int rl;
-			String[] parts;
-			for(rl = 0; rl <=7; ++rl){
-				line = in.readLine();
-				parts = line.split(":");
-				switch (parts[0]){
-				
-					case "LN":{
-						ln = Float.parseFloat(parts[1]);
-						break;
-					}
-					case "GD":{
-						gd = Float.parseFloat(parts[1]);
-						break;
-					}
-					case "ET":{
-						et = Float.parseFloat(parts[1]);
-						break;
-					}
-					case "ED":{
-						ed = Float.parseFloat(parts[1]);
-						break;
-					}
-					case "ER":{
-						er = Float.parseFloat(parts[1]);
-						break;
-					}
-					case "RS":{
-						rs = Float.parseFloat(parts[1]);
-						break;
-					}
-					case "PR":{
-						pr = Float.parseFloat(parts[1]);
-						break;
-					}
-					case "PO":{
-						po = Float.parseFloat(parts[1]);
-						break;
-					}
-				}
-			}
-			line = in.readLine();
-			
-			parts = line.split(":");
-			int height = Integer.parseInt(parts[2]);
-			int weight = Integer.parseInt(parts[1]);
-			System.out.println(height + " X " + weight);
-			char[][] grid = new char[height][weight];
-			int i, j;
-			char c;
-			for(j = 0; j< height; ++j){
-				
-				for(i = 0; i<weight; ++i){
-					c = (char) in.read();
-					if(c == '\n' || c == '\r'){
-						--i;
-						continue;
-					}
-					grid[j][i] = c;
-					
-				}
-			}
-			for(j = 0; j< height; ++j){
-				
-				for(i = 0; i<weight; ++i){
-					
-					System.out.print(grid[j][i]);
-					
-				}
-				System.out.print("\n");
-			}
-		}*/
-		
+			levelgrid.setDefaultLevel(); //default grid
+			level.setGrid(levelgrid); 
+		}		
 		return level;
 	}
 }

@@ -56,6 +56,7 @@ public class MainMenuActivity extends Activity {
 		String name = ePlayerName.getText().toString();
 		Intent intent = new Intent(this, LobbyActivity.class);
 		intent.putExtra("playerName", name);
+		intent.putExtra("levelName", this.spinnerValue);
 		startActivity(intent);
 	}
 
