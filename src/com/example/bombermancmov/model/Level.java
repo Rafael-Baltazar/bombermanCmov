@@ -7,7 +7,6 @@ import java.util.Map;
 
 public class Level {
 	private String levelName;
-	private long gameDuration;
 
 	private float explosionDuration;
 	private float explosionRange;
@@ -15,7 +14,7 @@ public class Level {
 	private float robotSpeed;
 	private float pointsPerRobotKilled;
 	private float pointsPerOpponentKilled;
-	private float gameDuration;
+	private long gameDuration;
 
 	private int maxNumberPlayers;
 	
@@ -42,66 +41,6 @@ public class Level {
 		this.maxNumberPlayers = maxNumberPlayers;
 		this.explosionTimeout = explosionTimeout;
 		this.grid = grid;
-	}
-	
-	private class LevelSpecification{
-		private Map<String, Method> methodList = new HashMap<String, Method>();
-		
-		public void initMethods(Level l)
-		{
-			methodList.put("LN", new SetLevelName(l));
-			methodList.put("GD", new SetGameDuration(l));
-			
-		}
-		
-	}
-	private abstract class Method{
-		
-		private Level l;
-		public abstract void execute(String arg);
-		public Level getL() {
-			return l;
-		}
-		public void setL(Level l) {
-			this.l = l;
-		}
-		
-		
-	}
-	private class SetLevelName extends Method{
-
-		public SetLevelName(Level l){
-			setL(l);
-		}
-		
-		@Override
-		public void execute(String arg) {
-			getL().levelName = arg;
-		}
-	}
-	private class SetGameDuration extends Method{
-
-		public SetGameDuration(Level l){
-			setL(l);
-		}
-		
-		@Override
-		public void execute(String arg) {
-			getL().gameDuration = Float.parseFloat(arg);
-		}
-	}
-	
-
-	private void readLevelFromFile(Resource resource, int level){
-		int line_n;
-		String line;
-		String []parts;
-		BufferedReader bis = new BufferedReader(new InputStreamReader(resource.getLevelResource(level)));
-		
-			
-		
-		
-		resource.closeLevelResource(level);
 	}
 	
 	/**

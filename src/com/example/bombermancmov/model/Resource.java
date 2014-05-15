@@ -1,9 +1,5 @@
 package com.example.bombermancmov.model;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.SurfaceView;
@@ -24,7 +20,6 @@ public class Resource {
 	private Bitmap[] droidBitmap;
 	private SurfaceView surfaceView;
 	private SoundComponent explosionSoundComponent;
-	private InputStream[] levels;
 
 	public Resource(SurfaceView surfaceView) {
 		this.surfaceView = surfaceView;
@@ -95,40 +90,6 @@ public class Resource {
 		decodeBombBitmaps();
 		decodePlayerBitmaps();
 		decodeDroidBitmaps();
-	}
-	public InputStream getLevelResource(int level){
-		
-		decodeLevel(level);
-		
-		return levels[level];
-	}
-	public void closeLevelResource(int level){
-		try {
-			levels[level].close();
-		} catch (IOException e) {
-			e.getMessage();
-		}
-	}
-	
-	private void decodeLevel(int level){
-		Resources res = getSurfaceView().getResources();
-		InputStream levelIS = null;
-		
-		switch(level){
-			case LEVEL_1:{
-				levelIS = res.openRawResource(R.raw.level1);
-				break;
-			}case LEVEL_2:{
-				levelIS = res.openRawResource(R.raw.level2);
-				break;
-			}case LEVEL_3:{
-				levelIS = res.openRawResource(R.raw.level3);
-				break;
-			}default:{
-				break;
-			}
-		}
-		levels[level] = levelIS;
 	}
 
 	/**
