@@ -1,11 +1,11 @@
 package com.example.bombermancmov;
 
-import com.example.bombermancmov.model.Game;
-
 import android.graphics.Canvas;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceHolder;
+
+import com.example.bombermancmov.model.Game;
 
 /**
  * The Main thread which contains the game loop. The thread must have access to

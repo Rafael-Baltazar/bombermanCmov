@@ -1,10 +1,10 @@
 package com.example.bombermancmov.model;
 
-import com.example.bombermancmov.model.component.DrawableComponent;
-
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.util.Log;
+
+import com.example.bombermancmov.model.component.DrawableComponent;
 
 public class Character extends GameObject {
 	private static final String TAG = Character.class.getSimpleName();

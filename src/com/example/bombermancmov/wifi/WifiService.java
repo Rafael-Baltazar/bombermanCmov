@@ -5,7 +5,6 @@ import pt.utl.ist.cmov.wifidirect.SimWifiP2pManager;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pManager.Channel;
 import pt.utl.ist.cmov.wifidirect.SimWifiP2pManager.PeerListListener;
 import pt.utl.ist.cmov.wifidirect.service.SimWifiP2pService;
-import pt.utl.ist.cmov.wifidirect.sockets.SimWifiP2pSocketManager;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;

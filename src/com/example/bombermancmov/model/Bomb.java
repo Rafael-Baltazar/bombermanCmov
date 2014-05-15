@@ -3,13 +3,8 @@ package com.example.bombermancmov.model;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.SoundPool;
 import android.util.Log;
-import android.view.SurfaceView;
 
-import com.example.bombermancmov.R;
 import com.example.bombermancmov.model.component.DrawableExplosionComponent;
 import com.example.bombermancmov.model.component.SoundComponent;
 

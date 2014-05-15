@@ -1,12 +1,12 @@
 package com.example.bombermancmov;
 
-import com.example.bombermancmov.wifi.WifiService;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.EditText;
+
+import com.example.bombermancmov.wifi.WifiService;
 
 public class LobbyActivity extends ActionBarActivity {
 	private static final String TAG = LobbyActivity.class.getSimpleName();
@@ -14,12 +14,14 @@ public class LobbyActivity extends ActionBarActivity {
 	private WifiService mWifi = new WifiService(this);
 	private EditText eIp;
 	private String playerName;
+	private String levelName;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.lobby);
 		playerName = getIntent().getStringExtra("playerName");
+		levelName = getIntent().getStringExtra("levelName");
 		eIp= (EditText) findViewById(R.id.edit_ip_connect);
 		mWifi.bindService();
 	}
@@ -41,6 +43,7 @@ public class LobbyActivity extends ActionBarActivity {
 		intent.putExtra("isLocal", false);
 		intent.putExtra("isMaster", isMaster);
 		intent.putExtra("masterIp", masterIp);
+		intent.putExtra("levelName", levelName);
 		startActivity(intent);
 	}
 	
