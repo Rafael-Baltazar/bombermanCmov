@@ -18,11 +18,11 @@ public class NullStatusScreenUpdater extends StatusScreenUpdater {
 	}
 
 	@Override
-	public void setPlayerScore(float points) {
+	public void setPlayerScore(int points) {
 	}
 
 	@Override
-	public void setTimeLeft(float timeLeft) {
+	public void setTimeLeft(int timeLeft) {
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -63,7 +64,6 @@ public class MainGamePanel extends SurfaceView implements
 	private Game game;
 	private Resource mResource;
 	private boolean isMaster;
-	private Level level;
 
 	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
 
@@ -84,8 +84,6 @@ public class MainGamePanel extends SurfaceView implements
 		this.context = context;
 		surfaceHolder = getHolder();
 		mStatusScreenUpdater = updater;
-		this.level = level;
-
 		// adding the callback(this) to the surface holder to intercept events
 		surfaceHolder.addCallback(this);
 
@@ -183,10 +181,6 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void pauseThread() {
 		gameLoopThread.pause();
-
-		if (this.game.isFinished()) {
-			this.buildEnddialog();
-		}
 	}
 
 	public void resumeThread() {
@@ -195,42 +189,22 @@ public class MainGamePanel extends SurfaceView implements
 
 	public void tryLeft(int id) {
 		game.getPlayerByNumber(id).tryMoveLeft();
-
-		if (this.game.isFinished()) {
-			this.buildEnddialog();
-		}
 	}
 
 	public void tryUp(int id) {
 		game.getPlayerByNumber(id).tryMoveUp();
-
-		if (this.game.isFinished()) {
-			this.buildEnddialog();
-		}
 	}
 
 	public void tryDown(int id) {
 		game.getPlayerByNumber(id).tryMoveDown();
-
-		if (this.game.isFinished()) {
-			this.buildEnddialog();
-		}
 	}
 
 	public void tryRight(int id) {
 		game.getPlayerByNumber(id).tryMoveRight();
-
-		if (this.game.isFinished()) {
-			this.buildEnddialog();
-		}
 	}
 
 	public void tryStop(int id) {
 		game.getPlayerByNumber(id).stop();
-
-		if (this.game.isFinished()) {
-			this.buildEnddialog();
-		}
 	}
 
 	public void placeBomb(int id) {
@@ -344,14 +318,23 @@ public class MainGamePanel extends SurfaceView implements
 	private void updateStatusScreen() {
 		mStatusScreenUpdater.runOnUiThread(new Runnable() {
 			@Override
-			public void run() {
-				mStatusScreenUpdater.setPlayerScore(game.getPlayerByNumber(0)
-						.getPoints());
-				mStatusScreenUpdater.setTimeLeft(game.getTimeLeft());
-				mStatusScreenUpdater.setNumPlayers(game.getLevel()
-						.getMaxNumberPlayers());
+			public void run() {			
+				mStatusScreenUpdater.setPlayerScore((int)game.getPlayerByNumber(0).getPoints());
+				mStatusScreenUpdater.setTimeLeft((int)(game.getTimeLeft() / 1000));
+				mStatusScreenUpdater.setNumPlayers(game.getLeftOpponents());				
+				if(game.isFinished()) {
+					buildEnddialog();
+				}
 			}
 		});
+	}
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent me) {
+		if(game.isFinished()) {
+			buildEnddialog();
+		}
+		return true;
 	}
 
 	// Enddialog for finishing a game
@@ -401,7 +384,7 @@ public class MainGamePanel extends SurfaceView implements
 		finishDialog.show();
 	}
 
-	public void drawGameModel(Canvas canvas) {
+	public void drawGameModel(Canvas canvas) {	
 		canvas.drawColor(Color.WHITE);
 		game.draw(canvas);
 	}
