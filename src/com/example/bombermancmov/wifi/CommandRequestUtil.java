@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.example.bombermancmov.model.Droid;
+import com.example.bombermancmov.model.Game;
 import com.example.bombermancmov.wifi.commands.Command;
+import com.example.bombermancmov.wifi.commands.DroidMovementCommand;
 
 /**
- * Util methods to translate command requests from a string, code command
+ * Utility methods to translate command requests from a string, code command
  * requests into a string and execute command requests given a command list.
  */
 public class CommandRequestUtil {
@@ -67,11 +70,46 @@ public class CommandRequestUtil {
 		return result.toString();
 	}
 
+	/**
+	 * Executes the given command requests given a command map.
+	 * 
+	 * @param cmdRequests
+	 * @param commandMap
+	 */
 	public static void executeCommandRequests(List<CommandRequest> cmdRequests,
-			Map<String, Command> commands) {
+			Map<String, Command> commandMap) {
 		for (CommandRequest c : cmdRequests) {
-			Command cmd = commands.get(c.getCommand());
+			Command cmd = commandMap.get(c.getCommand());
 			cmd.execute(c.getArgs());
 		}
+	}
+
+	/**
+	 * Analyzes the game object in order to create game updates to be sent by
+	 * the master to its peers.
+	 * 
+	 * @param game
+	 * @return the list of game updates in form of command requests
+	 */
+	public static List<CommandRequest> extractCommandRequests(Game game) {
+		List<CommandRequest> commandRequests = new ArrayList<CommandRequest>();
+		CommandRequest droidMovCmdReq = extractDroidMovement(commandRequests, game);
+		commandRequests.add(droidMovCmdReq);
+		return commandRequests;
+	}
+
+	private static CommandRequest extractDroidMovement(
+			List<CommandRequest> commandRequests, Game game) {
+		List<String> args = new ArrayList<String>();
+		List<Droid> droids = game.getDroids();
+		for (Droid d : droids) {
+			float x = d.getX();
+			float y = d.getY();
+			args.add(String.valueOf(x));
+			args.add(String.valueOf(y));
+		}
+		CommandRequest cmdRequest = new CommandRequest(
+				DroidMovementCommand.CODE, args);
+		return cmdRequest;
 	}
 }

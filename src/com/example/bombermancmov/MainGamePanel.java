@@ -30,6 +30,7 @@ import com.example.bombermancmov.wifi.AcceptNewPeersThread;
 import com.example.bombermancmov.wifi.CommandRequest;
 import com.example.bombermancmov.wifi.CommandRequestUtil;
 import com.example.bombermancmov.wifi.commands.Command;
+import com.example.bombermancmov.wifi.commands.DroidMovementCommand;
 import com.example.bombermancmov.wifi.commands.NopCommand;
 import com.example.bombermancmov.wifi.commands.PlaceBombCommand;
 import com.example.bombermancmov.wifi.commands.TryMoveCommand;
@@ -114,6 +115,7 @@ public class MainGamePanel extends SurfaceView implements
 		commands.put(TryMoveCommand.CODE, new TryMoveCommand(game));
 		commands.put(TryStopCommand.CODE, new TryStopCommand(game));
 		commands.put(PlaceBombCommand.CODE, new PlaceBombCommand());
+		commands.put(DroidMovementCommand.CODE, new DroidMovementCommand(game));
 		return commands;
 	}
 
@@ -240,89 +242,102 @@ public class MainGamePanel extends SurfaceView implements
 	}
 
 	/**
-	 * Send command requests to master. If master, execute commands received.
+	 * Used to progress game.
 	 * 
 	 * @param timePassed
 	 */
 	public void update(long timePassed) {
-		List<CommandRequest> cmdRequests = new ArrayList<CommandRequest>();
 		if (isMaster) {
-			receiveCommandRequests(cmdRequests);
-
-			game.getPlayerInput().setPlayerId(MASTER_ID);
-			cmdRequests = game.getPlayerInput().consumeCommandRequests();
-			CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
-
-			game.update(timePassed);
+			updateAsMaster(timePassed);
 		} else {
-			try {
-				requestPlayerIdFromMaster();
-				// Send command requests
-				cmdRequests = game.getPlayerInput().consumeCommandRequests();
-				sendCommandRequests(cmdRequests);
-			} catch (ClassNotFoundException e) {
-				Log.e(TAG, "ClassNotFound new client socket: " + e.getMessage());
-			} catch (IOException e) {
-				Log.e(TAG, "IO new client socket: " + e.getMessage());
-			}
+			updateAsPeer();
 		}
 		updateStatusScreen();
 	}
 
+	/**
+	 * Receive player inputs from peers and executes them. Then, updates game
+	 * and, finally, sends game updates to peers.
+	 * 
+	 * @param timePassed
+	 */
+	private void updateAsMaster(long timePassed) {
+		List<CommandRequest> cmdRequests;
+		try {
+			cmdRequests = masterNetComp.receiveCommandRequests();
+			CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
+		} catch (OptionalDataException e) {
+			Log.e(TAG,
+					"OptionalData master receive command requests: "
+							+ e.getMessage());
+		} catch (ClassNotFoundException e) {
+			Log.e(TAG,
+					"ClassNotFound master receive command requests: "
+							+ e.getMessage());
+		} catch (IOException e) {
+			Log.e(TAG, "IO master receive command requests: " + e.getMessage());
+		}
+		game.getPlayerInput().setPlayerId(MASTER_ID);
+		cmdRequests = game.getPlayerInput().consumeCommandRequests();
+		CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
+		game.update(timePassed);
+		cmdRequests = CommandRequestUtil.extractCommandRequests(game);
+		try {
+			masterNetComp.sendCommandRequests(cmdRequests);
+		} catch (IOException e) {
+			Log.e(TAG, "IO master send command requests: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * First, peer sends its player inputs to master. Then, receives the game
+	 * updates from master and executes them.
+	 */
+	private void updateAsPeer() {
+		List<CommandRequest> cmdRequests;
+		try {
+			requestPlayerIdFromMaster();
+			cmdRequests = game.getPlayerInput().consumeCommandRequests();
+			try {
+				peerNetComp.sendCommandRequests(cmdRequests);
+			} catch (IOException e) {
+				Log.e(TAG, "IO peer sending cmd requests: " + e.getMessage());
+			}
+			try {
+				cmdRequests = peerNetComp.receiveCommandRequests();
+			} catch (OptionalDataException e) {
+				Log.e(TAG,
+						"OptionalData peer receive command requests: "
+								+ e.getMessage());
+			} catch (ClassNotFoundException e) {
+				Log.e(TAG,
+						"ClassNotFound peer receive command requests: "
+								+ e.getMessage());
+			} catch (IOException e) {
+				Log.e(TAG,
+						"IO peer receive command requests: " + e.getMessage());
+			}
+			CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
+		} catch (ClassNotFoundException e) {
+			Log.e(TAG,
+					"ClassNotFound peer new client socket: " + e.getMessage());
+		} catch (IOException e) {
+			Log.e(TAG, "IO peer new client socket: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * If not yet connected, connects to client and sets player id.
+	 * 
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
 	private void requestPlayerIdFromMaster() throws ClassNotFoundException,
 			IOException {
 		peerNetComp.createClientSocket(masterHost, MASTER_PORT);
 		int playerId = peerNetComp.getPlayerId();
 		PlayerInput playerInput = game.getPlayerInput();
 		playerInput.setPlayerId(playerId);
-	}
-
-	/**
-	 * If you are master, send command requests to peers. Otherwise, send
-	 * command requests to master.
-	 * 
-	 * @param cmdRequests
-	 * @see #MainGamePanel(Activity, StatusScreenUpdater, Level, boolean,
-	 *      boolean, String)
-	 */
-	private void sendCommandRequests(List<CommandRequest> cmdRequests) {
-		try {
-			if (isMaster) {
-				masterNetComp.sendCommandRequests(cmdRequests);
-			} else {
-				peerNetComp.sendCommandRequests(cmdRequests);
-			}
-		} catch (IOException e) {
-			Log.e(TAG, "IO sending command requests: " + e.getMessage());
-		}
-	}
-
-	/**
-	 * Receive command requests and executes the corresponding commands.
-	 * Receives from peers, if you are master. Otherwise, receive from master.
-	 * 
-	 * @param cmdRequests
-	 * @see #MainGamePanel(Activity, StatusScreenUpdater, Level, boolean,
-	 *      boolean, String)
-	 */
-	private void receiveCommandRequests(List<CommandRequest> cmdRequests) {
-		try {
-			if (isMaster) {
-				cmdRequests = masterNetComp.receiveCommandRequests();
-			} else {
-				cmdRequests = peerNetComp.receiveCommandRequests();
-			}
-			CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
-		} catch (OptionalDataException e) {
-			Log.e(TAG,
-					"OptionalData receive command requests: " + e.getMessage());
-		} catch (ClassNotFoundException e) {
-			Log.e(TAG,
-					"ClassNotFound receive command requests: " + e.getMessage());
-		} catch (IOException e) {
-			Log.e(TAG, "IO receive command requests: " + e.getMessage());
-		}
-
 	}
 
 	private void updateStatusScreen() {

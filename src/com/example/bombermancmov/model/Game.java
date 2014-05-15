@@ -324,6 +324,10 @@ public class Game {
 		return mPlayers;
 	}
 
+	public List<Droid> getDroids() {
+		return mDroids;
+	}
+
 	public void setPlayers(List<Character> players) {
 		this.mPlayers = players;
 	}
