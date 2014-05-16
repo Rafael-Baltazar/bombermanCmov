@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -59,7 +60,7 @@ public class MainGamePanel extends SurfaceView implements
 	private SurfaceHolder surfaceHolder;
 
 	private Activity context;
-
+	
 	/* Game model */
 	private Game game;
 	private Resource mResource;
@@ -105,6 +106,7 @@ public class MainGamePanel extends SurfaceView implements
 		// make the GamePanel focusable so it can handle events
 		mCommands = initCommands();
 		setFocusable(true);
+		
 		Log.d(TAG, "constructor");
 	}
 
@@ -152,8 +154,9 @@ public class MainGamePanel extends SurfaceView implements
 	}
 
 	private void shutDownThreads() {
-		gameLoopThread.setRunning(false);
+		gameLoopThread.setRunning(false);		
 		shutDown(gameLoopThread);
+		
 		Log.d(TAG, "Game loop thread was shut down cleanly");
 
 		if (isMaster && acceptPeersThread != null) {
@@ -318,54 +321,48 @@ public class MainGamePanel extends SurfaceView implements
 	private void updateStatusScreen() {
 		mStatusScreenUpdater.runOnUiThread(new Runnable() {
 			@Override
-			public void run() {			
-				mStatusScreenUpdater.setPlayerScore((int)game.getPlayerByNumber(0).getPoints());
+			public void run() {	
+				mStatusScreenUpdater.setPlayerScore((int)game.getPlayerByNumber(game.getPlayerInput().getPlayerId()).getPoints());
 				mStatusScreenUpdater.setTimeLeft((int)(game.getTimeLeft() / 1000));
-				mStatusScreenUpdater.setNumPlayers(game.getLeftOpponents());				
+				mStatusScreenUpdater.setNumPlayers(game.getLeftOpponents());
+				
 				if(game.isFinished()) {
 					buildEnddialog();
 				}
 			}
 		});
 	}
-	
-	@Override
-	public boolean onTouchEvent(MotionEvent me) {
-		if(game.isFinished()) {
-			buildEnddialog();
-		}
-		return true;
-	}
 
 	// Enddialog for finishing a game
 	public void buildEnddialog() {
-		invalidate();
+		//invalidate();
 		// game complete
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setCancelable(false);
+		
+		String endMsgTitle = "";
 
 		switch (this.game.getEndStatus()) {
-		case 1:
-			builder.setTitle(context.getText(R.string.finished_title_win)
-					+ " Points: " + this.game.getPlayerByNumber(0).getPoints());
+		case 1: endMsgTitle = context.getText(R.string.finished_title_win).toString();
 			break;
-		case 2:
-			builder.setTitle(context
-					.getText(R.string.finished_title_lost_killed)
-					+ " Points: "
-					+ this.game.getPlayerByNumber(0).getPoints());
+		case 2: endMsgTitle = context.getText(R.string.finished_title_lost_killed).toString();
 			break;
-		case 3:
-			builder.setTitle(context.getText(R.string.finished_title_lost_time)
-					+ " Points: " + this.game.getPlayerByNumber(0).getPoints());
+		case 3: endMsgTitle = context.getText(R.string.finished_title_lost_time).toString();
 			break;
-		default:
-			builder.setTitle(context
-					.getText(R.string.finished_title_lost_unkown)
-					+ " Points: "
-					+ this.game.getPlayerByNumber(0).getPoints());
+		default: endMsgTitle = context.getText(R.string.finished_title_lost_unkown).toString();
 			break;
 		}
+		builder.setTitle(endMsgTitle + "! Points: " + ((int)game.getPlayerByNumber(game.getPlayerInput().getPlayerId()).getPoints()) + "\n");
+		
+		if(this.game.getPlayers().size() > 1) {
+			String strScore = "";
+			for(int i = 0; i < this.game.getPlayers().size(); i++) {
+				if(i != game.getPlayerInput().getPlayerId()) {
+					strScore = strScore + (int) this.game.getPlayerByNumber(i).getPoints() + " by " + this.game.getPlayerByNumber(i).getName() +  "\n";
+				}
+			}
+			builder.setMessage(strScore);
+		}		
 
 		LayoutInflater inflater = context.getLayoutInflater();
 		View view = inflater.inflate(R.layout.finish, null);
