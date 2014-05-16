@@ -36,7 +36,8 @@ public class Character extends GameObject {
 	 * @param game
 	 *            TODO
 	 */
-	public Character(Bitmap bitmap[], float x, float y, float speed, LevelGrid grid, Game game, boolean isAlive) {
+	public Character(Bitmap bitmap[], float x, float y, float speed,
+			LevelGrid grid, Game game, boolean isAlive) {
 		super(x, y);
 		this.speed = speed;
 		this.points = 0;
@@ -145,8 +146,7 @@ public class Character extends GameObject {
 		this.setAlive(false);
 		Log.d(TAG, "Character died.");
 	}
-	
-	
+
 	public boolean isAlive() {
 		return isAlive;
 	}

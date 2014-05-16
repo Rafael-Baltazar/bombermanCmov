@@ -32,7 +32,7 @@ public class UpdateTimeCommand extends Command {
 		float timePass = mGame.getTimeLeft() - raw;
 		mGame.setTimeLeft(timeLeft);
 		Log.d("TIMEPASS", Float.toString(timePass));
-		mGame.updatePeerBombs((long)Math.rint(timePass));
+		mGame.updateRoundPeer((long)Math.rint(timePass));
 	}
 	
 	public static CommandRequest extractCommandRequest(Game game) {

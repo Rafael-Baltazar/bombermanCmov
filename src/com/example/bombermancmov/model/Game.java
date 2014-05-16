@@ -1,8 +1,10 @@
 package com.example.bombermancmov.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -34,14 +36,16 @@ public class Game {
 
 	private boolean isSingleplayer;
 
-	private List<Character> mPlayers;
+	private Map<Integer, Character> mPlayers;
 	private List<Droid> mDroids;
 	private List<Bomb> mBombs;
 	
 	private List<Bomb> newPlacedBombs;
-	private boolean containsNewBombs;
-	
 	private List<Bomb> explodedBombs;
+	
+	private Map<Integer, Integer> walkMovements;
+	private List<Integer> stopMovements;
+	private boolean hasDeadPlayers;
 	
 
 	private Resource mResources;
@@ -50,7 +54,6 @@ public class Game {
 		super();
 		this.finished = false;
 		this.endStatus = NOT_ENDED;
-		this.containsNewBombs = false;
 
 		this.isSingleplayer = isSingleplayer;
 
@@ -58,7 +61,10 @@ public class Game {
 		this.gameDuration = level.getGameDuration() * 1000; //to ms
 		this.mBombs = new ArrayList<Bomb>();
 		this.newPlacedBombs = new ArrayList<Bomb>();
-		this.explodedBombs= new ArrayList<Bomb>();
+		this.explodedBombs = new ArrayList<Bomb>();
+		this.walkMovements = new HashMap<Integer, Integer>();
+		this.stopMovements = new ArrayList<Integer>();
+		this.hasDeadPlayers = false;
 
 		mResources = resources;
 		if (this.isSingleplayer) {
@@ -75,7 +81,7 @@ public class Game {
 	private void setCharactersOnField() {
 		// Create Lists
 		this.mDroids = new ArrayList<Droid>();
-		this.mPlayers = new ArrayList<Character>();
+		this.mPlayers = new HashMap<Integer, Character>();
 
 		// Creating Player and Robots on their starting position
 		for (int i = 0; i < this.mLevel.getGrid().getColSize(); i++) {
@@ -84,7 +90,7 @@ public class Game {
 				case '1':
 					if (this.mPlayers.size() < this.mLevel
 							.getMaxNumberPlayers()) {
-						mPlayers.add(new Character(
+						mPlayers.put(0, new Character(
 								mResources.getPlayerBitmap()[PLAYER_1], j, i,
 								PLAYER_SPEED, getLevel().getGrid(), this, true));
 					}
@@ -92,7 +98,7 @@ public class Game {
 				case '2':
 					if (this.mPlayers.size() < this.mLevel
 							.getMaxNumberPlayers() && !this.isSingleplayer) {
-						mPlayers.add(new Character(
+						mPlayers.put(1, new Character(
 								mResources.getPlayerBitmap()[PLAYER_2], j, i,
 								PLAYER_SPEED, getLevel().getGrid(), this, true));
 					}
@@ -100,7 +106,7 @@ public class Game {
 				case '3':
 					if (this.mPlayers.size() < this.mLevel
 							.getMaxNumberPlayers() && !this.isSingleplayer) {
-						mPlayers.add(new Character(
+						mPlayers.put(2, new Character(
 								mResources.getPlayerBitmap()[PLAYER_3], j, i,
 								PLAYER_SPEED, getLevel().getGrid(), this, true));
 					}
@@ -108,7 +114,7 @@ public class Game {
 				case '4':
 					if (this.mPlayers.size() < this.mLevel
 							.getMaxNumberPlayers() && !this.isSingleplayer) {
-						mPlayers.add(new Character(
+						mPlayers.put(3, new Character(
 								mResources.getPlayerBitmap()[PLAYER_4], j, i,
 								PLAYER_SPEED, getLevel().getGrid(), this, true));
 					}
@@ -124,10 +130,18 @@ public class Game {
 		}
 	}
 
+	public void setHasDeadPlayers(boolean value){
+		this.hasDeadPlayers = value;
+	}
+	public boolean hasDeadPlayers(){
+		return hasDeadPlayers;
+	}
+	
+	
 	public List<Character> getPlayersByPos(float x, float y) {
 		float range = 0.01f;
 		List<Character> result = new ArrayList<Character>();
-		for (Character p : mPlayers) {
+		for (Character p : mPlayers.values()) {
 			int intX = (int) Math.rint(p.getX());
 			int intY = (int) Math.rint(p.getY());
 			if (inRange(x, intX, range) && inRange(y, intY, range)) {
@@ -146,19 +160,45 @@ public class Game {
 				y, this, mResources.getExplosionSoundComponent());
 		mBombs.add(b);
 		newPlacedBombs.add(b);
-		containsNewBombs = true;
 	}
 	public boolean hasNewBombs(){
-		return containsNewBombs;
+		return !newPlacedBombs.isEmpty();
 	}
 	
 	public List<Bomb> getNewBombs(){
 		List<Bomb> retList = new ArrayList<Bomb>();
 		retList.addAll(newPlacedBombs);
 		newPlacedBombs.clear();
-		containsNewBombs = false;
 		return retList;
 	}
+	public boolean playerMoved(){
+		return !walkMovements.isEmpty();
+	}
+	public Map<Integer, Integer> getPlayerMovments(){
+		Map<Integer, Integer> retList = new HashMap<Integer, Integer>();
+		retList.putAll(walkMovements);
+		walkMovements.clear();
+		return retList;
+	}
+	public void addPlayerMovement(int player, int direction){
+		walkMovements.put(player, direction);
+	}
+	
+	public boolean playerStoped(){
+		return !stopMovements.isEmpty();
+	}
+	
+	public List<Integer> getStopedPlayers(){
+		List<Integer> retList = new ArrayList<Integer>();
+		retList.addAll(stopMovements);
+		stopMovements.clear();
+		return retList;
+	}
+	public void addStopedPlayer(int player){
+		stopMovements.add(player);
+	}
+	
+	
 
 	/**
 	 * Remove all droids and enemy players in act range and adds to player's
@@ -169,7 +209,9 @@ public class Game {
 	 */
 	public void explosionCollision(Bomb bomb, int[] actRange) {
 		Iterator<Droid> droidIt = mDroids.iterator();
-		Iterator<Character> playerIt = mPlayers.iterator();
+		List<Character> playerList = new ArrayList<Character>();
+		playerList.addAll(mPlayers.values());
+		Iterator<Character> playerIt = playerList.iterator();
 		float droidPoints = mLevel.getPointsPerRobotKilled();
 		float playerPoints = mLevel.getPointsPerOpponentKilled();
 		explodeDroids(bomb, actRange, droidIt, droidPoints);
@@ -196,7 +238,7 @@ public class Game {
 			if (collidedHorizontally || collidedVertically) {
 				p.kill();
 				Character owner = bomb.getOwner();
-				if (mPlayers.contains(owner)) {
+				if (mPlayers.values().contains(owner)) {
 					owner.setPoints(owner.getPoints() + points);
 				}
 			}
@@ -220,13 +262,18 @@ public class Game {
 			if (collidedHorizontally || collidedVertically) {
 				it.remove();
 				Character owner = bomb.getOwner();
-				if (mPlayers.contains(owner)) {
+				if (mPlayers.values().contains(owner)) {
 					owner.setPoints(owner.getPoints() + points);
 				}
 			}
 		}
 	}
-	public void updatePeerBombs(long timePassed){
+	public void updateRoundPeer(long timePassed){
+		for (Character p : mPlayers.values()) {
+			if (p.isAlive()) {
+				p.update(timePassed);
+			}
+		}
 		List<Bomb> bombsToRemove = new ArrayList<Bomb>();
 		for (Bomb b : mBombs) {
 			float t = b.updateInPeed(timePassed);
@@ -239,7 +286,7 @@ public class Game {
 
 	public void update(long timePassed) {
 		gameDuration -= timePassed;
-		for (Character p : mPlayers) {
+		for (Character p : mPlayers.values()) {
 			if (p.isAlive()) {
 				p.update(timePassed);
 			}
@@ -324,7 +371,7 @@ public class Game {
 			}
 		}
 
-		for (Character c : mPlayers) {
+		for (Character c : mPlayers.values()) {
 			if (c.isAlive()) {
 				c.draw(canvas);
 			}
@@ -374,15 +421,11 @@ public class Game {
 	}
 
 	public List<Character> getPlayers() {
-		return mPlayers;
+		return (List<Character>) mPlayers.values();
 	}
 
 	public List<Droid> getDroids() {
 		return mDroids;
-	}
-
-	public void setPlayers(List<Character> players) {
-		this.mPlayers = players;
 	}
 
 	public boolean isFinished() {
@@ -403,5 +446,8 @@ public class Game {
 
 	public PlayerInput getPlayerInput() {
 		return mPlayerInput;
+	}
+	public Map<Integer, Character> getPlayerMap(){
+		return mPlayers;
 	}
 }

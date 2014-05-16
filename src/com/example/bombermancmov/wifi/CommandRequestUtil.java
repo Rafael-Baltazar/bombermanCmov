@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.example.bombermancmov.model.Droid;
 import com.example.bombermancmov.model.Game;
 import com.example.bombermancmov.wifi.commands.Command;
 import com.example.bombermancmov.wifi.commands.DroidMovementCommand;
+import com.example.bombermancmov.wifi.commands.KillPlayerCommand;
 import com.example.bombermancmov.wifi.commands.PlaceBombCommand;
+import com.example.bombermancmov.wifi.commands.TryMoveCommand;
+import com.example.bombermancmov.wifi.commands.TryStopCommand;
 import com.example.bombermancmov.wifi.commands.UpdateTimeCommand;
 
 /**
@@ -109,6 +111,23 @@ public class CommandRequestUtil {
 					.extractCommandRequest(game);
 			commandRequests.add(placeBombCmdReq);
 		}
+		if(game.playerMoved()){
+			CommandRequest tryMoveCmdReq = TryMoveCommand
+					.extractCommandRequest(game);
+			commandRequests.add(tryMoveCmdReq);
+		}
+		if(game.playerStoped()){
+			CommandRequest trStopCmdReq = TryStopCommand
+					.extractCommandRequest(game);
+			commandRequests.add(trStopCmdReq);
+			
+		}
+		/*
+		if(game.hasDeadPlayers()){
+			CommandRequest killPlayerCmdReq = KillPlayerCommand
+					.extractCommandRequest(game);
+			commandRequests.add(killPlayerCmdReq);
+		}*/
 		
 		
 		return commandRequests;
