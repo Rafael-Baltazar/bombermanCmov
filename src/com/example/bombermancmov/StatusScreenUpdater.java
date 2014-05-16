@@ -4,27 +4,25 @@ import android.app.Activity;
 import android.widget.TextView;
 
 public class StatusScreenUpdater {
-	private TextView playerNameTextView, playerScoreTextView, timeLeftTextView,
-			numPlayersTextView;
+	private TextView playerNameTextView;
+	private TextView playerScoreTextView;
+	private TextView timeLeftTextView;
+	private TextView numPlayersTextView;
 	private Activity act;
 
 	/**
-	 * @param playerNameTextView
-	 * @param playerScoreTextView
-	 * @param timeLeftTextView
-	 * @param numPlayersTextView
-	 * @param act TODO
+	 * @param act
 	 */
-	public StatusScreenUpdater(TextView playerNameTextView,
-			TextView playerScoreTextView, TextView timeLeftTextView,
-			TextView numPlayersTextView, Activity act) {
-		this.playerNameTextView = playerNameTextView;
-		this.playerScoreTextView = playerScoreTextView;
-		this.timeLeftTextView = timeLeftTextView;
-		this.numPlayersTextView = numPlayersTextView;
+	public StatusScreenUpdater(Activity act) {
 		this.act = act;
+		this.playerNameTextView = (TextView) act.findViewById(R.id.playerName);
+		this.playerScoreTextView = (TextView) act
+				.findViewById(R.id.playerScore);
+		this.timeLeftTextView = (TextView) act.findViewById(R.id.timeLeft);
+		this.numPlayersTextView = (TextView) act
+				.findViewById(R.id.numberPlayers);
 	}
-	
+
 	public void runOnUiThread(Runnable run) {
 		act.runOnUiThread(run);
 	}

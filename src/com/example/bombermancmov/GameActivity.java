@@ -17,7 +17,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
 import com.example.bombermancmov.model.Game;
 import com.example.bombermancmov.model.Level;
@@ -39,74 +38,69 @@ import com.example.bombermancmov.wifi.commands.TryStopCommand;
 import com.example.bombermancmov.wifi.commands.UpdateTimeCommand;
 
 public class GameActivity extends ActionBarActivity {
-	//Tag for notifications
-	private static final String TAG = GameActivity.class.getSimpleName();	
+	// Tag for notifications
+	private static final String TAG = GameActivity.class.getSimpleName();
 	/* UI ELEMENTS */
-	//Buttons
+	// Buttons
 	private ImageButton upButton;
 	private ImageButton leftButton;
 	private ImageButton rightButton;
 	private ImageButton downButton;
-	private ImageButton bombButton; 
+	private ImageButton bombButton;
 	private ImageButton pauseButton;
 	private ImageButton quitButton;
-	//Frame & Panel
+	// Frame & Panel
 	private FrameLayout frm;
 	private MainGamePanel mGamePanel;
-	//Flags
+	// Flags
 	private boolean btnPaused; // true if button has pause-symbol, false if
-							   // button has resume-symbol
-	//Updater for Status
-	private StatusScreenUpdater statusScreenUpdater;	
-	
+								// button has resume-symbol
+	// Updater for Status
+	private StatusScreenUpdater statusScreenUpdater;
+
 	/* LOGIC ELEMENTS */
 	private PlayerInput playerInput;
 	private Level level;
 	private Game game;
-	//Threads
+	// Threads
 	private GameLoopThread gameLoopThread;
 	private AcceptNewPeersThread acceptPeersThread;
-	//Network
+	// Network
 	private MasterNetworkComponent masterNetComp;
 	private PeerNetworkComponent peerNetComp;
 	private Map<String, Command> mCommands;
-	//Flags
-	private boolean isSinglePlayer;
+	// Flags
 	private boolean isMaster;
-	//Others
-	private String fileName;	
+	// Others
+	private String fileName;
 	private Resource mResource;
-	public String masterHost;	
-	//Global flags
-	public static final int ROUND_TIME = 1000; // milliseconds
+	public String masterHost;
+	// Global flags
 	public static final int MASTER_PORT = 10001;
 	private static final int MASTER_ID = 0;
-	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		/* GUI */
-		//Set view
+		// Set view
 		setContentView(R.layout.activity_game);
-		//Get elements
-		TextView nameTextView = (TextView) findViewById(R.id.playerName);
-		TextView scoreTextView = (TextView) findViewById(R.id.playerScore);
-		TextView timeLeftTextView = (TextView) findViewById(R.id.timeLeft);
-		TextView numPlayersTextView = (TextView) findViewById(R.id.numberPlayers);
-		//set gui flags
+		// set gui flags
 		this.btnPaused = true;
-		//Set status updater, frame & buttons
-		statusScreenUpdater = new StatusScreenUpdater(nameTextView, scoreTextView, timeLeftTextView,numPlayersTextView, this);
+		// Set status updater, frame & buttons
+		statusScreenUpdater = new StatusScreenUpdater(this);
 		frm = (FrameLayout) findViewById(R.id.frameLayout);
-		setOnClickListenersToButtons();		
-		
+		setOnClickListenersToButtons();
+
 		/* EXTRAS */
-		statusScreenUpdater.setPlayerName(getIntent().getStringExtra("playerName"));
-		isSinglePlayer = getIntent().getBooleanExtra("isLocal", true);
+		String playerName = getIntent().getStringExtra("playerName");
+		statusScreenUpdater.setPlayerName(playerName);
+		boolean isSinglePlayer = getIntent().getBooleanExtra("isLocal", true);
 		isMaster = getIntent().getBooleanExtra("isMaster", true);
 		masterHost = getIntent().getStringExtra("masterIp");
-		fileName = getIntent().getStringExtra("levelName").replace(" ","").toLowerCase(Locale.ENGLISH) + ".dat";
+		fileName = getIntent().getStringExtra("levelName").replace(" ", "")
+				.toLowerCase(Locale.ENGLISH)
+				+ ".dat";
 		// Handle Flags
 		if (isSinglePlayer) {
 			masterNetComp = new NullMasterNetworkComponent();
@@ -114,27 +108,27 @@ public class GameActivity extends ActionBarActivity {
 		} else {
 			masterNetComp = new MasterNetworkComponent();
 			peerNetComp = new PeerNetworkComponent();
-		}	
-		//Load Resources: level & sound
+		}
+		// Load Resources: level & sound
 		AssetManager am = getAssets();
 		try {
 			this.level = LevelLoader.loadLevel(am.open(fileName));
 		} catch (IOException e) {
 			this.level = LevelLoader.loadLevel(null);
-		}	
-		
-		//Panel
-		mGamePanel = new MainGamePanel(this);		
-		//Start game
+		}
+
+		// Panel
+		mGamePanel = new MainGamePanel(this);
+		// Start game
 		game = new Game(mGamePanel.getResource(), level, isSinglePlayer);
 		playerInput = this.game.getPlayerInput();
-		//Network commands
-		mCommands = initCommands();		
-		
+		// Network commands
+		mCommands = initCommands();
+
 		frm.addView(mGamePanel);
 		Log.d(TAG, "View added");
 	}
-	
+
 	/** THREAD handling */
 	public void startThread() {
 		Log.d(TAG, "Thread starts");
@@ -152,11 +146,11 @@ public class GameActivity extends ActionBarActivity {
 			}
 		}
 	}
-	
+
 	public void shutDownThreads() {
-		gameLoopThread.setRunning(false);		
+		gameLoopThread.setRunning(false);
 		shutDown(gameLoopThread);
-		
+
 		Log.d(TAG, "Game loop thread was shut down cleanly");
 
 		if (isMaster && acceptPeersThread != null) {
@@ -170,7 +164,7 @@ public class GameActivity extends ActionBarActivity {
 			}
 		}
 	}
-	
+
 	private void shutDown(Thread thread) {
 		while (true) {
 			try {
@@ -181,7 +175,7 @@ public class GameActivity extends ActionBarActivity {
 			}
 		}
 	}
-	
+
 	public void pauseThread() {
 		gameLoopThread.pause();
 	}
@@ -189,7 +183,7 @@ public class GameActivity extends ActionBarActivity {
 	public void resumeThread() {
 		gameLoopThread.unPause();
 	}
-	
+
 	/** UPDATE handling */
 	public void update(long timePassed) {
 		if (isMaster) {
@@ -199,24 +193,28 @@ public class GameActivity extends ActionBarActivity {
 		}
 		updateStatusScreen();
 	}
-	
+
 	private void updateStatusScreen() {
 		this.statusScreenUpdater.runOnUiThread(new Runnable() {
 			@Override
-			public void run() {	
-				statusScreenUpdater.setPlayerScore((int)game.getPlayerByNumber(game.getPlayerInput().getPlayerId()).getPoints());
-				statusScreenUpdater.setTimeLeft((int)(game.getTimeLeft() / 1000));
+			public void run() {
+				statusScreenUpdater.setPlayerScore((int) game
+						.getPlayerByNumber(game.getPlayerInput().getPlayerId())
+						.getPoints());
+				statusScreenUpdater.setTimeLeft((int) (game.getTimeLeft() / 1000));
 				statusScreenUpdater.setNumPlayers(game.getLeftOpponents());
-				
-				if(game.isFinished() || !game.getPlayerByNumber(game.getPlayerInput().getPlayerId()).isAlive()) {
-					if(mGamePanel.getFinishDialog() == null) {
+
+				if (game.isFinished()
+						|| !game.getPlayerByNumber(
+								game.getPlayerInput().getPlayerId()).isAlive()) {
+					if (mGamePanel.getFinishDialog() == null) {
 						mGamePanel.buildEnddialog();
 					}
-				} 
+				}
 			}
 		});
 	}
-		
+
 	/**
 	 * Receive player inputs from peers and itself and executes them. Then,
 	 * updates game and, finally, sends game updates to peers.
@@ -242,9 +240,9 @@ public class GameActivity extends ActionBarActivity {
 		game.getPlayerInput().setPlayerId(MASTER_ID);
 		cmdRequests = game.getPlayerInput().consumeCommandRequests();
 		CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
-		
+
 		game.update(timePassed);
-		
+
 		cmdRequests = CommandRequestUtil.extractCommandRequests(game);
 		try {
 			masterNetComp.sendCommandRequests(cmdRequests);
@@ -269,7 +267,8 @@ public class GameActivity extends ActionBarActivity {
 			}
 			try {
 				cmdRequests = peerNetComp.receiveCommandRequests();
-				CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
+				CommandRequestUtil.executeCommandRequests(cmdRequests,
+						mCommands);
 			} catch (OptionalDataException e) {
 				Log.e(TAG,
 						"OptionalData peer receive command requests: "
@@ -282,7 +281,7 @@ public class GameActivity extends ActionBarActivity {
 				Log.e(TAG,
 						"IO peer receive command requests: " + e.getMessage());
 			}
-			
+
 		} catch (ClassNotFoundException e) {
 			Log.e(TAG,
 					"ClassNotFound peer new client socket: " + e.getMessage());
@@ -290,7 +289,7 @@ public class GameActivity extends ActionBarActivity {
 			Log.e(TAG, "IO peer new client socket: " + e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * If not yet connected, connects to client and sets player id.
 	 * 
@@ -304,7 +303,7 @@ public class GameActivity extends ActionBarActivity {
 		PlayerInput playerInput = game.getPlayerInput();
 		playerInput.setPlayerId(playerId);
 	}
-	
+
 	/** NETWORK handling */
 	private Map<String, Command> initCommands() {
 		Map<String, Command> commands = new HashMap<String, Command>();
@@ -322,7 +321,7 @@ public class GameActivity extends ActionBarActivity {
 		leftButton = (ImageButton) findViewById(R.id.buttonLeft);
 		leftButton.setOnTouchListener(new OnTouchListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {				
+			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					playerInput.tryMoveLeft();
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -335,7 +334,7 @@ public class GameActivity extends ActionBarActivity {
 		upButton = (ImageButton) findViewById(R.id.buttonUp);
 		upButton.setOnTouchListener(new OnTouchListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {				
+			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					playerInput.tryMoveUp();
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -362,7 +361,7 @@ public class GameActivity extends ActionBarActivity {
 		rightButton = (ImageButton) findViewById(R.id.buttonRight);
 		rightButton.setOnTouchListener(new OnTouchListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {				
+			public boolean onTouch(View v, MotionEvent event) {
 				if (event.getAction() == MotionEvent.ACTION_DOWN) {
 					playerInput.tryMoveRight();
 				} else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -379,15 +378,15 @@ public class GameActivity extends ActionBarActivity {
 				playerInput.placeBomb();
 			}
 		});
-		
+
 		quitButton = (ImageButton) findViewById(R.id.buttonQuit);
 		quitButton.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View v) {				
+			public void onClick(View v) {
 				finish();
 			}
 		});
-		
+
 		pauseButton = (ImageButton) findViewById(R.id.buttonPause);
 		pauseButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -404,24 +403,20 @@ public class GameActivity extends ActionBarActivity {
 			}
 		});
 	}
-	
+
 	/** GETTERS & SETTERS */
-	public boolean isSinglePlayer() {
-		return isSinglePlayer;
-	}
-	
 	public Level getLevel() {
 		return level;
 	}
-	
+
 	public Resource getmResource() {
 		return mResource;
 	}
-	
+
 	public Game getGame() {
 		return game;
 	}
-	
+
 	public MainGamePanel getmGamePanel() {
 		return mGamePanel;
 	}
