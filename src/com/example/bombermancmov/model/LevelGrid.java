@@ -42,7 +42,7 @@ public class LevelGrid {
 	}
 	
 	public static boolean isPlayer(char c) {
-		return (c == '1' || c == '2' || c == '3');
+		return (c == '1' || c == '2' || c == '3' || c == '4');
 	}
 
 	public char[][] getGridLayout() {

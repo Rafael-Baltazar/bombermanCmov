@@ -16,6 +16,7 @@ public class Game {
 	public static final int PLAYER_1 = 0;
 	public static final int PLAYER_2 = 1;
 	public static final int PLAYER_3 = 2;
+	public static final int PLAYER_4 = 3;
 	private static final float PLAYER_SPEED = 3.0f;
 
 	private float gameDuration;
@@ -97,6 +98,14 @@ public class Game {
 							.getMaxNumberPlayers() && !this.isSingleplayer) {
 						mPlayers.add(new Character(
 								mResources.getPlayerBitmap()[PLAYER_3], j, i,
+								PLAYER_SPEED, getLevel().getGrid(), this, true));
+					}
+					break;
+				case '4':
+					if (this.mPlayers.size() < this.mLevel
+							.getMaxNumberPlayers() && !this.isSingleplayer) {
+						mPlayers.add(new Character(
+								mResources.getPlayerBitmap()[PLAYER_4], j, i,
 								PLAYER_SPEED, getLevel().getGrid(), this, true));
 					}
 					break;

@@ -8,11 +8,11 @@ import com.example.bombermancmov.R;
 import com.example.bombermancmov.model.component.SoundComponent;
 
 public class Resource {
-	
+
 	public static final int LEVEL_1 = 1;
 	public static final int LEVEL_2 = 2;
 	public static final int LEVEL_3 = 3;
-	
+
 	private Bitmap wallBitMap;
 	private Bitmap obstacleBitmap;
 	private Bitmap[] bombBitmap;
@@ -96,16 +96,16 @@ public class Resource {
 	 * @see #decodeResources()
 	 */
 	private void decodeWallBitmap() {
-		setWallBitMap(BitmapFactory.decodeResource(getSurfaceView().getResources(),
-				R.drawable.wall_1));
+		setWallBitMap(BitmapFactory.decodeResource(getSurfaceView()
+				.getResources(), R.drawable.wall_1));
 	}
 
 	/**
 	 * @see #decodeResources()
 	 */
 	private void decodeObstacleBitmap() {
-		setObstacleBitmap(BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.obstacle_0));
+		setObstacleBitmap(BitmapFactory.decodeResource(getSurfaceView()
+				.getResources(), R.drawable.obstacle_0));
 	}
 
 	/**
@@ -125,43 +125,71 @@ public class Resource {
 	 * @see #decodeResources()
 	 */
 	private void decodePlayerBitmaps() {
-		setPlayerBitmap(new Bitmap[3][4]);
+		setPlayerBitmap(new Bitmap[4][4]);
 		decodePlayer1Bitmaps();
 		decodePlayer2Bitmaps();
 		decodePlayer3Bitmaps();
+		decodePlayer4Bitmaps();
 	}
 
 	private void decodePlayer1Bitmaps() {
-		getPlayerBitmap()[Game.PLAYER_1][Character.FRONT] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.eevee_front);
-		getPlayerBitmap()[Game.PLAYER_1][Character.LEFT] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.eevee_left);
-		getPlayerBitmap()[Game.PLAYER_1][Character.RIGHT] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.eevee_right);
-		getPlayerBitmap()[Game.PLAYER_1][Character.BACK] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.eevee_back);
+		getPlayerBitmap()[Game.PLAYER_1][Character.FRONT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.eevee_front);
+		getPlayerBitmap()[Game.PLAYER_1][Character.LEFT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.eevee_left);
+		getPlayerBitmap()[Game.PLAYER_1][Character.RIGHT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.eevee_right);
+		getPlayerBitmap()[Game.PLAYER_1][Character.BACK] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.eevee_back);
 	}
 
 	private void decodePlayer2Bitmaps() {
-		getPlayerBitmap()[Game.PLAYER_2][Character.FRONT] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.espeon_front);
-		getPlayerBitmap()[Game.PLAYER_2][Character.LEFT] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.espeon_left);
-		getPlayerBitmap()[Game.PLAYER_2][Character.RIGHT] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.espeon_right);
-		getPlayerBitmap()[Game.PLAYER_2][Character.BACK] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.espeon_back);
+		getPlayerBitmap()[Game.PLAYER_2][Character.FRONT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.espeon_front);
+		getPlayerBitmap()[Game.PLAYER_2][Character.LEFT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.espeon_left);
+		getPlayerBitmap()[Game.PLAYER_2][Character.RIGHT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.espeon_right);
+		getPlayerBitmap()[Game.PLAYER_2][Character.BACK] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.espeon_back);
 	}
 
 	private void decodePlayer3Bitmaps() {
-		getPlayerBitmap()[Game.PLAYER_3][Character.FRONT] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.flareon_front);
-		getPlayerBitmap()[Game.PLAYER_3][Character.LEFT] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.flareon_left);
-		getPlayerBitmap()[Game.PLAYER_3][Character.RIGHT] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.flareon_right);
-		getPlayerBitmap()[Game.PLAYER_3][Character.BACK] = BitmapFactory.decodeResource(
-				getSurfaceView().getResources(), R.drawable.flareon_back);
+		getPlayerBitmap()[Game.PLAYER_3][Character.FRONT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.flareon_front);
+		getPlayerBitmap()[Game.PLAYER_3][Character.LEFT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.flareon_left);
+		getPlayerBitmap()[Game.PLAYER_3][Character.RIGHT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.flareon_right);
+		getPlayerBitmap()[Game.PLAYER_3][Character.BACK] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.flareon_back);
+	}
+
+	private void decodePlayer4Bitmaps() {
+		getPlayerBitmap()[Game.PLAYER_4][Character.FRONT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.umbreon_front);
+		getPlayerBitmap()[Game.PLAYER_4][Character.LEFT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.umbreon_left);
+		getPlayerBitmap()[Game.PLAYER_4][Character.RIGHT] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.umbreon_right);
+		getPlayerBitmap()[Game.PLAYER_4][Character.BACK] = BitmapFactory
+				.decodeResource(getSurfaceView().getResources(),
+						R.drawable.umbreon_back);
 	}
 
 	/**
@@ -181,8 +209,11 @@ public class Resource {
 
 	/**
 	 * Scale bitmaps only once to increase performance.
-	 * @param newWidth the desired new width
-	 * @param newHeight the desired new height
+	 * 
+	 * @param newWidth
+	 *            the desired new width
+	 * @param newHeight
+	 *            the desired new height
 	 */
 	public void scaleResources(int newWidth, int newHeight) {
 		scaleWallBitmap(newWidth, newHeight);
@@ -198,8 +229,8 @@ public class Resource {
 	 * @see #scaleResources(int, int)
 	 */
 	private void scaleWallBitmap(int newWidth, int newHeight) {
-		setWallBitMap(Bitmap.createScaledBitmap(getWallBitMap(), newWidth, newHeight,
-				false));
+		setWallBitMap(Bitmap.createScaledBitmap(getWallBitMap(), newWidth,
+				newHeight, false));
 	}
 
 	/**
@@ -208,8 +239,8 @@ public class Resource {
 	 * @see #scaleResources(int, int)
 	 */
 	private void scaleObstacleBitmap(int newWidth, int newHeight) {
-		setObstacleBitmap(Bitmap.createScaledBitmap(getObstacleBitmap(), newWidth,
-				newHeight, false));
+		setObstacleBitmap(Bitmap.createScaledBitmap(getObstacleBitmap(),
+				newWidth, newHeight, false));
 	}
 
 	/**
