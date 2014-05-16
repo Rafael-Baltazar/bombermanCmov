@@ -47,8 +47,7 @@ public class Game {
 		this.isSingleplayer = isSingleplayer;
 
 		this.mLevel = level;
-		this.gameDuration = 60000; // 1 minute
-
+		this.gameDuration = level.getGameDuration() * 1000; //to ms
 		this.mBombs = new ArrayList<Bomb>();
 
 		mResources = resources;

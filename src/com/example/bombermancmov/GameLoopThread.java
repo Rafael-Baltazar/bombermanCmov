@@ -5,8 +5,6 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
-import com.example.bombermancmov.model.Game;
-
 /**
  * The Main thread which contains the game loop. The thread must have access to
  * the surface view and holder to trigger events every game tick.
