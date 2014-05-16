@@ -3,6 +3,9 @@ package com.example.bombermancmov.wifi.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
+
+import com.example.bombermancmov.model.Bomb;
 import com.example.bombermancmov.model.Game;
 import com.example.bombermancmov.wifi.CommandRequest;
 
@@ -26,7 +29,10 @@ public class UpdateTimeCommand extends Command {
 	public void execute(List<String> args) {
 		float raw = Float.parseFloat(args.get(ARG_TIME_VALUE));
 		int timeLeft = (int) Math.rint(raw);
+		float timePass = mGame.getTimeLeft() - raw;
 		mGame.setTimeLeft(timeLeft);
+		Log.d("TIMEPASS", Float.toString(timePass));
+		mGame.updatePeerBombs((long)Math.rint(timePass));
 	}
 	
 	public static CommandRequest extractCommandRequest(Game game) {

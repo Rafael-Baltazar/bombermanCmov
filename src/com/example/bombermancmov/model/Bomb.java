@@ -61,6 +61,24 @@ public class Bomb extends GameObject {
 			drawableComponent.draw(canvas);
 		}
 	}
+	
+	public float updateInPeed(long timePassed) {
+		timeToExplode -= timePassed;
+		if (timeToExplode > TIME_TO_NEARLY) {
+			drawableComponent.setActiveBitmapIndex(NORMAL);
+		} else if (timeToExplode > 0) {
+			drawableComponent.setActiveBitmapIndex(NEARLY);
+		} else if (timeToExplode > -explosionDuration) {
+			Log.d("Bomb", timeToExplode + " : " + -explosionDuration);
+			if(actRange == null) {
+				initActRange();
+				explode();
+			}
+			drawableComponent.setActiveBitmapIndex(EXPLODING);
+			isExploding = true;
+		}
+		return timeToExplode;
+	}
 
 	public float update(long timePassed) {
 		timeToExplode -= timePassed;

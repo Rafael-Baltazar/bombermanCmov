@@ -40,6 +40,9 @@ public class Game {
 	
 	private List<Bomb> newPlacedBombs;
 	private boolean containsNewBombs;
+	
+	private List<Bomb> explodedBombs;
+	
 
 	private Resource mResources;
 
@@ -55,6 +58,7 @@ public class Game {
 		this.gameDuration = level.getGameDuration() * 1000; //to ms
 		this.mBombs = new ArrayList<Bomb>();
 		this.newPlacedBombs = new ArrayList<Bomb>();
+		this.explodedBombs= new ArrayList<Bomb>();
 
 		mResources = resources;
 		if (this.isSingleplayer) {
@@ -222,6 +226,16 @@ public class Game {
 			}
 		}
 	}
+	public void updatePeerBombs(long timePassed){
+		List<Bomb> bombsToRemove = new ArrayList<Bomb>();
+		for (Bomb b : mBombs) {
+			float t = b.updateInPeed(timePassed);
+			if (t < -b.getExplosionDuration()) {
+				bombsToRemove.add(b);
+			}
+		}
+		mBombs.removeAll(bombsToRemove);
+	}
 
 	public void update(long timePassed) {
 		gameDuration -= timePassed;
@@ -237,6 +251,7 @@ public class Game {
 				bombsToRemove.add(b);
 			}
 		}
+		explodedBombs.addAll(bombsToRemove);
 		mBombs.removeAll(bombsToRemove);
 		for (Droid d : mDroids) {
 			d.updateDroid(timePassed);
@@ -244,7 +259,18 @@ public class Game {
 		}
 		checkGameFinish();
 	}
-
+	public List<Bomb> getBombs(){
+		return mBombs;
+	}
+	public List<Bomb> getExplodedBombs(){
+		List<Bomb> retList = new ArrayList<Bomb>();
+		retList.addAll(explodedBombs);
+		explodedBombs.clear();
+		return retList;
+	}
+	public boolean hasExplodedBombs(){
+		return !explodedBombs.isEmpty();
+	}
 	private void checkGameFinish() {
 		//Singleplayer-Ending: You win if all droids are destroyed
 		//					   You loose, if time is over
