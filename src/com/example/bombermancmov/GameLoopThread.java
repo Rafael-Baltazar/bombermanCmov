@@ -61,7 +61,7 @@ public class GameLoopThread extends Thread {
 		while (!gamePanel.getGame().isFinished() && running) {
 			if((SystemClock.uptimeMillis() - oldTime) > this.roundTime) {
 				if(!this.game.nextRound()) {
-					break;
+					this.setRunning(false);
 				}
 				oldTime = SystemClock.uptimeMillis();
 			}	
