@@ -23,12 +23,20 @@ public class DroidMovementCommand extends Command {
 	@Override
 	public void execute(List<String> args) {
 		List<Droid> droids = mGame.getDroids();
+		List<Droid> toRemove = new ArrayList<Droid>();
 		int argIndex = 0;
 		for(Droid d : droids) {
-			float x = Float.parseFloat(args.get(argIndex++));
-			float y = Float.parseFloat(args.get(argIndex++));
-			d.setX(x);
-			d.setY(y);
+			if(argIndex < args.size()){
+				float x = Float.parseFloat(args.get(argIndex++));
+				float y = Float.parseFloat(args.get(argIndex++));
+				d.setX(x);
+				d.setY(y);
+			}else {
+				toRemove.add(d);
+			}
+		}
+		for(Droid d : toRemove){
+			droids.remove(d);
 		}
 	}
 	

@@ -24,10 +24,8 @@ public class PlaceBombCommand extends Command {
 	@Override
 	public void execute(List<String> args) {
 		int playerId = Integer.parseInt(args.get(ARG_PLAYER_ID));
-		
 		int bombX = (int) Math.rint(mGame.getPlayerByNumber(playerId).getX());
 		int bombY = (int) Math.rint(mGame.getPlayerByNumber(playerId).getY());
-		
 		mGame.placeBomb(playerId, bombX, bombY);
 	}
 

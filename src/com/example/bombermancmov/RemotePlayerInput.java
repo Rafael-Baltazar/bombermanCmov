@@ -80,12 +80,7 @@ public class RemotePlayerInput extends PlayerInput {
 			return;
 		}
 		List<String> args = new ArrayList<String>();
-		Character player = mGame.getPlayerByNumber(mPlayerId);
-		int x = (int) Math.rint(player.getX());
-		int y = (int) Math.rint(player.getY());
 		args.add(String.valueOf(mPlayerId));
-		args.add(String.valueOf(x));
-		args.add(String.valueOf(y));
 		bombPlacement = new CommandRequest(PlaceBombCommand.CODE, args);
 	}
 
