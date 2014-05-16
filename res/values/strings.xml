@@ -18,7 +18,7 @@
     <string name="display_time_left">Time left:</string>
     <string name="display_player_name">Name:</string>
     <string name="display_player_score">Score:</string>
-    <string name="display_num_players">Enemys left:</string>
+    <string name="display_num_enemies_left">Enemies left:</string>
     <string name="hint_player_name">Insert a nickname here</string>
     <string name="background_main_menu_description">Bomberman front view</string>
     <string name="title_activity_server">ServerActivity</string>

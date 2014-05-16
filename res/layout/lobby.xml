@@ -1,24 +1,31 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center_vertical"
     android:orientation="vertical" >
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:onClick="newMultiPlayerGame"
         android:text="@string/btn_multi" />
 
     <EditText
         android:id="@+id/edit_ip_connect"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="@string/hint_ip" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:onClick="connect"
         android:text="@string/btn_connect" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="exit"
+        android:text="@string/btn_exit" />
 
 </LinearLayout>

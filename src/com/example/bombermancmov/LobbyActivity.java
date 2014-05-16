@@ -61,5 +61,9 @@ public class LobbyActivity extends ActionBarActivity {
 	public void connect(View v) {
 		joinGame(false);
 	}
+	
+	public void exit(View v) {
+		finish();
+	}
 
 }
