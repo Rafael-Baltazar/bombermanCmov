@@ -65,6 +65,8 @@ public class MainGamePanel extends SurfaceView implements
 	private boolean isMaster;
 
 	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
+	
+	AlertDialog finishDialog;
 
 	/**
 	 * Constructor.
@@ -89,6 +91,8 @@ public class MainGamePanel extends SurfaceView implements
 		// create level
 		mResource = new Resource(this);
 		mResource.setExplosionSoundComponent(new SoundComponent(this));
+		
+		this.finishDialog = null;
 
 		// TODO more flags bleh dX
 		this.isMaster = isMaster;
@@ -224,9 +228,6 @@ public class MainGamePanel extends SurfaceView implements
 			updateAsPeer();
 		}
 		updateStatusScreen();
-		if(game.isFinished()) {
-			buildEnddialog();
-		}
 	}
 
 	/**
@@ -325,17 +326,17 @@ public class MainGamePanel extends SurfaceView implements
 				mStatusScreenUpdater.setTimeLeft((int)(game.getTimeLeft() / 1000));
 				mStatusScreenUpdater.setNumPlayers(game.getLeftOpponents());
 				
-				if(game.isFinished()) {
-					buildEnddialog();
-				}
+				if(game.isFinished() || !game.getPlayerByNumber(game.getPlayerInput().getPlayerId()).isAlive()) {
+					if(finishDialog == null) {
+						buildEnddialog();
+					}
+				} 
 			}
 		});
 	}
 
 	// Enddialog for finishing a game
 	public void buildEnddialog() {
-		//invalidate();
-		// game complete
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		builder.setCancelable(false);
 		
@@ -376,8 +377,9 @@ public class MainGamePanel extends SurfaceView implements
 				}
 			}
 		});
-		AlertDialog finishDialog = builder.create();
-		finishDialog.show();
+		
+		this.finishDialog = builder.create();
+		this.finishDialog.show();		
 	}
 
 	public void drawGameModel(Canvas canvas) {

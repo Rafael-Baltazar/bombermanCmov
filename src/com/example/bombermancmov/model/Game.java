@@ -219,24 +219,29 @@ public class Game {
 	}
 
 	private void checkGameFinish() {
-		int playersAlive = 0;
-		for (Character c : mPlayers) {
-			if (c.isAlive()) {
-				playersAlive++;
-			}
-		}
-		if (gameDuration <= 0 || playersAlive < 1
-				|| (playersAlive == 1 && this.mDroids.size() == 0)) {
+		//Singleplayer-Ending: You win if all droids are destroyed
+		//					   You loose, if time is over
+		//								  you are killed by a droid
+		//Multiplayer-Endig:   You win if no opponents are left
+		//					   You loose, if time is over
+		//								  you are killed by anyone		
+		if(this.getLeftOpponents() == 0) {
 			this.finished = true;
-			int playerId = mPlayerInput.getPlayerId();
-
-			if (this.mDroids.size() == 0
-					&& this.mPlayers.get(playerId).isAlive()) {
-				this.endStatus = WIN;
-			} else if (!this.mPlayers.get(playerId).isAlive()) {
-				this.endStatus = LOST_KILLED;
-			} else if (gameDuration <= 0) {
-				this.endStatus = LOST_TIMEOVER;
+			this.endStatus = WIN;
+		} else {
+			if(this.gameDuration <= 0) {
+				this.finished = true;
+				this.endStatus = LOST_TIMEOVER; 
+			} else {
+				if(this.mPlayers.size() > 1 && !this.getPlayerByNumber(this.getPlayerInput().getPlayerId()).isAlive()) {
+					this.finished = false;
+					this.endStatus = LOST_KILLED;
+				} else {
+					if(this.mPlayers.size() == 1 && !this.getPlayerByNumber(this.getPlayerInput().getPlayerId()).isAlive()) {
+						this.finished = true;
+						this.endStatus = LOST_KILLED;
+					}
+				}
 			}
 		}
 	}

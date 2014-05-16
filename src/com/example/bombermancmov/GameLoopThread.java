@@ -86,6 +86,7 @@ public class GameLoopThread extends Thread {
 				Log.d(TAG, "Interrupted sleep");
 			}
 		}
+		this.gamePanel.update(0);
 	}
 
 	public void unPause() {
