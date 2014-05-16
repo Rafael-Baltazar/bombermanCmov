@@ -29,7 +29,7 @@
     <string name="title_activity_lobby">LobbyActivity</string>
     <string name="hint_ip">Master Ip</string>
     <string name="btn_connect">Connect</string>
-    <string name="finished_title_win">You won! All droids killed</string>
+    <string name="finished_title_win">You won! All enemys killed</string>
     <string name="finished_title_lost_killed">You lost! R.I.P</string>
     <string name="finished_title_lost_time">You lost! Time is over</string>
     <string name="finished_title_lost_unkown">You lost! Unknown?</string>
