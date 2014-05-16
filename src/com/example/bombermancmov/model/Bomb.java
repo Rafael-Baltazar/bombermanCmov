@@ -1,6 +1,5 @@
 package com.example.bombermancmov.model;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.util.Log;
@@ -18,12 +17,15 @@ public class Bomb extends GameObject {
 	public static final int NEARLY = 1;
 	public static final int EXPLODING = 2;
 
+	private static final float TIME_TO_NEARLY = 700;
 	private LevelGrid level;
+	private Game game;
 	private Character owner;
 	private int timeToExplode;
+	private float explosionDuration;
 	private float range;
 	private boolean isExploding;
-	private int actRange[];
+	private int actRange[] = null;
 	// Explosion sound
 	private SoundComponent mSoundComponent;
 
@@ -34,19 +36,14 @@ public class Bomb extends GameObject {
 		return range;
 	}
 
-	public Bomb(Bitmap[] bitmaps, Character owner, float x, float y, int time, float range,
-			LevelGrid grid, SoundComponent soundComponent) {
+	public Bomb(Bitmap[] bitmaps, Character owner, float x, float y, Game game,
+			SoundComponent soundComponent) {
 		super(x, y);
-		int intx = (int) Math.rint(x);
-		int inty = (int) Math.rint(y);
-		this.actRange = new int[4];
-		actRange[RANGE_UP] = inty;
-		actRange[RANGE_DOWN] = inty;
-		actRange[RANGE_LEFT] = intx;
-		actRange[RANGE_RIGHT] = intx;
-		this.timeToExplode = time;
-		this.level = grid;
-		this.range = range;
+		this.timeToExplode = game.getLevel().getExplosionTimeout() * 1000;
+		this.explosionDuration = game.getLevel().getExplosionDuration() * 1000;
+		this.level = game.getLevel().getGrid();
+		this.range = game.getLevel().getExplosionRange();
+		this.game = game;
 		this.isExploding = false;
 		this.owner = owner;
 		// Explosion Sound load
@@ -63,16 +60,33 @@ public class Bomb extends GameObject {
 		}
 	}
 
-	public float tick() {
-		if (timeToExplode > 1) {
+	public float update(long timePassed) {
+		timeToExplode -= timePassed;
+		if (timeToExplode > TIME_TO_NEARLY) {
 			drawableComponent.setActiveBitmapIndex(NORMAL);
-		} else if (timeToExplode == 1) {
+		} else if (timeToExplode > 0) {
 			drawableComponent.setActiveBitmapIndex(NEARLY);
-		} else {
+		} else if (timeToExplode > -explosionDuration) {
+			Log.d("Bomb", timeToExplode + " : " + -explosionDuration);
+			if(actRange == null) {
+				initActRange();
+				explode();
+				game.explosionCollision(this, actRange);
+			}
 			drawableComponent.setActiveBitmapIndex(EXPLODING);
 			isExploding = true;
 		}
-		return timeToExplode--;
+		return timeToExplode;
+	}
+
+	private void initActRange() {
+		int intx = (int) Math.rint(getX());
+		int inty = (int) Math.rint(getY());
+		this.actRange = new int[4];
+		actRange[RANGE_UP] = inty;
+		actRange[RANGE_DOWN] = inty;
+		actRange[RANGE_LEFT] = intx;
+		actRange[RANGE_RIGHT] = intx;
 	}
 
 	/**
@@ -81,10 +95,9 @@ public class Bomb extends GameObject {
 	 * certain direction, when encountering a wall or an obstacle. Note: Updates
 	 * actRange field.
 	 * 
-	 * @param context
 	 * @return the actRange
 	 */
-	public int[] explode(Context context) {
+	public int[] explode() {
 		mSoundComponent.play();
 
 		Log.d("BOMB", "Draw explosion in X: " + getX() + " Y: " + getY());
@@ -161,8 +174,13 @@ public class Bomb extends GameObject {
 		isExploding = true;
 		return actRange;
 	}
-	
+
 	public Character getOwner() {
 		return owner;
 	}
+
+	public float getExplosionDuration() {
+		return explosionDuration;
+	}
+
 }

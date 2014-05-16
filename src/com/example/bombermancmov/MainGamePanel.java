@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -64,6 +65,7 @@ public class MainGamePanel extends SurfaceView implements
 	private Game game;
 	private Resource mResource;
 	private boolean isMaster;
+	private long oldTime = SystemClock.uptimeMillis();
 
 	private StatusScreenUpdater mStatusScreenUpdater; // HORRIBLE HACK!
 
@@ -131,7 +133,7 @@ public class MainGamePanel extends SurfaceView implements
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.d(TAG, "Surface is being created");
 		// create & start the game loop thread
-		gameLoopThread = new GameLoopThread(surfaceHolder, this);
+		gameLoopThread = new GameLoopThread(this);
 		gameLoopThread.start();
 		// create master thread
 		if (isMaster) {
@@ -216,11 +218,6 @@ public class MainGamePanel extends SurfaceView implements
 		}
 	}
 
-	/**
-	 * Used to progress game.
-	 * 
-	 * @param timePassed
-	 */
 	public void update(long timePassed) {
 		if (isMaster) {
 			updateAsMaster(timePassed);
@@ -228,11 +225,14 @@ public class MainGamePanel extends SurfaceView implements
 			updateAsPeer();
 		}
 		updateStatusScreen();
+		if(game.isFinished()) {
+			buildEnddialog();
+		}
 	}
 
 	/**
-	 * Receive player inputs from peers and executes them. Then, updates game
-	 * and, finally, sends game updates to peers.
+	 * Receive player inputs from peers and itself and executes them. Then,
+	 * updates game and, finally, sends game updates to peers.
 	 * 
 	 * @param timePassed
 	 */
@@ -255,7 +255,9 @@ public class MainGamePanel extends SurfaceView implements
 		game.getPlayerInput().setPlayerId(MASTER_ID);
 		cmdRequests = game.getPlayerInput().consumeCommandRequests();
 		CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
+		
 		game.update(timePassed);
+		
 		cmdRequests = CommandRequestUtil.extractCommandRequests(game);
 		try {
 			masterNetComp.sendCommandRequests(cmdRequests);
@@ -280,6 +282,7 @@ public class MainGamePanel extends SurfaceView implements
 			}
 			try {
 				cmdRequests = peerNetComp.receiveCommandRequests();
+				CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
 			} catch (OptionalDataException e) {
 				Log.e(TAG,
 						"OptionalData peer receive command requests: "
@@ -292,7 +295,7 @@ public class MainGamePanel extends SurfaceView implements
 				Log.e(TAG,
 						"IO peer receive command requests: " + e.getMessage());
 			}
-			CommandRequestUtil.executeCommandRequests(cmdRequests, mCommands);
+			
 		} catch (ClassNotFoundException e) {
 			Log.e(TAG,
 					"ClassNotFound peer new client socket: " + e.getMessage());
@@ -318,20 +321,21 @@ public class MainGamePanel extends SurfaceView implements
 	private void updateStatusScreen() {
 		mStatusScreenUpdater.runOnUiThread(new Runnable() {
 			@Override
-			public void run() {			
-				mStatusScreenUpdater.setPlayerScore((int)game.getPlayerByNumber(0).getPoints());
-				mStatusScreenUpdater.setTimeLeft((int)(game.getTimeLeft() / 1000));
-				mStatusScreenUpdater.setNumPlayers(game.getLeftOpponents());				
-				if(game.isFinished()) {
+			public void run() {
+				mStatusScreenUpdater.setPlayerScore((int) game
+						.getPlayerByNumber(0).getPoints());
+				mStatusScreenUpdater.setTimeLeft((int) (game.getTimeLeft() / 1000));
+				mStatusScreenUpdater.setNumPlayers(game.getLeftOpponents());
+				if (game.isFinished()) {
 					buildEnddialog();
 				}
 			}
 		});
 	}
-	
+
 	@Override
 	public boolean onTouchEvent(MotionEvent me) {
-		if(game.isFinished()) {
+		if (game.isFinished()) {
 			buildEnddialog();
 		}
 		return true;
@@ -384,7 +388,7 @@ public class MainGamePanel extends SurfaceView implements
 		finishDialog.show();
 	}
 
-	public void drawGameModel(Canvas canvas) {	
+	public void drawGameModel(Canvas canvas) {
 		canvas.drawColor(Color.WHITE);
 		game.draw(canvas);
 	}

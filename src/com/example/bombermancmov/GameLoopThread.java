@@ -20,10 +20,6 @@ public class GameLoopThread extends Thread {
 	/** The actual view that handles inputs and draws to the surface. */
 	private MainGamePanel gamePanel;
 	
-	/** the game & round time */
-	private Game game;
-	private int roundTime;
-
 	/** Flag to hold game state */
 	private boolean running;
 
@@ -39,12 +35,10 @@ public class GameLoopThread extends Thread {
 	/** The duration of a frame in milliseconds. */
 	private long frameDuration = 1000 / maxFps;
 
-	public GameLoopThread(SurfaceHolder surfaceHolder, MainGamePanel gamePanel) {
+	public GameLoopThread(MainGamePanel gamePanel) {
 		super();
-		this.surfaceHolder = surfaceHolder;
+		this.surfaceHolder = gamePanel.getHolder();
 		this.gamePanel = gamePanel;
-		this.game = gamePanel.getGame();
-		this.roundTime = MainGamePanel.ROUND_TIME;
 		this.running = true; //for shutdowns
 	}
 
@@ -55,17 +49,9 @@ public class GameLoopThread extends Thread {
 	 */
 	@Override
 	public void run() {
-		long beginTime, timeDiff, oldTime;		
-		oldTime = SystemClock.uptimeMillis();
+		long beginTime, timeDiff;		
 		
 		while (!gamePanel.getGame().isFinished() && running) {
-			if((SystemClock.uptimeMillis() - oldTime) > this.roundTime) {
-				if(!this.game.nextRound()) {
-					break;
-				}
-				oldTime = SystemClock.uptimeMillis();
-			}	
-			
 			// draw step
 			Canvas canvas = null;
 			try {

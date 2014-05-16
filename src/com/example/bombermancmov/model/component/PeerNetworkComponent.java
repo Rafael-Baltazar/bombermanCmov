@@ -38,6 +38,7 @@ public class PeerNetworkComponent extends NetworkComponent {
 		os.flush();
 		ObjectInputStream is = new ObjectInputStream(client.getInputStream());
 		mMaster = new Peer(client, os, is);
+		
 		Integer request = mPlayerId;
 		os.writeObject(request);
 		mPlayerId = (Integer) is.readObject();
