@@ -21,6 +21,7 @@ public class Bomb extends GameObject {
 	private LevelGrid level;
 	private Game game;
 	private Character owner;
+	private int ownerId;
 	private int timeToExplode;
 	private float explosionDuration;
 	private float range;
@@ -36,7 +37,7 @@ public class Bomb extends GameObject {
 		return range;
 	}
 
-	public Bomb(Bitmap[] bitmaps, Character owner, float x, float y, Game game,
+	public Bomb(Bitmap[] bitmaps, Character owner, int ownerId, float x, float y, Game game,
 			SoundComponent soundComponent) {
 		super(x, y);
 		this.timeToExplode = game.getLevel().getExplosionTimeout() * 1000;
@@ -46,6 +47,7 @@ public class Bomb extends GameObject {
 		this.game = game;
 		this.isExploding = false;
 		this.owner = owner;
+		this.ownerId = ownerId;
 		// Explosion Sound load
 		mSoundComponent = soundComponent;
 		drawableComponent = new DrawableExplosionComponent(this, bitmaps,
@@ -181,6 +183,9 @@ public class Bomb extends GameObject {
 
 	public float getExplosionDuration() {
 		return explosionDuration;
+	}
+	public int getOwnerId(){
+		return ownerId;
 	}
 
 }

@@ -34,6 +34,7 @@ import com.example.bombermancmov.wifi.commands.NopCommand;
 import com.example.bombermancmov.wifi.commands.PlaceBombCommand;
 import com.example.bombermancmov.wifi.commands.TryMoveCommand;
 import com.example.bombermancmov.wifi.commands.TryStopCommand;
+import com.example.bombermancmov.wifi.commands.UpdateTimeCommand;
 
 /**
  * This is the main surface that handles the on-touch events and draws the image
@@ -115,6 +116,7 @@ public class MainGamePanel extends SurfaceView implements
 		commands.put(TryStopCommand.CODE, new TryStopCommand(game));
 		commands.put(PlaceBombCommand.CODE, new PlaceBombCommand(game));
 		commands.put(DroidMovementCommand.CODE, new DroidMovementCommand(game));
+		commands.put(UpdateTimeCommand.CODE, new UpdateTimeCommand(game));
 		return commands;
 	}
 

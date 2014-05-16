@@ -8,6 +8,8 @@ import com.example.bombermancmov.model.Droid;
 import com.example.bombermancmov.model.Game;
 import com.example.bombermancmov.wifi.commands.Command;
 import com.example.bombermancmov.wifi.commands.DroidMovementCommand;
+import com.example.bombermancmov.wifi.commands.PlaceBombCommand;
+import com.example.bombermancmov.wifi.commands.UpdateTimeCommand;
 
 /**
  * Utility methods to translate command requests from a string, code command
@@ -93,9 +95,22 @@ public class CommandRequestUtil {
 	 */
 	public static List<CommandRequest> extractCommandRequests(Game game) {
 		List<CommandRequest> commandRequests = new ArrayList<CommandRequest>();
+		
 		CommandRequest droidMovCmdReq = DroidMovementCommand
 				.extractCommandRequest(game);
 		commandRequests.add(droidMovCmdReq);
+		
+		CommandRequest updateTimeCmdReq = UpdateTimeCommand
+				.extractCommandRequest(game);
+		commandRequests.add(updateTimeCmdReq);
+		
+		if(game.hasNewBombs()){
+			CommandRequest placeBombCmdReq = PlaceBombCommand
+					.extractCommandRequest(game);
+			commandRequests.add(placeBombCmdReq);
+		}
+		
+		
 		return commandRequests;
 	}
 

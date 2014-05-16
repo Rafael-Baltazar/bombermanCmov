@@ -36,6 +36,9 @@ public class Game {
 	private List<Character> mPlayers;
 	private List<Droid> mDroids;
 	private List<Bomb> mBombs;
+	
+	private List<Bomb> newPlacedBombs;
+	private boolean containsNewBombs;
 
 	private Resource mResources;
 
@@ -43,12 +46,14 @@ public class Game {
 		super();
 		this.finished = false;
 		this.endStatus = NOT_ENDED;
+		this.containsNewBombs = false;
 
 		this.isSingleplayer = isSingleplayer;
 
 		this.mLevel = level;
 		this.gameDuration = level.getGameDuration() * 1000; //to ms
 		this.mBombs = new ArrayList<Bomb>();
+		this.newPlacedBombs = new ArrayList<Bomb>();
 
 		mResources = resources;
 		if (this.isSingleplayer) {
@@ -124,9 +129,22 @@ public class Game {
 	}
 
 	public void placeBomb(int id, int x, int y) {
-		Bomb b = new Bomb(mResources.getBombBitmap(), getPlayerByNumber(id), x,
+		Bomb b = new Bomb(mResources.getBombBitmap(), getPlayerByNumber(id), id,x,
 				y, this, mResources.getExplosionSoundComponent());
 		mBombs.add(b);
+		newPlacedBombs.add(b);
+		containsNewBombs = true;
+	}
+	public boolean hasNewBombs(){
+		return containsNewBombs;
+	}
+	
+	public List<Bomb> getNewBombs(){
+		List<Bomb> retList = new ArrayList<Bomb>();
+		retList.addAll(newPlacedBombs);
+		newPlacedBombs.clear();
+		containsNewBombs = false;
+		return retList;
 	}
 
 	/**
@@ -294,6 +312,9 @@ public class Game {
 	 */
 	public float getTimeLeft() {
 		return gameDuration;
+	}
+	public void setTimeLeft(int timeLeft){
+		this.gameDuration = timeLeft;
 	}
 
 	public Bitmap getWallBitMap() {
