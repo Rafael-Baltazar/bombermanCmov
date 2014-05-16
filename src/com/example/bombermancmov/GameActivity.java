@@ -87,14 +87,12 @@ public class GameActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_game);
 		// set gui flags
 		this.btnPaused = true;
-		// Set status updater, frame & buttons
-		statusScreenUpdater = new StatusScreenUpdater(this);
+		// Set status, frame & buttons
+		initStatusScreenUpdater();
 		frm = (FrameLayout) findViewById(R.id.frameLayout);
 		setOnClickListenersToButtons();
 
 		/* EXTRAS */
-		String playerName = getIntent().getStringExtra("playerName");
-		statusScreenUpdater.setPlayerName(playerName);
 		boolean isSinglePlayer = getIntent().getBooleanExtra("isLocal", true);
 		isMaster = getIntent().getBooleanExtra("isMaster", true);
 		masterHost = getIntent().getStringExtra("masterIp");
@@ -116,7 +114,6 @@ public class GameActivity extends ActionBarActivity {
 		} catch (IOException e) {
 			this.level = LevelLoader.loadLevel(null);
 		}
-
 		// Panel
 		mGamePanel = new MainGamePanel(this);
 		// Start game
@@ -129,8 +126,24 @@ public class GameActivity extends ActionBarActivity {
 		Log.d(TAG, "View added");
 	}
 
+	private void initStatusScreenUpdater() {
+		statusScreenUpdater = new StatusScreenUpdater(this);
+		String playerName = getIntent().getStringExtra("playerName");
+		statusScreenUpdater.setPlayerName(playerName);
+	}
+
+	@Override
+	protected void onDestroy() {
+		try {
+			masterNetComp.close();
+		} catch (IOException e) {
+			Log.e(TAG, "IO closing all sockets: " + e.getMessage());
+		}
+		super.onDestroy();
+	}
+
 	/** THREAD handling */
-	public void startThread() {
+	public void startThreads() {
 		Log.d(TAG, "Thread starts");
 		// create & start the game loop thread
 		gameLoopThread = new GameLoopThread(this);
@@ -171,7 +184,7 @@ public class GameActivity extends ActionBarActivity {
 				thread.join();
 				break;
 			} catch (InterruptedException e) {
-				Log.d(TAG, "Surface destroyed: " + e.getMessage());
+				Log.e(TAG, "Surface destroyed: " + e.getMessage());
 			}
 		}
 	}
