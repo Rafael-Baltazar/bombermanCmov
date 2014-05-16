@@ -14,9 +14,6 @@ public class GameLoopThread extends Thread {
 
 	/** Surface holder that can access the physical surface. */
 	private SurfaceHolder surfaceHolder;
-
-	/** The actual view that handles inputs and draws to the surface. */
-	private MainGamePanel gamePanel;
 	
 	/** Flag to hold game state */
 	private boolean running;
@@ -32,11 +29,13 @@ public class GameLoopThread extends Thread {
 
 	/** The duration of a frame in milliseconds. */
 	private long frameDuration = 1000 / maxFps;
+	
+	private GameActivity activity;
 
-	public GameLoopThread(MainGamePanel gamePanel) {
+	public GameLoopThread(GameActivity activity) {
 		super();
-		this.surfaceHolder = gamePanel.getHolder();
-		this.gamePanel = gamePanel;
+		this.activity = activity;
+		this.surfaceHolder = this.activity.getmGamePanel().getHolder();
 		this.running = true; //for shutdowns
 	}
 
@@ -49,7 +48,7 @@ public class GameLoopThread extends Thread {
 	public void run() {
 		long beginTime, timeDiff;		
 		
-		while (!gamePanel.getGame().isFinished() && running) {
+		while (!this.activity.getGame().isFinished() && running) {
 			// draw step
 			Canvas canvas = null;
 			try {
@@ -62,8 +61,8 @@ public class GameLoopThread extends Thread {
 					// render state to the screen
 					// draws the canvas on the panel
 					if (canvas != null && frameDuration > 0) {
-						this.gamePanel.update(frameDuration);
-						this.gamePanel.drawGameModel(canvas);
+						this.activity.update(frameDuration);
+						this.activity.getmGamePanel().drawGameModel(canvas);
 					}
 				}
 			} finally {
@@ -86,7 +85,7 @@ public class GameLoopThread extends Thread {
 				Log.d(TAG, "Interrupted sleep");
 			}
 		}
-		this.gamePanel.update(0);
+		this.activity.update(0);
 	}
 
 	public void unPause() {
